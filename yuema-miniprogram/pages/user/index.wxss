@@ -1,0 +1,193 @@
+/* ========================================
+   个人中心 - SOLO 深色风格
+   ======================================== */
+
+/* 顶部卡片 */
+.profile-hero {
+  position: relative;
+  border-radius: 28rpx;
+  overflow: hidden;
+  margin-bottom: 32rpx;
+}
+
+.profile-hero-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, #6C5CE7 0%, #a855f7 50%, #c084fc 100%);
+  opacity: 0.9;
+}
+
+.profile-hero-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48rpx 32rpx 32rpx;
+}
+
+.profile-avatar-wrap {
+  position: relative;
+  margin-bottom: 20rpx;
+}
+
+.profile-avatar {
+  width: 128rpx;
+  height: 128rpx;
+  border-radius: 50%;
+  border: 4rpx solid rgba(255, 255, 255, 0.3);
+}
+
+.profile-level-ring {
+  position: absolute;
+  bottom: -4rpx;
+  right: -4rpx;
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 50%;
+  background: #0f0f0f;
+  border: 3rpx solid #a78bfa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-level-text {
+  font-size: 16rpx;
+  color: #a78bfa;
+  font-weight: 700;
+}
+
+.profile-name {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 6rpx;
+}
+
+.profile-title {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 400;
+}
+
+/* 统计行 */
+.profile-stats-row {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 28rpx 0;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.profile-stat {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-num {
+  font-size: 36rpx;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 4rpx;
+}
+
+.stat-desc {
+  font-size: 22rpx;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.stat-divider {
+  width: 1rpx;
+  height: 48rpx;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* 菜单组 */
+.menu-group {
+  background: #1a1a1a;
+  border-radius: 24rpx;
+  margin-bottom: 24rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.06);
+  overflow: hidden;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  padding: 28rpx 32rpx;
+  border-bottom: 1rpx solid rgba(255, 255, 255, 0.04);
+  transition: background 0.15s ease;
+}
+
+.menu-item:last-child {
+  border-bottom: none;
+}
+
+.menu-item:active {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.menu-icon-wrap {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 14rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 20rpx;
+  font-size: 28rpx;
+}
+
+.icon-game { background: rgba(108, 92, 231, 0.15); }
+.icon-chart { background: rgba(52, 211, 153, 0.15); }
+.icon-friends { background: rgba(59, 130, 246, 0.15); }
+.icon-order { background: rgba(251, 191, 36, 0.15); }
+.icon-edit { background: rgba(168, 85, 247, 0.15); }
+.icon-phone { background: rgba(14, 165, 233, 0.15); }
+.icon-about { background: rgba(255, 255, 255, 0.08); }
+
+.menu-item-text {
+  flex: 1;
+  font-size: 28rpx;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 500;
+}
+
+.menu-item-status {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.3);
+  margin-right: 12rpx;
+}
+
+.menu-arrow {
+  font-size: 32rpx;
+  color: rgba(255, 255, 255, 0.15);
+  font-weight: 300;
+}
+
+/* 退出登录 */
+.logout-area {
+  padding: 24rpx;
+}
+
+.logout-btn {
+  width: 100%;
+  height: 96rpx;
+  line-height: 96rpx;
+  text-align: center;
+  background: rgba(248, 113, 113, 0.08);
+  color: #f87171;
+  border-radius: 48rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  border: 1rpx solid rgba(248, 113, 113, 0.15);
+}
+
+.logout-btn::after {
+  border: none;
+}

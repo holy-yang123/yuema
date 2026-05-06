@@ -1,0 +1,89 @@
+<view class="container">
+  <!-- 头部信息 -->
+  <view class="score-header">
+    <view class="score-header-top">
+      <text class="score-round-label">记录第 {{roundNo}} 局</text>
+      <text class="score-header-hint">填写各玩家得分</text>
+    </view>
+  </view>
+
+  <!-- 胡牌方式选择 -->
+  <view class="card">
+    <text class="card-label">胡牌方式</text>
+    <view class="type-chips">
+      <view class="type-chip {{scoreType === item.value ? 'chip-active' : ''}}" 
+            wx:for="{{scoreTypes}}" 
+            wx:key="value"
+            bindtap="selectScoreType"
+            data-value="{{item.value}}">
+        {{item.label}}
+      </view>
+    </view>
+  </view>
+
+  <!-- 玩家分数录入 -->
+  <view class="card">
+    <text class="card-label">玩家得分</text>
+    <view class="player-score-list">
+      <view class="player-score-item" wx:for="{{players}}" wx:key="userId">
+        <view class="player-score-left">
+          <view class="player-score-avatar">
+            <image src="{{item.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"/>
+          </view>
+          <text class="player-score-name">{{item.nickname}}</text>
+        </view>
+        <view class="player-score-right">
+          <view class="score-toggle {{item.score >= 0 ? 'toggle-positive' : 'toggle-negative'}}" 
+                data-index="{{index}}" bindtap="toggleSign">
+            {{item.score >= 0 ? '+' : '-'}}
+          </view>
+          <input class="score-value-input" 
+                 type="number" 
+                 value="{{item.score === 0 ? '' : Math.abs(item.score)}}"
+                 placeholder="0"
+                 placeholder-style="color: rgba(255,255,255,0.2)"
+                 data-index="{{index}}"
+                 bindinput="onScoreInput"/>
+        </view>
+      </view>
+    </view>
+    
+    <!-- 分数校验 -->
+    <view class="validation-bar {{totalScore === 0 ? 'valid' : 'invalid'}}">
+      <text class="validation-icon">{{totalScore === 0 ? '✓' : '!'}}</text>
+      <text class="validation-text">
+        {{totalScore === 0 ? '分数总和为0，可以提交' : '分数总和应为0，当前 ' + (totalScore > 0 ? '+' : '') + totalScore}}
+      </text>
+    </view>
+  </view>
+
+  <!-- 备注 -->
+  <view class="card">
+    <text class="card-label">备注</text>
+    <textarea class="remark-area" 
+              placeholder="记录本局特殊情况..."
+              placeholder-style="color: rgba(255,255,255,0.2)"
+              value="{{remark}}"
+              bindinput="onRemarkInput"
+              maxlength="200"/>
+  </view>
+
+  <!-- 快捷操作 -->
+  <view class="card">
+    <text class="card-label">快捷模板</text>
+    <view class="template-btns">
+      <button class="template-btn" size="mini" bindtap="quickSetZimo">自摸</button>
+      <button class="template-btn" size="mini" bindtap="quickSetDianpao">点炮</button>
+      <button class="template-btn template-btn-clear" size="mini" bindtap="clearAll">清空</button>
+    </view>
+  </view>
+
+  <!-- 提交按钮 -->
+  <view class="submit-area safe-bottom">
+    <button class="btn btn-primary submit-btn {{totalScore !== 0 ? 'disabled' : ''}}" 
+            bindtap="submitScore"
+            disabled="{{totalScore !== 0 || submitting}}">
+      {{submitting ? '提交中...' : '确认记录'}}
+    </button>
+  </view>
+</view>

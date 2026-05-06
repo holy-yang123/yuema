@@ -1,0 +1,52 @@
+package com.yuema.server.entity;
+
+import com.baomidou.mybatisplus.annotation.*;
+import lombok.Data;
+
+import java.time.LocalDateTime;
+
+@Data
+@TableName("users")
+public class User {
+    
+    @TableId(type = IdType.AUTO)
+    private Long id;
+    
+    private String openid;
+    
+    private String unionid;
+    
+    private String nickname;
+    
+    @TableField("avatar_url")
+    private String avatarUrl;
+    
+    private String phone;
+    
+    private Integer gender;
+    
+    private Integer level;
+    
+    private Integer score;
+    
+    @TableField("total_games")
+    private Integer totalGames;
+    
+    @TableField("win_games")
+    private Integer winGames;
+    
+    private Integer status;
+    
+    @TableField("last_login_time")
+    private LocalDateTime lastLoginTime;
+    
+    @TableField(value = "created_at", fill = FieldFill.INSERT)
+    private LocalDateTime createdAt;
+    
+    @TableField(value = "updated_at", fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime updatedAt;
+    
+    @TableLogic
+    @TableField("deleted")
+    private Integer deleted;
+}

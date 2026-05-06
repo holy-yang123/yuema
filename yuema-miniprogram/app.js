@@ -1,0 +1,89 @@
+App({
+  globalData: {
+    userInfo: null,
+    token: null,
+    apiBaseUrl: 'http://localhost:8080/api'
+  },
+
+  onLaunch() {
+    // 检查登录状态
+    const token = wx.getStorageSync('token');
+    if (token) {
+      this.globalData.token = token;
+      this.getUserInfo();
+    }
+  },
+
+  // 登录
+  login() {
+    return new Promise((resolve, reject) => {
+      wx.login({
+        success: (res) => {
+          if (res.code) {
+            // 调用后端登录接口
+            wx.request({
+              url: `${this.globalData.apiBaseUrl}/user/login`,
+              method: 'POST',
+              data: {
+                openid: 'test_openid_' + Date.now(), // 实际应使用微信登录获取
+                nickname: '微信用户',
+                avatarUrl: ''
+              },
+              success: (result) => {
+                if (result.data.code === 200) {
+                  const data = result.data.data;
+                  this.globalData.token = data.token;
+                  this.globalData.userInfo = {
+                    userId: data.userId,
+                    nickname: data.nickname,
+                    avatarUrl: data.avatarUrl
+                  };
+                  wx.setStorageSync('token', data.token);
+                  resolve(data);
+                } else {
+                  reject(result.data.message);
+                }
+              },
+              fail: reject
+            });
+          } else {
+            reject('登录失败');
+          }
+        },
+        fail: reject
+      });
+    });
+  },
+
+  // 获取用户信息
+  getUserInfo() {
+    return new Promise((resolve, reject) => {
+      wx.request({
+        url: `${this.globalData.apiBaseUrl}/user/info`,
+        header: {
+          'Authorization': `Bearer ${this.globalData.token}`
+        },
+        success: (res) => {
+          if (res.data.code === 200) {
+            this.globalData.userInfo = res.data.data;
+            resolve(res.data.data);
+          } else {
+            reject(res.data.message);
+          }
+        },
+        fail: reject
+      });
+    });
+  },
+
+  // 检查登录
+  checkLogin() {
+    if (!this.globalData.token) {
+      wx.navigateTo({
+        url: '/pages/user/login'
+      });
+      return false;
+    }
+    return true;
+  }
+});

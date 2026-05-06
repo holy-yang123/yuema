@@ -1,0 +1,101 @@
+<view class="container">
+  <!-- 房间信息 -->
+  <view class="room-header-card">
+    <view class="room-header-top">
+      <text class="room-id">#{{room.roomNo}}</text>
+      <view class="status-pill {{room.status === 0 ? 'status-waiting' : room.status === 1 ? 'status-playing' : 'status-ended'}}">
+        <view class="status-dot"></view>
+        <text>{{room.status === 0 ? '等待中' : room.status === 1 ? '进行中' : '已结束'}}</text>
+      </view>
+    </view>
+    <view class="room-meta-grid">
+      <view class="meta-cell">
+        <text class="meta-cell-label">玩法</text>
+        <text class="meta-cell-value">{{gameTypeMap[room.gameType] || room.gameType}}</text>
+      </view>
+      <view class="meta-cell">
+        <text class="meta-cell-label">人数</text>
+        <text class="meta-cell-value">{{room.currentPlayers}}/{{room.maxPlayers}}</text>
+      </view>
+      <view class="meta-cell" wx:if="{{room.venueName}}">
+        <text class="meta-cell-label">场地</text>
+        <text class="meta-cell-value">{{room.venueName}}</text>
+      </view>
+      <view class="meta-cell" wx:if="{{room.baseScore}}">
+        <text class="meta-cell-label">底分</text>
+        <text class="meta-cell-value">{{room.baseScore}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 成员列表 -->
+  <view class="card">
+    <view class="card-title">
+      <text>牌局成员</text>
+      <text class="card-title-badge">{{members.length}}/{{room.maxPlayers}}</text>
+    </view>
+    <view class="member-list">
+      <view class="member-item" wx:for="{{members}}" wx:key="userId">
+        <view class="member-avatar-wrap">
+          <image class="member-avatar" src="{{item.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"/>
+          <text class="seat-badge">{{item.seatNo}}</text>
+        </view>
+        <view class="member-info">
+          <text class="member-name">{{item.nickname}}</text>
+          <text class="member-role {{item.role === 1 ? 'is-owner' : ''}}">{{item.role === 1 ? '房主' : '玩家'}}</text>
+        </view>
+      </view>
+      <view class="member-item member-empty" wx:for="{{emptySeats}}" wx:key="index">
+        <view class="member-avatar-wrap empty-slot">
+          <text class="empty-slot-text">?</text>
+        </view>
+        <text class="member-info empty-info">等待加入</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 计分区域 -->
+  <view class="card" wx:if="{{room.status === 1 || room.status === 2}}">
+    <view class="card-title flex-between">
+      <text>当前分数</text>
+      <text class="round-badge">第 {{currentRound}} 局</text>
+    </view>
+    
+    <view class="score-list">
+      <view class="score-item" wx:for="{{scoreSummary.memberScores}}" wx:key="userId">
+        <text class="score-player">{{getPlayerName(item.userId)}}</text>
+        <text class="score-value {{item.finalScore >= 0 ? 'score-win' : 'score-lose'}}">
+          {{item.finalScore > 0 ? '+' : ''}}{{item.finalScore}}
+        </text>
+      </view>
+    </view>
+
+    <view class="score-actions" wx:if="{{room.status === 1}}">
+      <button class="btn btn-primary" bindtap="goToRecordScore">记录本局分数</button>
+      <button class="btn btn-secondary mt-20" bindtap="viewScoreHistory">查看历史记录</button>
+    </view>
+
+    <view class="settlement-section" wx:if="{{room.status === 2}}">
+      <view class="divider"></view>
+      <text class="settlement-label">最终结算</text>
+      <view class="settlement-list">
+        <view class="settlement-item" wx:for="{{settlement.settlements}}" wx:key="userId">
+          <text class="settlement-name">{{getPlayerName(item.userId)}}</text>
+          <text class="settlement-amount {{item.amount >= 0 ? 'amount-win' : 'amount-lose'}}">
+            {{item.amount >= 0 ? '应收' : '应付'}} ¥{{Math.abs(item.amount)}}
+          </text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="action-bar safe-bottom" wx:if="{{room.status === 0}}">
+    <button class="btn btn-secondary action-btn" open-type="share">邀请好友</button>
+    <button class="btn btn-primary action-btn" wx:if="{{isOwner}}" bindtap="startGame">开始牌局</button>
+  </view>
+
+  <view class="action-bar safe-bottom" wx:if="{{room.status === 1 && isOwner}}">
+    <button class="btn btn-danger action-btn-full" bindtap="endGame">结束牌局</button>
+  </view>
+</view>

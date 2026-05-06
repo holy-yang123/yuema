@@ -1,0 +1,114 @@
+<view class="container">
+  <!-- 顶部问候 -->
+  <view class="greeting">
+    <view class="greeting-text">
+      <text class="greeting-hello">约麻</text>
+      <text class="greeting-sub">找到你的牌搭子</text>
+    </view>
+    <view class="greeting-avatar" bindtap="goToUser">
+      <image src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill" class="avatar"/>
+    </view>
+  </view>
+
+  <!-- 搜索栏 -->
+  <view class="search-bar">
+    <view class="search-input">
+      <text class="search-icon">⌕</text>
+      <input placeholder="搜索牌局、场地" disabled placeholder-style="color: rgba(255,255,255,0.3)"/>
+    </view>
+  </view>
+
+  <!-- 快捷入口 -->
+  <view class="quick-actions">
+    <view class="action-item" bindtap="createRoom">
+      <view class="action-icon action-create">
+        <text class="action-emoji">+</text>
+      </view>
+      <text class="action-label">创建牌局</text>
+    </view>
+    <view class="action-item" bindtap="joinRoom">
+      <view class="action-icon action-join">
+        <text class="action-emoji">⎔</text>
+      </view>
+      <text class="action-label">加入牌局</text>
+    </view>
+    <view class="action-item" bindtap="goToVenue">
+      <view class="action-icon action-venue">
+        <text class="action-emoji">◎</text>
+      </view>
+      <text class="action-label">附近场地</text>
+    </view>
+    <view class="action-item" bindtap="goToHistory">
+      <view class="action-icon action-history">
+        <text class="action-emoji">☰</text>
+      </view>
+      <text class="action-label">历史战绩</text>
+    </view>
+  </view>
+
+  <!-- 推荐牌局 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">推荐牌局</text>
+      <text class="section-more" bindtap="goToRoomList">查看全部</text>
+    </view>
+    
+    <view class="room-list">
+      <view class="room-card" wx:for="{{roomList}}" wx:key="id" bindtap="goToRoomDetail" data-id="{{item.id}}">
+        <view class="room-card-header">
+          <view class="room-card-left">
+            <text class="room-no-text">#{{item.roomNo}}</text>
+            <text class="room-game-type">{{gameTypeMap[item.gameType]}}</text>
+          </view>
+          <view class="status-pill {{item.status === 0 ? 'status-waiting' : 'status-playing'}}">
+            <view class="status-dot"></view>
+            <text>{{item.status === 0 ? '等待中' : '进行中'}}</text>
+          </view>
+        </view>
+        <view class="room-card-body">
+          <view class="room-meta-row">
+            <text class="meta-label">人数</text>
+            <text class="meta-value">{{item.currentPlayers}}/{{item.maxPlayers}}</text>
+          </view>
+          <view class="room-meta-row" wx:if="{{item.venueName}}">
+            <text class="meta-label">场地</text>
+            <text class="meta-value venue-name-text">{{item.venueName}}</text>
+          </view>
+        </view>
+        <view class="room-card-footer">
+          <button class="room-join-btn" size="mini" catchtap="quickJoin" data-id="{{item.id}}">加入</button>
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:if="{{roomList.length === 0 && !loading}}">
+      <text class="empty-icon">🀄</text>
+      <text class="empty-text">暂无推荐牌局</text>
+      <button class="btn btn-primary mt-32" style="width: 320rpx;" bindtap="createRoom">创建牌局</button>
+    </view>
+  </view>
+
+  <!-- 附近场地 -->
+  <view class="section">
+    <view class="section-header">
+      <text class="section-title">附近场地</text>
+      <text class="section-more" bindtap="goToVenue">查看全部</text>
+    </view>
+    
+    <view class="venue-list">
+      <view class="venue-card" wx:for="{{venueList}}" wx:key="id" bindtap="goToVenueDetail" data-id="{{item.id}}">
+        <view class="venue-card-image">
+          <image src="{{item.imageUrls || '/images/default-venue.png'}}" mode="aspectFill"/>
+        </view>
+        <view class="venue-card-info">
+          <text class="venue-card-name">{{item.name}}</text>
+          <view class="venue-card-meta">
+            <text class="venue-rating">{{item.rating}} ⭐</text>
+            <text class="venue-price">¥{{item.minPrice/100}}/h</text>
+          </view>
+          <text class="venue-card-address">{{item.address}}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

@@ -1,0 +1,59 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/room/list",
+    "pages/room/detail",
+    "pages/room/create",
+    "pages/score/record",
+    "pages/score/history",
+    "pages/venue/list",
+    "pages/venue/detail",
+    "pages/user/index"
+  ],
+  "window": {
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#0f0f0f",
+    "navigationBarTitleText": "约麻",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#0f0f0f"
+  },
+  "tabBar": {
+    "color": "rgba(255,255,255,0.35)",
+    "selectedColor": "#a78bfa",
+    "backgroundColor": "#1a1a1a",
+    "borderStyle": "black",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "text": "首页",
+        "iconPath": "images/home.png",
+        "selectedIconPath": "images/home-active.png"
+      },
+      {
+        "pagePath": "pages/room/list",
+        "text": "牌局",
+        "iconPath": "images/room.png",
+        "selectedIconPath": "images/room-active.png"
+      },
+      {
+        "pagePath": "pages/venue/list",
+        "text": "场地",
+        "iconPath": "images/venue.png",
+        "selectedIconPath": "images/venue-active.png"
+      },
+      {
+        "pagePath": "pages/user/index",
+        "text": "我的",
+        "iconPath": "images/user.png",
+        "selectedIconPath": "images/user-active.png"
+      }
+    ]
+  },
+  "permission": {
+    "scope.userLocation": {
+      "desc": "获取位置信息用于推荐附近棋牌室"
+    }
+  },
+  "requiredBackgroundModes": ["audio"],
+  "sitemapLocation": "sitemap.json"
+}

@@ -1,0 +1,231 @@
+/* ========================================
+   计分页 - SOLO 深色风格
+   ======================================== */
+
+.score-header {
+  padding: 20rpx 0 32rpx;
+}
+
+.score-header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.score-round-label {
+  font-size: 40rpx;
+  font-weight: 800;
+  color: #fff;
+}
+
+.score-header-hint {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* 卡片标签 */
+.card-label {
+  font-size: 24rpx;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 2rpx;
+  display: block;
+  margin-bottom: 20rpx;
+}
+
+/* 胡牌方式选择 */
+.type-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+
+.type-chip {
+  padding: 16rpx 28rpx;
+  border-radius: 40rpx;
+  font-size: 26rpx;
+  color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1rpx solid rgba(255, 255, 255, 0.06);
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.type-chip.chip-active {
+  background: rgba(108, 92, 231, 0.2);
+  color: #a78bfa;
+  border-color: rgba(108, 92, 231, 0.4);
+}
+
+/* 玩家分数列表 */
+.player-score-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.player-score-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20rpx;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 16rpx;
+}
+
+.player-score-left {
+  display: flex;
+  align-items: center;
+}
+
+.player-score-avatar {
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 50%;
+  overflow: hidden;
+  margin-right: 20rpx;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.player-score-avatar image {
+  width: 100%;
+  height: 100%;
+}
+
+.player-score-name {
+  font-size: 28rpx;
+  color: #fff;
+  font-weight: 500;
+}
+
+.player-score-right {
+  display: flex;
+  align-items: center;
+}
+
+.score-toggle {
+  width: 56rpx;
+  height: 56rpx;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32rpx;
+  font-weight: 700;
+  margin-right: 16rpx;
+}
+
+.toggle-positive {
+  background: rgba(52, 211, 153, 0.15);
+  color: #34d399;
+}
+
+.toggle-negative {
+  background: rgba(248, 113, 113, 0.15);
+  color: #f87171;
+}
+
+.score-value-input {
+  width: 120rpx;
+  height: 72rpx;
+  text-align: center;
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 16rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.08);
+}
+
+/* 分数校验 */
+.validation-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20rpx;
+  border-radius: 16rpx;
+  margin-top: 20rpx;
+}
+
+.validation-bar.valid {
+  background: rgba(52, 211, 153, 0.08);
+}
+
+.validation-bar.invalid {
+  background: rgba(248, 113, 113, 0.08);
+}
+
+.validation-icon {
+  font-size: 28rpx;
+  margin-right: 10rpx;
+  font-weight: 700;
+}
+
+.validation-bar.valid .validation-icon { color: #34d399; }
+.validation-bar.invalid .validation-icon { color: #f87171; }
+
+.validation-text {
+  font-size: 24rpx;
+}
+
+.validation-bar.valid .validation-text { color: rgba(52, 211, 153, 0.8); }
+.validation-bar.invalid .validation-text { color: rgba(248, 113, 113, 0.8); }
+
+/* 备注 */
+.remark-area {
+  width: 100%;
+  height: 160rpx;
+  padding: 20rpx;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 16rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.06);
+  color: #e8e8e8;
+  font-size: 28rpx;
+  box-sizing: border-box;
+}
+
+/* 快捷模板 */
+.template-btns {
+  display: flex;
+  gap: 16rpx;
+}
+
+.template-btn {
+  flex: 1;
+  height: 72rpx;
+  line-height: 72rpx;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.6);
+  border-radius: 16rpx;
+  font-size: 26rpx;
+  font-weight: 500;
+  border: 1rpx solid rgba(255, 255, 255, 0.06);
+}
+
+.template-btn::after {
+  border: none;
+}
+
+.template-btn:active {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.template-btn-clear {
+  color: rgba(248, 113, 113, 0.7);
+  border-color: rgba(248, 113, 113, 0.15);
+}
+
+/* 提交 */
+.submit-area {
+  padding: 32rpx 24rpx;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #0f0f0f;
+}
+
+.submit-btn {
+  width: 100%;
+}

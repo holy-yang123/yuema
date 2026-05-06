@@ -1,0 +1,95 @@
+<view class="container">
+  <!-- 用户信息卡片 -->
+  <view class="profile-hero">
+    <view class="profile-hero-bg"></view>
+    <view class="profile-hero-content">
+      <view class="profile-avatar-wrap">
+        <image class="profile-avatar" src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"/>
+        <view class="profile-level-ring">
+          <text class="profile-level-text">Lv.{{userInfo.level || 1}}</text>
+        </view>
+      </view>
+      <text class="profile-name">{{userInfo.nickname || '未登录'}}</text>
+      <text class="profile-title">{{levelName}}</text>
+    </view>
+    <view class="profile-stats-row">
+      <view class="profile-stat">
+        <text class="stat-num">{{userInfo.totalGames || 0}}</text>
+        <text class="stat-desc">总对局</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="profile-stat">
+        <text class="stat-num">{{userInfo.winGames || 0}}</text>
+        <text class="stat-desc">胜局</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="profile-stat">
+        <text class="stat-num">{{winRate}}%</text>
+        <text class="stat-desc">胜率</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 功能菜单 -->
+  <view class="menu-group">
+    <view class="menu-item" bindtap="goToMyRooms">
+      <view class="menu-icon-wrap icon-game">
+        <text>🎮</text>
+      </view>
+      <text class="menu-item-text">我的牌局</text>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" bindtap="goToHistory">
+      <view class="menu-icon-wrap icon-chart">
+        <text>📊</text>
+      </view>
+      <text class="menu-item-text">历史战绩</text>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" bindtap="goToFriends">
+      <view class="menu-icon-wrap icon-friends">
+        <text>👥</text>
+      </view>
+      <text class="menu-item-text">我的好友</text>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" bindtap="goToOrders">
+      <view class="menu-icon-wrap icon-order">
+        <text>📝</text>
+      </view>
+      <text class="menu-item-text">我的订单</text>
+      <text class="menu-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 设置菜单 -->
+  <view class="menu-group">
+    <view class="menu-item" bindtap="editProfile">
+      <view class="menu-icon-wrap icon-edit">
+        <text>✏️</text>
+      </view>
+      <text class="menu-item-text">编辑资料</text>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" bindtap="bindPhone">
+      <view class="menu-icon-wrap icon-phone">
+        <text>📱</text>
+      </view>
+      <text class="menu-item-text">绑定手机</text>
+      <text class="menu-item-status">{{userInfo.phone ? '已绑定' : '未绑定'}}</text>
+      <text class="menu-arrow">›</text>
+    </view>
+    <view class="menu-item" bindtap="showAbout">
+      <view class="menu-icon-wrap icon-about">
+        <text>ℹ️</text>
+      </view>
+      <text class="menu-item-text">关于约麻</text>
+      <text class="menu-arrow">›</text>
+    </view>
+  </view>
+
+  <!-- 退出登录 -->
+  <view class="logout-area safe-bottom" wx:if="{{userInfo.id}}">
+    <button class="logout-btn" bindtap="logout">退出登录</button>
+  </view>
+</view>
