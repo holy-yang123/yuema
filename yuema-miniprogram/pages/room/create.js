@@ -12,7 +12,8 @@ Page({
     maxPlayersOptions: [2, 3, 4],
     maxPlayersIndex: 2,
     venues: [],
-    venueIndex: -1
+    venueIndex: -1,
+    selectedLocation: null // {address, latitude, longitude}
   },
 
   onLoad() {
@@ -42,13 +43,30 @@ Page({
     this.setData({ venueIndex: e.detail.value });
   },
 
+  // 选择位置
+  chooseLocation() {
+    wx.chooseLocation({
+      success: (res) => {
+        this.setData({
+          selectedLocation: {
+            address: res.name || res.address,
+            latitude: res.latitude,
+            longitude: res.longitude
+          }
+        });
+      }
+    });
+  },
+
   async submit() {
     const { gameTypes, gameTypeIndex, maxPlayersOptions, maxPlayersIndex, venues, venueIndex } = this.data;
     
     const data = {
       gameType: gameTypes[gameTypeIndex].id,
       maxPlayers: maxPlayersOptions[maxPlayersIndex],
-      venueId: venueIndex === -1 ? null : venues[venueIndex].id
+      venueId: venueIndex === -1 ? null : venues[venueIndex].id,
+      latitude: venueIndex === -1 && this.data.selectedLocation ? this.data.selectedLocation.latitude : null,
+      longitude: venueIndex === -1 && this.data.selectedLocation ? this.data.selectedLocation.longitude : null
     };
 
     try {

@@ -26,6 +26,13 @@
         </view>
       </picker>
     </view>
+
+    <view class="form-item" wx:if="{{venueIndex === -1}}">
+      <text class="label">对局位置</text>
+      <view class="picker-value {{!selectedLocation ? 'placeholder' : ''}}" bindtap="chooseLocation">
+        {{selectedLocation ? selectedLocation.address : '点击选择位置'}}
+      </view>
+    </view>
   </view>
 
   <view class="btn-area">

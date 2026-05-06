@@ -3,6 +3,7 @@ package com.yuema.server.entity;
 import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Data
@@ -46,6 +47,10 @@ public class Room {
     
     @TableField("tai_fee")
     private Integer taiFee;
+    
+    private BigDecimal longitude;
+    
+    private BigDecimal latitude;
     
     private String remark;
     

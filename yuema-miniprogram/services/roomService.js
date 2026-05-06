@@ -17,8 +17,8 @@ module.exports = {
   },
 
   // 获取牌局列表
-  getRoomList() {
-    return request.get('/room/list');
+  getRoomList(longitude, latitude) {
+    return request.get('/room/list', { longitude, latitude });
   },
 
   // 获取我的牌局

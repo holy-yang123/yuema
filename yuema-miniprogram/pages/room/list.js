@@ -24,7 +24,11 @@ Page({
 
   async loadRooms() {
     try {
-      const res = await roomService.getRoomList();
+      const { location } = getApp().globalData;
+      const res = await roomService.getRoomList(
+        location ? location.longitude : null,
+        location ? location.latitude : null
+      );
       this.setData({
         rooms: res.data || []
       }, () => {

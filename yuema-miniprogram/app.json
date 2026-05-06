@@ -54,6 +54,10 @@
       "desc": "获取位置信息用于推荐附近棋牌室"
     }
   },
+  "requiredPrivateInfos": [
+    "getLocation",
+    "chooseLocation"
+  ],
   "requiredBackgroundModes": ["audio"],
   "sitemapLocation": "sitemap.json"
 }

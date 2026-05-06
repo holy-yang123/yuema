@@ -2,6 +2,8 @@ App({
   globalData: {
     userInfo: null,
     token: null,
+    location: null, // {longitude, latitude}
+    address: '', // 地址描述
     // 修改为你的局域网 IP
     apiBaseUrl: 'http://192.168.1.140:8080/api'
   },
@@ -13,6 +15,31 @@ App({
       this.globalData.token = token;
       this.getUserInfo();
     }
+    
+    // 获取位置信息
+    this.updateLocation();
+  },
+
+  // 更新位置信息
+  updateLocation() {
+    return new Promise((resolve, reject) => {
+      // 优先尝试获取精确位置
+      wx.getLocation({
+        type: 'gcj02',
+        success: (res) => {
+          this.globalData.location = {
+            longitude: res.longitude,
+            latitude: res.latitude
+          };
+          resolve(this.globalData.location);
+        },
+        fail: (err) => {
+          // 如果获取失败且没有历史位置，尝试让用户手动选
+          console.error('获取位置失败:', err);
+          resolve(null);
+        }
+      });
+    });
   },
 
   // 登录

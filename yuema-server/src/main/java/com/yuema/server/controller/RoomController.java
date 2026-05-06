@@ -76,8 +76,9 @@ public class RoomController {
     }
 
     @GetMapping("/list")
-    public Result<List<Room>> getRoomList() {
-        List<Room> rooms = roomService.getActiveRooms();
+    public Result<List<Room>> getRoomList(@RequestParam(required = false) Double longitude,
+                                           @RequestParam(required = false) Double latitude) {
+        List<Room> rooms = roomService.getActiveRooms(longitude, latitude);
         return Result.success(rooms);
     }
 

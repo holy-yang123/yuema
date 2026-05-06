@@ -35,11 +35,16 @@ public class RoomService extends ServiceImpl<RoomMapper, Room> {
         room.setMaxPlayers(dto.getMaxPlayers());
         room.setCurrentPlayers(1);
         room.setVenueId(dto.getVenueId());
+        room.setLongitude(dto.getLongitude());
+        room.setLatitude(dto.getLatitude());
 
         if (dto.getVenueId() != null) {
             Venue venue = venueMapper.selectById(dto.getVenueId());
             if (venue != null) {
                 room.setVenueName(venue.getName());
+                // 如果房间没有指定经纬度，则使用场地的经纬度
+                if (room.getLongitude() == null) room.setLongitude(venue.getLongitude());
+                if (room.getLatitude() == null) room.setLatitude(venue.getLatitude());
             }
         }
 
@@ -67,8 +72,11 @@ public class RoomService extends ServiceImpl<RoomMapper, Room> {
         return baseMapper.selectByRoomNo(roomNo);
     }
 
-    public List<Room> getActiveRooms() {
-        return baseMapper.selectByStatus(0);
+    public List<Room> getActiveRooms(Double longitude, Double latitude) {
+        if (longitude != null && latitude != null) {
+            return baseMapper.selectNearbyRooms(0, longitude, latitude);
+        }
+        return baseMapper.selectNearbyRooms(0, 0.0, 0.0); // 默认排序
     }
 
     public List<Room> getMyRooms(Long userId) {

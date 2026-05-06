@@ -2,6 +2,11 @@
   <!-- 顶部问候 -->
   <view class="greeting">
     <view class="greeting-text">
+      <view class="location-box" bindtap="reSelectLocation">
+        <text class="location-icon">📍</text>
+        <text class="location-name">{{address || '获取位置中...'}}</text>
+        <text class="location-arrow">></text>
+      </view>
       <text class="greeting-hello">约麻</text>
       <text class="greeting-sub">找到你的牌搭子</text>
     </view>

@@ -7,6 +7,7 @@ Page({
     roomList: [],
     venueList: [],
     loading: false,
+    address: '', // 当前地址
     gameTypeMap: {
       'sichuan': '四川麻将',
       'guobiao': '国标麻将',
@@ -20,6 +21,9 @@ Page({
 
   onShow() {
     if (app.globalData.token) {
+      this.setData({
+        address: app.globalData.address || this.data.address
+      });
       this.loadData();
     }
   },
@@ -47,14 +51,37 @@ Page({
     this.setData({ loading: true });
     
     try {
+      let { location } = app.globalData;
+      if (!location) {
+        location = await app.updateLocation();
+      }
+
+      // 如果有经纬度但没有地址，尝试获取地址 (Mock 逻辑，实际需调用逆地址解析 API)
+      if (location && !this.data.address) {
+        this.setData({ address: '获取位置成功' });
+      }
+
       // 加载牌局列表
-      const roomRes = await roomService.getRoomList();
+      const roomRes = await roomService.getRoomList(
+        location ? location.longitude : null,
+        location ? location.latitude : null
+      );
       this.setData({
-        roomList: roomRes.data || []
+        roomList: (roomRes.data || []).slice(0, 5)
       });
 
       // 加载附近场地
-      this.loadNearbyVenues();
+      if (location) {
+        const venueRes = await venueService.getNearbyVenues(location.longitude, location.latitude, 5);
+        this.setData({
+          venueList: venueRes.data || []
+        });
+      } else {
+        const venueRes = await venueService.getVenueList();
+        this.setData({
+          venueList: (venueRes.data || []).slice(0, 5)
+        });
+      }
     } catch (err) {
       console.error('加载数据失败:', err);
     } finally {
@@ -62,29 +89,28 @@ Page({
     }
   },
 
-  // 加载附近场地
+  // 加载附近场地（此方法已合并到 loadData 中，保留为空或删除）
   loadNearbyVenues() {
-    wx.getLocation({
-      type: 'gcj02',
+    // 逻辑已整合到 loadData
+  },
+
+  // 重新选择位置
+  reSelectLocation() {
+    wx.chooseLocation({
       success: (res) => {
-        venueService.getNearbyVenues(res.longitude, res.latitude, 5)
-          .then(res => {
-            this.setData({
-              venueList: res.data || []
-            });
-          })
-          .catch(err => {
-            console.error('获取附近场地失败:', err);
-          });
+        const location = {
+          longitude: res.longitude,
+          latitude: res.latitude
+        };
+        app.globalData.location = location;
+        app.globalData.address = res.name || res.address;
+        this.setData({
+          address: app.globalData.address
+        });
+        this.loadData();
       },
-      fail: () => {
-        // 获取位置失败，加载默认场地
-        venueService.getVenueList()
-          .then(res => {
-            this.setData({
-              venueList: (res.data || []).slice(0, 5)
-            });
-          });
+      fail: (err) => {
+        console.error('选择位置失败:', err);
       }
     });
   },
