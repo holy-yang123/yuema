@@ -1,13 +1,14 @@
 .container {
-  background-color: #0f0f0f;
+  background-color: #000000;
   min-height: 100vh;
-  padding: 30rpx;
+  padding: 32rpx;
 }
 
 .form-container {
-  background: #1a1a1a;
-  border-radius: 24rpx;
-  padding: 0 30rpx;
+  background: #101214;
+  border-radius: 12rpx;
+  padding: 0 32rpx;
+  border: 1rpx solid #1F1F1F;
 }
 
 .form-item {
@@ -15,7 +16,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 40rpx 0;
-  border-bottom: 1rpx solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1rpx solid #1F1F1F;
 }
 
 .form-item:last-child {
@@ -23,29 +24,35 @@
 }
 
 .label {
-  color: #fff;
-  font-size: 30rpx;
+  color: #ffffff;
+  font-size: 28rpx;
+  font-weight: 500;
 }
 
 .picker-value {
-  color: #a78bfa;
-  font-size: 30rpx;
+  color: #28E088;
+  font-size: 28rpx;
+  font-weight: 500;
 }
 
 .picker-value.placeholder {
-  color: rgba(255, 255, 255, 0.2);
+  color: #4B4B4B;
 }
 
 .btn-area {
-  margin-top: 60rpx;
+  margin-top: 64rpx;
 }
 
 .submit-btn {
-  background: #a78bfa !important;
-  color: #fff !important;
-  border-radius: 44rpx !important;
+  background: #28E088 !important;
+  color: #000000 !important;
+  border-radius: 8rpx !important;
   height: 88rpx !important;
   line-height: 88rpx !important;
-  font-size: 32rpx !important;
-  font-weight: bold !important;
+  font-size: 30rpx !important;
+  font-weight: 600 !important;
+}
+
+.submit-btn:active {
+  opacity: 0.8;
 }

@@ -1,85 +1,55 @@
-/* ========================================
-   个人中心 - SOLO 深色风格
-   ======================================== */
-
-/* 顶部卡片 */
-.profile-hero {
-  position: relative;
-  border-radius: 28rpx;
-  overflow: hidden;
-  margin-bottom: 32rpx;
+.container {
+  background-color: #000000;
+  min-height: 100vh;
+  padding: 32rpx;
 }
 
-.profile-hero-bg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, #6C5CE7 0%, #a855f7 50%, #c084fc 100%);
-  opacity: 0.9;
+/* 顶部英雄区 */
+.profile-hero {
+  background: #101214;
+  border-radius: 12rpx;
+  overflow: hidden;
+  margin-bottom: 32rpx;
+  border: 1rpx solid #1F1F1F;
 }
 
 .profile-hero-content {
-  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 48rpx 32rpx 32rpx;
-}
-
-.profile-avatar-wrap {
-  position: relative;
-  margin-bottom: 20rpx;
+  padding: 64rpx 32rpx 48rpx;
 }
 
 .profile-avatar {
-  width: 128rpx;
-  height: 128rpx;
-  border-radius: 50%;
-  border: 4rpx solid rgba(255, 255, 255, 0.3);
-}
-
-.profile-level-ring {
-  position: absolute;
-  bottom: -4rpx;
-  right: -4rpx;
-  width: 44rpx;
-  height: 44rpx;
-  border-radius: 50%;
-  background: #0f0f0f;
-  border: 3rpx solid #a78bfa;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.profile-level-text {
-  font-size: 16rpx;
-  color: #a78bfa;
-  font-weight: 700;
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 12rpx;
+  border: 1rpx solid #1F1F1F;
+  margin-bottom: 24rpx;
+  background: #1F1F1F;
 }
 
 .profile-name {
   font-size: 36rpx;
   font-weight: 700;
-  color: #fff;
-  margin-bottom: 6rpx;
+  color: #ffffff;
+  letter-spacing: -1rpx;
+  margin-bottom: 8rpx;
 }
 
 .profile-title {
   font-size: 24rpx;
-  color: rgba(255, 255, 255, 0.6);
-  font-weight: 400;
+  color: #28E088;
+  font-weight: 500;
 }
 
 /* 统计行 */
 .profile-stats-row {
-  position: relative;
   display: flex;
   align-items: center;
-  padding: 28rpx 0;
-  background: rgba(0, 0, 0, 0.2);
+  padding: 32rpx 0;
+  background: rgba(255, 255, 255, 0.02);
+  border-top: 1rpx solid #1F1F1F;
 }
 
 .profile-stat {
@@ -90,38 +60,37 @@
 }
 
 .stat-num {
-  font-size: 36rpx;
-  font-weight: 800;
-  color: #fff;
+  font-size: 32rpx;
+  font-weight: 700;
+  color: #ffffff;
   margin-bottom: 4rpx;
 }
 
 .stat-desc {
   font-size: 22rpx;
-  color: rgba(255, 255, 255, 0.5);
+  color: #4B4B4B;
 }
 
 .stat-divider {
   width: 1rpx;
-  height: 48rpx;
-  background: rgba(255, 255, 255, 0.15);
+  height: 40rpx;
+  background: #1F1F1F;
 }
 
 /* 菜单组 */
 .menu-group {
-  background: #1a1a1a;
-  border-radius: 24rpx;
-  margin-bottom: 24rpx;
-  border: 1rpx solid rgba(255, 255, 255, 0.06);
+  background: #101214;
+  border-radius: 12rpx;
+  margin-bottom: 32rpx;
+  border: 1rpx solid #1F1F1F;
   overflow: hidden;
 }
 
 .menu-item {
   display: flex;
   align-items: center;
-  padding: 28rpx 32rpx;
-  border-bottom: 1rpx solid rgba(255, 255, 255, 0.04);
-  transition: background 0.15s ease;
+  padding: 32rpx;
+  border-bottom: 1rpx solid #1F1F1F;
 }
 
 .menu-item:last-child {
@@ -129,65 +98,179 @@
 }
 
 .menu-item:active {
-  background: rgba(255, 255, 255, 0.03);
+  background: #1A1D21;
 }
-
-.menu-icon-wrap {
-  width: 48rpx;
-  height: 48rpx;
-  border-radius: 14rpx;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-right: 20rpx;
-  font-size: 28rpx;
-}
-
-.icon-game { background: rgba(108, 92, 231, 0.15); }
-.icon-chart { background: rgba(52, 211, 153, 0.15); }
-.icon-friends { background: rgba(59, 130, 246, 0.15); }
-.icon-order { background: rgba(251, 191, 36, 0.15); }
-.icon-edit { background: rgba(168, 85, 247, 0.15); }
-.icon-phone { background: rgba(14, 165, 233, 0.15); }
-.icon-about { background: rgba(255, 255, 255, 0.08); }
 
 .menu-item-text {
   flex: 1;
   font-size: 28rpx;
-  color: rgba(255, 255, 255, 0.85);
+  color: #ffffff;
   font-weight: 500;
 }
 
-.menu-item-status {
-  font-size: 24rpx;
-  color: rgba(255, 255, 255, 0.3);
-  margin-right: 12rpx;
-}
-
 .menu-arrow {
-  font-size: 32rpx;
-  color: rgba(255, 255, 255, 0.15);
-  font-weight: 300;
+  font-size: 24rpx;
+  color: #4B4B4B;
 }
 
 /* 退出登录 */
 .logout-area {
-  padding: 24rpx;
+  padding: 32rpx 0;
 }
 
 .logout-btn {
   width: 100%;
-  height: 96rpx;
-  line-height: 96rpx;
+  height: 88rpx;
+  line-height: 88rpx;
   text-align: center;
-  background: rgba(248, 113, 113, 0.08);
-  color: #f87171;
-  border-radius: 48rpx;
-  font-size: 30rpx;
+  background: transparent;
+  color: #FF4D4F;
+  border-radius: 8rpx;
+  font-size: 28rpx;
   font-weight: 600;
-  border: 1rpx solid rgba(248, 113, 113, 0.15);
+  border: 1rpx solid rgba(255, 77, 79, 0.2);
 }
 
-.logout-btn::after {
-  border: none;
+.logout-btn:active {
+  background: rgba(255, 77, 79, 0.05);
+}
+
+.login-trigger-btn {
+  margin-top: 24rpx;
+  background: #28E088 !important;
+  color: #000000 !important;
+  font-size: 24rpx !important;
+  font-weight: 600 !important;
+  padding: 0 40rpx !important;
+  height: 64rpx !important;
+  line-height: 64rpx !important;
+  border-radius: 8rpx !important;
+}
+
+/* 登录弹窗样式 */
+.login-modal {
+  visibility: hidden;
+  opacity: 0;
+  transition: all 0.3s ease;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+}
+
+.login-modal.show {
+  visibility: visible;
+  opacity: 1;
+}
+
+.login-modal-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.85);
+  backdrop-filter: blur(4rpx);
+}
+
+.login-modal-content {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #101214;
+  border-radius: 32rpx 32rpx 0 0;
+  padding: 48rpx 48rpx calc(48rpx + env(safe-area-inset-bottom));
+  transform: translateY(100%);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-top: 1rpx solid #1F1F1F;
+}
+
+.login-modal.show .login-modal-content {
+  transform: translateY(0);
+}
+
+.modal-header {
+  margin-bottom: 48rpx;
+}
+
+.modal-title {
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #ffffff;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.modal-subtitle {
+  font-size: 24rpx;
+  color: #4B4B4B;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 40rpx;
+  margin-bottom: 64rpx;
+}
+
+.avatar-wrapper {
+  padding: 0;
+  width: 160rpx !important;
+  height: 160rpx !important;
+  background: #1F1F1F;
+  border-radius: 24rpx;
+  position: relative;
+}
+
+.modal-avatar {
+  width: 100%;
+  height: 100%;
+  border-radius: 24rpx;
+}
+
+.avatar-edit-tag {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.6);
+  color: #ffffff;
+  font-size: 20rpx;
+  padding: 4rpx 0;
+  text-align: center;
+}
+
+.nickname-input-wrap {
+  width: 100%;
+  background: #000000;
+  border-radius: 12rpx;
+  padding: 24rpx;
+  border: 1rpx solid #1F1F1F;
+}
+
+.input-label {
+  font-size: 22rpx;
+  color: #4B4B4B;
+  display: block;
+  margin-bottom: 8rpx;
+}
+
+.nickname-input {
+  color: #ffffff;
+  font-size: 30rpx;
+}
+
+.confirm-login-btn {
+  width: 100% !important;
+  background: #28E088 !important;
+  color: #000000 !important;
+  height: 96rpx !important;
+  line-height: 96rpx !important;
+  border-radius: 12rpx !important;
+  font-weight: 700 !important;
+  font-size: 30rpx !important;
 }

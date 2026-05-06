@@ -146,11 +146,77 @@ Page({
             userInfo: {},
             winRate: 0
           });
-          wx.switchTab({
-            url: '/pages/index/index'
-          });
+          // 不再强制跳转，让用户留在个人中心看到登录按钮
+          wx.showToast({ title: '已退出登录', icon: 'none' });
         }
       }
     });
+  },
+
+  // 触发登录
+  async onLogin() {
+    wx.showLoading({ title: '尝试登录...' });
+    try {
+      // 1. 先尝试静默登录
+      const res = await app.login();
+      
+      if (res.needProfile) {
+        // 2. 如果是新用户，才弹出资料完善框
+        wx.hideLoading();
+        this.setData({
+          showLoginModal: true,
+          tempNickname: '',
+          tempAvatarUrl: ''
+        });
+      } else {
+        // 3. 老用户，直接登录成功
+        await this.loadUserInfo();
+        wx.hideLoading();
+        wx.showToast({ title: '欢迎回来', icon: 'success' });
+      }
+    } catch (err) {
+      wx.hideLoading();
+      wx.showToast({ title: '登录失败', icon: 'none' });
+      console.error(err);
+    }
+  },
+
+  closeLoginModal() {
+    this.setData({ showLoginModal: false });
+  },
+
+  onChooseAvatar(e) {
+    const { avatarUrl } = e.detail;
+    this.setData({
+      tempAvatarUrl: avatarUrl
+    });
+  },
+
+  onNicknameBlur(e) {
+    this.setData({
+      tempNickname: e.detail.value
+    });
+  },
+
+  async confirmLogin() {
+    const { tempNickname, tempAvatarUrl } = this.data;
+    
+    if (!tempNickname) {
+      wx.showToast({ title: '请输入昵称', icon: 'none' });
+      return;
+    }
+
+    wx.showLoading({ title: '登录中...' });
+    try {
+      await app.login(tempNickname, tempAvatarUrl);
+      await this.loadUserInfo();
+      this.closeLoginModal();
+      wx.hideLoading();
+      wx.showToast({ title: '登录成功', icon: 'success' });
+    } catch (err) {
+      wx.hideLoading();
+      wx.showToast({ title: '登录失败', icon: 'none' });
+      console.error(err);
+    }
   }
 });

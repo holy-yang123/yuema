@@ -9,8 +9,9 @@
           <text class="profile-level-text">Lv.{{userInfo.level || 1}}</text>
         </view>
       </view>
-      <text class="profile-name">{{userInfo.nickname || '未登录'}}</text>
-      <text class="profile-title">{{levelName}}</text>
+      <text class="profile-name">{{userInfo.id ? userInfo.nickname : '访客您好'}}</text>
+      <text class="profile-title" wx:if="{{userInfo.id}}">{{levelName}}</text>
+      <button class="login-trigger-btn" wx:else bindtap="onLogin">点击登录账户</button>
     </view>
     <view class="profile-stats-row">
       <view class="profile-stat">
@@ -91,5 +92,30 @@
   <!-- 退出登录 -->
   <view class="logout-area safe-bottom" wx:if="{{userInfo.id}}">
     <button class="logout-btn" bindtap="logout">退出登录</button>
+  </view>
+
+  <!-- 登录授权弹窗 (Trae Solo 风格) -->
+  <view class="login-modal {{showLoginModal ? 'show' : ''}}">
+    <view class="login-modal-mask" bindtap="closeLoginModal"></view>
+    <view class="login-modal-content">
+      <view class="modal-header">
+        <text class="modal-title">完善个人资料</text>
+        <text class="modal-subtitle">请选择头像并填写昵称以开启约麻之旅</text>
+      </view>
+      
+      <view class="login-form">
+        <button class="avatar-wrapper" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+          <image class="modal-avatar" src="{{tempAvatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+          <view class="avatar-edit-tag">更换</view>
+        </button>
+        
+        <view class="nickname-input-wrap">
+          <text class="input-label">昵称</text>
+          <input type="nickname" class="nickname-input" placeholder="请输入昵称" bindblur="onNicknameBlur" />
+        </view>
+      </view>
+
+      <button class="confirm-login-btn" bindtap="confirmLogin">进入约麻</button>
+    </view>
   </view>
 </view>

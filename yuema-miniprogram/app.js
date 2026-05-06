@@ -16,7 +16,7 @@ App({
   },
 
   // 登录
-  login() {
+  login(nickname = null, avatarUrl = null) {
     return new Promise((resolve, reject) => {
       wx.login({
         success: (res) => {
@@ -26,21 +26,20 @@ App({
               url: `${this.globalData.apiBaseUrl}/user/login`,
               method: 'POST',
               data: {
-                openid: 'test_openid_' + Date.now(), // 实际应使用微信登录获取
-                nickname: '微信用户',
-                avatarUrl: ''
+                openid: 'user_' + res.code, // 使用真实 code 模拟 openid
+                nickname: nickname,
+                avatarUrl: avatarUrl
               },
               success: (result) => {
                 if (result.data.code === 200) {
                   const data = result.data.data;
                   this.globalData.token = data.token;
-                  this.globalData.userInfo = {
-                    userId: data.userId,
-                    nickname: data.nickname,
-                    avatarUrl: data.avatarUrl
-                  };
+                  this.globalData.userInfo = data;
                   wx.setStorageSync('token', data.token);
                   resolve(data);
+                } else if (result.data.code === 404) {
+                  // 返回特定对象表示需要完善资料
+                  resolve({ needProfile: true, openid: 'user_' + res.code });
                 } else {
                   reject(result.data.message);
                 }
@@ -48,7 +47,7 @@ App({
               fail: reject
             });
           } else {
-            reject('登录失败');
+            reject('微信登录失败');
           }
         },
         fail: reject

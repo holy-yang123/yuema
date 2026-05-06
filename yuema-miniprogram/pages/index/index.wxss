@@ -1,291 +1,199 @@
-/* ========================================
-   首页 - SOLO 深色风格
-   ======================================== */
-
 /* 顶部问候 */
 .greeting {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20rpx 0 32rpx;
-}
-
-.greeting-text {
-  display: flex;
-  flex-direction: column;
+  padding: 32rpx 0;
 }
 
 .greeting-hello {
-  font-size: 48rpx;
-  font-weight: 800;
-  color: #fff;
-  letter-spacing: 2rpx;
+  font-size: 44rpx;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -1rpx;
 }
 
 .greeting-sub {
   font-size: 26rpx;
-  color: rgba(255, 255, 255, 0.35);
-  margin-top: 4rpx;
+  color: #8A9096;
+  margin-top: 8rpx;
 }
 
 .greeting-avatar {
-  width: 80rpx;
-  height: 80rpx;
-  border-radius: 50%;
+  width: 88rpx;
+  height: 88rpx;
+  border-radius: 12rpx;
   overflow: hidden;
-  border: 2rpx solid rgba(108, 92, 231, 0.4);
+  border: 1rpx solid #1F1F1F;
 }
 
 /* 搜索栏 */
 .search-bar {
-  margin-bottom: 40rpx;
+  margin-bottom: 48rpx;
 }
 
 .search-input {
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.06);
-  border-radius: 48rpx;
-  padding: 24rpx 32rpx;
-  border: 1rpx solid rgba(255, 255, 255, 0.06);
+  background: #101214;
+  border-radius: 8rpx;
+  padding: 24rpx;
+  border: 1rpx solid #1F1F1F;
 }
 
 .search-icon {
   font-size: 32rpx;
-  color: rgba(255, 255, 255, 0.25);
-  margin-right: 16rpx;
+  color: #4B4B4B;
+  margin-right: 20rpx;
 }
 
 .search-input input {
   flex: 1;
   font-size: 28rpx;
-  color: #e8e8e8;
+  color: #ffffff;
 }
 
-/* 快捷入口 */
+/* 快捷入口 (Trae 风格网格) */
 .quick-actions {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 48rpx;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24rpx;
+  margin-bottom: 64rpx;
 }
 
 .action-item {
+  background: #101214;
+  border: 1rpx solid #1F1F1F;
+  border-radius: 12rpx;
+  padding: 32rpx;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  flex: 1;
+  align-items: flex-start;
+  transition: all 0.2s ease;
+}
+
+.action-item:active {
+  border-color: #28E088;
+  background: #1A1D21;
 }
 
 .action-icon {
-  width: 96rpx;
-  height: 96rpx;
-  border-radius: 28rpx;
+  width: 64rpx;
+  height: 64rpx;
+  border-radius: 8rpx;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-bottom: 16rpx;
+  margin-bottom: 24rpx;
 }
 
-.action-create {
-  background: linear-gradient(135deg, #6C5CE7 0%, #a855f7 100%);
-  box-shadow: 0 8rpx 20rpx rgba(108, 92, 231, 0.25);
-}
-
-.action-join {
-  background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
-  box-shadow: 0 8rpx 20rpx rgba(0, 184, 148, 0.25);
-}
-
-.action-venue {
-  background: linear-gradient(135deg, #fdcb6e 0%, #f39c12 100%);
-  box-shadow: 0 8rpx 20rpx rgba(253, 203, 110, 0.25);
-}
-
-.action-history {
-  background: linear-gradient(135deg, #e17055 0%, #d63031 100%);
-  box-shadow: 0 8rpx 20rpx rgba(225, 112, 85, 0.25);
-}
-
-.action-emoji {
-  font-size: 40rpx;
-  color: #fff;
-}
+/* 渐变色保持 Trae 调性 */
+.action-create { background: rgba(40, 224, 136, 0.1); color: #28E088; }
+.action-join { background: rgba(0, 184, 148, 0.1); color: #00b894; }
+.action-venue { background: rgba(255, 171, 0, 0.1); color: #FFAB00; }
+.action-history { background: rgba(138, 144, 150, 0.1); color: #8A9096; }
 
 .action-label {
-  font-size: 24rpx;
-  color: rgba(255, 255, 255, 0.5);
-  font-weight: 500;
+  font-size: 28rpx;
+  color: #ffffff;
+  font-weight: 600;
 }
 
 /* Section */
-.section {
-  margin-bottom: 48rpx;
-}
-
 .section-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 24rpx;
+  margin-bottom: 32rpx;
+}
+
+.section-title {
+  margin-bottom: 0;
 }
 
 .section-more {
   font-size: 24rpx;
-  color: #6C5CE7;
+  color: #28E088;
   font-weight: 500;
 }
 
 /* 牌局卡片 */
 .room-card {
-  background: #1a1a1a;
-  border-radius: 24rpx;
-  padding: 28rpx;
-  margin-bottom: 20rpx;
-  border: 1rpx solid rgba(255, 255, 255, 0.06);
-  transition: all 0.2s ease;
-}
-
-.room-card:active {
-  background: #222;
-}
-
-.room-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 20rpx;
-}
-
-.room-card-left {
-  display: flex;
-  align-items: center;
+  background: #101214;
+  border-radius: 12rpx;
+  padding: 32rpx;
+  margin-bottom: 24rpx;
+  border: 1rpx solid #1F1F1F;
 }
 
 .room-no-text {
-  font-size: 32rpx;
-  font-weight: 700;
-  color: #fff;
-  margin-right: 16rpx;
+  font-size: 30rpx;
+  font-weight: 600;
+  color: #ffffff;
 }
 
-.room-game-type {
-  font-size: 22rpx;
-  color: rgba(255, 255, 255, 0.35);
-  background: rgba(255, 255, 255, 0.06);
-  padding: 6rpx 14rpx;
-  border-radius: 12rpx;
-}
-
-/* 状态胶囊 */
 .status-pill {
   display: flex;
   align-items: center;
-  padding: 8rpx 18rpx;
-  border-radius: 20rpx;
-  font-size: 22rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 4rpx;
+  font-size: 20rpx;
   font-weight: 500;
 }
 
-.status-dot {
-  width: 12rpx;
-  height: 12rpx;
-  border-radius: 50%;
-  margin-right: 8rpx;
-}
-
-.status-waiting {
-  background: rgba(16, 185, 129, 0.12);
-  color: #34d399;
-}
-
-.status-waiting .status-dot {
-  background: #34d399;
-}
-
-.status-playing {
-  background: rgba(251, 191, 36, 0.12);
-  color: #fbbf24;
-}
-
-.status-playing .status-dot {
-  background: #fbbf24;
-}
-
-/* 牌局详情 */
-.room-card-body {
-  margin-bottom: 20rpx;
-}
+.status-waiting { background: rgba(40, 224, 136, 0.1); color: #28E088; }
+.status-playing { background: rgba(138, 144, 150, 0.1); color: #8A9096; }
 
 .room-meta-row {
   display: flex;
-  align-items: center;
-  margin-bottom: 12rpx;
+  margin-top: 16rpx;
+  font-size: 26rpx;
 }
 
 .meta-label {
-  font-size: 26rpx;
-  color: rgba(255, 255, 255, 0.35);
+  color: #4B4B4B;
   width: 80rpx;
 }
 
 .meta-value {
-  font-size: 26rpx;
-  color: rgba(255, 255, 255, 0.75);
-}
-
-.venue-name-text {
-  max-width: 400rpx;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  color: #8A9096;
 }
 
 .room-card-footer {
+  margin-top: 24rpx;
+  border-top: 1rpx solid #1F1F1F;
+  padding-top: 24rpx;
   display: flex;
   justify-content: flex-end;
-  padding-top: 16rpx;
-  border-top: 1rpx solid rgba(255, 255, 255, 0.04);
 }
 
 .room-join-btn {
-  background: linear-gradient(135deg, #6C5CE7 0%, #a855f7 100%);
-  color: #fff;
-  border-radius: 32rpx;
-  padding: 12rpx 40rpx;
+  background: #28E088;
+  color: #000000;
+  border-radius: 8rpx;
+  padding: 12rpx 32rpx;
   font-size: 24rpx;
   font-weight: 600;
-  border: none;
-  box-shadow: 0 4rpx 12rpx rgba(108, 92, 231, 0.25);
-}
-
-.room-join-btn::after {
-  border: none;
 }
 
 /* 场地卡片 */
 .venue-card {
   display: flex;
-  background: #1a1a1a;
-  border-radius: 24rpx;
+  background: #101214;
+  border-radius: 12rpx;
   overflow: hidden;
-  margin-bottom: 20rpx;
-  border: 1rpx solid rgba(255, 255, 255, 0.06);
+  margin-bottom: 24rpx;
+  border: 1rpx solid #1F1F1F;
 }
 
 .venue-card-image {
-  width: 220rpx;
+  width: 180rpx;
   height: 180rpx;
-  flex-shrink: 0;
-}
-
-.venue-card-image image {
-  width: 100%;
-  height: 100%;
 }
 
 .venue-card-info {
   flex: 1;
-  padding: 20rpx 24rpx;
+  padding: 24rpx;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -294,43 +202,16 @@
 .venue-card-name {
   font-size: 28rpx;
   font-weight: 600;
-  color: #fff;
-}
-
-.venue-card-meta {
-  display: flex;
-  align-items: center;
-}
-
-.venue-rating {
-  color: #fbbf24;
-  font-size: 24rpx;
-  margin-right: 20rpx;
+  color: #ffffff;
 }
 
 .venue-price {
-  color: #a78bfa;
+  color: #28E088;
   font-size: 24rpx;
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .venue-card-address {
-  color: rgba(255, 255, 255, 0.3);
+  color: #4B4B4B;
   font-size: 22rpx;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* 空状态 */
-.empty-icon {
-  font-size: 80rpx;
-  margin-bottom: 20rpx;
-  opacity: 0.2;
-}
-
-.empty-text {
-  color: rgba(255, 255, 255, 0.25);
-  font-size: 28rpx;
-  margin-bottom: 32rpx;
 }

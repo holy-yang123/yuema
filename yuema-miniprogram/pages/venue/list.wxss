@@ -1,90 +1,109 @@
 .container {
-  background-color: #0f0f0f;
+  background-color: #000000;
   min-height: 100vh;
 }
 
 .header {
-  padding: 30rpx;
-  background-color: #1a1a1a;
+  padding: 32rpx;
+  background-color: #000000;
+  border-bottom: 1rpx solid #1F1F1F;
 }
 
 .search-box {
   display: flex;
   align-items: center;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 40rpx;
-  padding: 15rpx 30rpx;
+  background: #1A1D21; /* 稍稍提亮背景 */
+  border-radius: 8rpx;
+  padding: 16rpx 24rpx;
+  border: 1rpx solid #30363D; /* 更有质感的边框 */
 }
 
 .search-box input {
   flex: 1;
   margin-left: 20rpx;
-  color: #fff;
+  color: #ffffff;
   font-size: 28rpx;
 }
 
 .placeholder-style {
-  color: rgba(255, 255, 255, 0.2);
+  color: #8A9096; /* 提亮占位符 */
 }
 
 .venue-list {
-  padding: 30rpx;
-  box-sizing: border-box;
+  padding: 32rpx;
+  width: 100%;
 }
 
 .venue-card {
-  background: #1a1a1a;
-  border-radius: 24rpx;
-  margin-bottom: 30rpx;
+  width: 100%;
+  background: #101214;
+  border-radius: 12rpx;
+  margin-bottom: 32rpx;
   overflow: hidden;
   display: flex;
-  border: 1rpx solid rgba(255, 255, 255, 0.05);
+  align-items: center; /* 垂直居中 */
+  padding: 24rpx; /* 改为内部 padding */
+  border: 1rpx solid #1F1F1F;
+  transition: all 0.2s ease;
+}
+
+.venue-card:active {
+  border-color: #28E088;
+  background: #1A1D21;
 }
 
 .venue-image {
-  width: 220rpx;
-  height: 220rpx;
+  width: 160rpx; /* 稍微缩小图片，让排版更精致 */
+  height: 160rpx;
+  background: #1F1F1F; /* 解决黑洞问题 */
+  border-radius: 8rpx;
+  flex-shrink: 0;
 }
 
 .venue-image image {
   width: 100%;
   height: 100%;
+  border-radius: 8rpx;
 }
 
 .venue-info {
   flex: 1;
-  padding: 20rpx;
+  padding-left: 24rpx; /* 改为 padding-left */
   display: flex;
   flex-direction: column;
+  justify-content: center;
 }
 
 .venue-name {
-  color: #fff;
-  font-size: 32rpx;
-  font-weight: bold;
-  margin-bottom: 10rpx;
+  color: #ffffff;
+  font-size: 30rpx;
+  font-weight: 600;
+  margin-bottom: 8rpx;
 }
 
 .venue-meta {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 10rpx;
+  align-items: center;
+  margin-bottom: 8rpx;
 }
 
 .rating {
-  color: #fbbf24;
+  color: #FFAB00;
   font-size: 24rpx;
+  font-weight: 500;
 }
 
 .price {
-  color: #a78bfa;
-  font-size: 24rpx;
+  color: #28E088;
+  font-size: 26rpx;
+  font-weight: 600;
 }
 
 .venue-address {
-  color: rgba(255, 255, 255, 0.4);
+  color: #4B4B4B;
   font-size: 22rpx;
-  margin-bottom: 15rpx;
+  margin-bottom: 12rpx;
   display: -webkit-box;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
@@ -93,21 +112,22 @@
 
 .venue-tags {
   display: flex;
+  gap: 12rpx;
 }
 
 .tag {
-  font-size: 20rpx;
-  color: rgba(255, 255, 255, 0.5);
-  background: rgba(255, 255, 255, 0.05);
-  padding: 4rpx 12rpx;
+  font-size: 18rpx;
+  color: #8A9096;
+  background: #1A1D21;
+  padding: 4rpx 10rpx;
   border-radius: 4rpx;
-  margin-right: 10rpx;
+  border: 1rpx solid #30363D;
 }
 
 .empty-state {
   display: flex;
   justify-content: center;
-  padding-top: 100rpx;
-  color: rgba(255, 255, 255, 0.3);
+  padding-top: 160rpx;
+  color: #4B4B4B;
   font-size: 28rpx;
 }

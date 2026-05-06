@@ -11,16 +11,16 @@
     "pages/user/index"
   ],
   "window": {
-    "backgroundTextStyle": "dark",
-    "navigationBarBackgroundColor": "#0f0f0f",
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#000000",
     "navigationBarTitleText": "约麻",
     "navigationBarTextStyle": "white",
-    "backgroundColor": "#0f0f0f"
+    "backgroundColor": "#000000"
   },
   "tabBar": {
-    "color": "rgba(255,255,255,0.35)",
-    "selectedColor": "#a78bfa",
-    "backgroundColor": "#1a1a1a",
+    "color": "#8A9096",
+    "selectedColor": "#28E088",
+    "backgroundColor": "#000000",
     "borderStyle": "black",
     "list": [
       {
