@@ -1,0 +1,27 @@
+<view class="container">
+  <swiper class="banner" indicator-dots autoplay circular>
+    <swiper-item wx:for="{{venue.imageUrls}}" wx:key="*this">
+      <image src="{{item}}" mode="aspectFill"></image>
+    </swiper-item>
+  </swiper>
+
+  <view class="info-section">
+    <view class="venue-header">
+      <view class="venue-name">{{venue.name}}</view>
+      <view class="venue-rating">{{venue.rating}} ⭐</view>
+    </view>
+    <view class="venue-address" bindtap="openMap">
+      <text class="address-text">{{venue.address}}</text>
+      <text class="distance">导航 ></text>
+    </view>
+  </view>
+
+  <view class="detail-section">
+    <view class="section-title">场地介绍</view>
+    <view class="section-content">{{venue.description || '暂无详细介绍'}}</view>
+  </view>
+
+  <view class="footer-btn">
+    <button class="book-btn" bindtap="goToBook">立即预订</button>
+  </view>
+</view>

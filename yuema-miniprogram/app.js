@@ -2,7 +2,8 @@ App({
   globalData: {
     userInfo: null,
     token: null,
-    apiBaseUrl: 'http://localhost:8080/api'
+    // 修改为你的局域网 IP
+    apiBaseUrl: 'http://192.168.1.140:8080/api'
   },
 
   onLaunch() {

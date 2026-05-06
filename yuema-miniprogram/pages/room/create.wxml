@@ -1,0 +1,34 @@
+<view class="container">
+  <view class="form-container">
+    <view class="form-item">
+      <text class="label">玩法选择</text>
+      <picker bindchange="onGameTypeChange" value="{{gameTypeIndex}}" range="{{gameTypes}}" range-key="name">
+        <view class="picker-value {{gameTypeIndex === -1 ? 'placeholder' : ''}}">
+          {{gameTypeIndex === -1 ? '请选择玩法' : gameTypes[gameTypeIndex].name}}
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <text class="label">最大人数</text>
+      <picker bindchange="onMaxPlayersChange" value="{{maxPlayersIndex}}" range="{{maxPlayersOptions}}">
+        <view class="picker-value">
+          {{maxPlayersOptions[maxPlayersIndex]}}人
+        </view>
+      </picker>
+    </view>
+
+    <view class="form-item">
+      <text class="label">场地(可选)</text>
+      <picker bindchange="onVenueChange" value="{{venueIndex}}" range="{{venues}}" range-key="name">
+        <view class="picker-value {{venueIndex === -1 ? 'placeholder' : ''}}">
+          {{venueIndex === -1 ? '待定' : venues[venueIndex].name}}
+        </view>
+      </picker>
+    </view>
+  </view>
+
+  <view class="btn-area">
+    <button class="submit-btn" bindtap="submit">创建房间</button>
+  </view>
+</view>

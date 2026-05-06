@@ -1,0 +1,86 @@
+.container {
+  background-color: #0f0f0f;
+  min-height: 100vh;
+  padding-bottom: 120rpx;
+}
+
+.banner {
+  width: 100%;
+  height: 450rpx;
+}
+
+.banner image {
+  width: 100%;
+  height: 100%;
+}
+
+.info-section {
+  padding: 30rpx;
+  background-color: #1a1a1a;
+  margin-bottom: 20rpx;
+}
+
+.venue-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.venue-name {
+  color: #fff;
+  font-size: 36rpx;
+  font-weight: bold;
+}
+
+.venue-rating {
+  color: #fbbf24;
+  font-size: 28rpx;
+}
+
+.venue-address {
+  display: flex;
+  justify-content: space-between;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 26rpx;
+}
+
+.distance {
+  color: #a78bfa;
+}
+
+.detail-section {
+  padding: 30rpx;
+  background-color: #1a1a1a;
+}
+
+.section-title {
+  color: #fff;
+  font-size: 30rpx;
+  font-weight: bold;
+  margin-bottom: 20rpx;
+  border-left: 6rpx solid #a78bfa;
+  padding-left: 20rpx;
+}
+
+.section-content {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 28rpx;
+  line-height: 1.6;
+}
+
+.footer-btn {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20rpx 40rpx;
+  background: #1a1a1a;
+  border-top: 1rpx solid rgba(255, 255, 255, 0.05);
+}
+
+.book-btn {
+  background: #a78bfa !important;
+  color: #fff !important;
+  border-radius: 44rpx !important;
+}

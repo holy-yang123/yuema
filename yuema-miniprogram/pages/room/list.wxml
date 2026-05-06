@@ -1,0 +1,50 @@
+<view class="container">
+  <view class="header">
+    <view class="search-box">
+      <icon type="search" size="18" color="rgba(255,255,255,0.3)"></icon>
+      <input placeholder="搜索房间号、玩法" placeholder-class="placeholder-style" bindinput="onSearchInput" />
+    </view>
+    <view class="filter-tabs">
+      <view class="tab {{currentTab === 'all' ? 'active' : ''}}" bindtap="switchTab" data-tab="all">全部</view>
+      <view class="tab {{currentTab === 'waiting' ? 'active' : ''}}" bindtap="switchTab" data-tab="waiting">等待中</view>
+      <view class="tab {{currentTab === 'playing' ? 'active' : ''}}" bindtap="switchTab" data-tab="playing">进行中</view>
+    </view>
+  </view>
+
+  <scroll-view scroll-y class="room-list" refresher-enabled refresher-triggered="{{refreshing}}" bindrefresherrefresh="onRefresh">
+    <view class="room-card" wx:for="{{filteredRooms}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}">
+      <view class="card-header">
+        <view class="room-no">#{{item.roomNo}}</view>
+        <view class="status-tag {{item.status === 0 ? 'waiting' : 'playing'}}">
+          {{item.status === 0 ? '等待中' : '进行中'}}
+        </view>
+      </view>
+      <view class="card-body">
+        <view class="info-row">
+          <text class="label">玩法</text>
+          <text class="value">{{gameTypeMap[item.gameType]}}</text>
+        </view>
+        <view class="info-row">
+          <text class="label">人数</text>
+          <text class="value">{{item.currentPlayers}}/{{item.maxPlayers}}</text>
+        </view>
+        <view class="info-row" wx:if="{{item.venueName}}">
+          <text class="label">场地</text>
+          <text class="value">{{item.venueName}}</text>
+        </view>
+      </view>
+      <view class="card-footer">
+        <button class="join-btn" type="primary" size="mini" catchtap="onJoin" data-id="{{item.id}}">立即加入</button>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:if="{{filteredRooms.length === 0}}">
+      <image src="/images/empty.png" mode="aspectFit" wx:if="{{hasEmptyImage}}"></image>
+      <text>暂无相关牌局</text>
+    </view>
+  </scroll-view>
+
+  <view class="create-fab" bindtap="goToCreate">
+    <text class="plus">+</text>
+  </view>
+</view>

@@ -1,0 +1,90 @@
+.container {
+  background-color: #0f0f0f;
+  min-height: 100vh;
+  padding: 30rpx;
+}
+
+.room-info {
+  background: #1a1a1a;
+  padding: 30rpx;
+  border-radius: 20rpx;
+  margin-bottom: 30rpx;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.room-no {
+  color: #fff;
+  font-size: 32rpx;
+  font-weight: bold;
+}
+
+.game-type {
+  color: #a78bfa;
+  font-size: 26rpx;
+}
+
+.history-item {
+  background: #1a1a1a;
+  border-radius: 20rpx;
+  padding: 30rpx;
+  margin-bottom: 20rpx;
+}
+
+.round-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+  padding-bottom: 20rpx;
+  border-bottom: 1rpx solid rgba(255, 255, 255, 0.05);
+}
+
+.round-no {
+  color: #fff;
+  font-size: 28rpx;
+  font-weight: bold;
+}
+
+.round-time {
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 22rpx;
+}
+
+.player-scores {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20rpx;
+}
+
+.player-score {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.nickname {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 26rpx;
+}
+
+.score {
+  font-size: 28rpx;
+  font-weight: bold;
+}
+
+.plus {
+  color: #34d399;
+}
+
+.minus {
+  color: #f87171;
+}
+
+.empty-state {
+  display: flex;
+  justify-content: center;
+  padding-top: 100rpx;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 28rpx;
+}

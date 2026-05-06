@@ -1,0 +1,163 @@
+.container {
+  background-color: #0f0f0f;
+  min-height: 100vh;
+  padding-bottom: 40rpx;
+}
+
+.header {
+  padding: 30rpx;
+  background-color: #1a1a1a;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.search-box {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 40rpx;
+  padding: 15rpx 30rpx;
+  margin-bottom: 30rpx;
+}
+
+.search-box input {
+  flex: 1;
+  margin-left: 20rpx;
+  color: #fff;
+  font-size: 28rpx;
+}
+
+.placeholder-style {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.filter-tabs {
+  display: flex;
+  justify-content: space-around;
+}
+
+.tab {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 28rpx;
+  padding: 10rpx 0;
+  position: relative;
+}
+
+.tab.active {
+  color: #a78bfa;
+  font-weight: bold;
+}
+
+.tab.active::after {
+  content: '';
+  position: absolute;
+  bottom: -10rpx;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 40rpx;
+  height: 4rpx;
+  background: #a78bfa;
+  border-radius: 2rpx;
+}
+
+.room-list {
+  padding: 30rpx;
+  box-sizing: border-box;
+}
+
+.room-card {
+  background: #1a1a1a;
+  border-radius: 24rpx;
+  padding: 30rpx;
+  margin-bottom: 30rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.05);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.room-no {
+  font-size: 32rpx;
+  font-weight: bold;
+  color: #fff;
+}
+
+.status-tag {
+  font-size: 22rpx;
+  padding: 4rpx 16rpx;
+  border-radius: 8rpx;
+}
+
+.status-tag.waiting {
+  background: rgba(167, 139, 250, 0.1);
+  color: #a78bfa;
+}
+
+.status-tag.playing {
+  background: rgba(52, 211, 153, 0.1);
+  color: #34d399;
+}
+
+.card-body {
+  margin-bottom: 30rpx;
+}
+
+.info-row {
+  display: flex;
+  margin-bottom: 12rpx;
+  font-size: 26rpx;
+}
+
+.label {
+  color: rgba(255, 255, 255, 0.4);
+  width: 100rpx;
+}
+
+.value {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.card-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.join-btn {
+  margin: 0 !important;
+  background: #a78bfa !important;
+  border-radius: 30rpx !important;
+}
+
+.create-fab {
+  position: fixed;
+  right: 40rpx;
+  bottom: 40rpx;
+  width: 100rpx;
+  height: 100rpx;
+  background: #a78bfa;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 8rpx 20rpx rgba(167, 139, 250, 0.4);
+}
+
+.plus {
+  color: #fff;
+  font-size: 60rpx;
+  margin-top: -6rpx;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 100rpx;
+  color: rgba(255, 255, 255, 0.3);
+  font-size: 28rpx;
+}

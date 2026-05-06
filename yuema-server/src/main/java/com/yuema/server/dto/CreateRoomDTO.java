@@ -1,0 +1,15 @@
+package com.yuema.server.dto;
+
+import lombok.Data;
+import java.time.LocalDateTime;
+
+@Data
+public class CreateRoomDTO {
+    private String gameType;
+    private Integer maxPlayers;
+    private Long venueId;
+    private LocalDateTime startTime;
+    private Integer baseScore;
+    private Integer taiFee;
+    private String remark;
+}

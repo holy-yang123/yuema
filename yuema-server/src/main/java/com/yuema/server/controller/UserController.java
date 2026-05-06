@@ -1,5 +1,6 @@
 package com.yuema.server.controller;
 
+import com.yuema.server.dto.LoginDTO;
 import com.yuema.server.entity.User;
 import com.yuema.server.service.UserService;
 import com.yuema.server.utils.JwtUtil;
@@ -21,13 +22,11 @@ public class UserController {
     private JwtUtil jwtUtil;
 
     @PostMapping("/login")
-    public Result<Map<String, Object>> login(@RequestParam String openid,
-                                              @RequestParam(required = false) String nickname,
-                                              @RequestParam(required = false) String avatarUrl) {
-        User user = userService.getByOpenid(openid);
+    public Result<Map<String, Object>> login(@RequestBody LoginDTO dto) {
+        User user = userService.getByOpenid(dto.getOpenid());
         
         if (user == null) {
-            user = userService.createUser(openid, nickname, avatarUrl);
+            user = userService.createUser(dto.getOpenid(), dto.getNickname(), dto.getAvatarUrl());
         } else {
             userService.updateLoginTime(user.getId());
         }

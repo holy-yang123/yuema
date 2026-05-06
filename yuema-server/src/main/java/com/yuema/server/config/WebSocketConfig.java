@@ -1,6 +1,7 @@
 package com.yuema.server.config;
 
 import com.yuema.server.websocket.RoomWebSocketHandler;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
@@ -11,14 +12,12 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketConfigurer {
 
+    @Autowired
+    private RoomWebSocketHandler roomWebSocketHandler;
+
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
-        registry.addHandler(roomWebSocketHandler(), "/ws/room")
+        registry.addHandler(roomWebSocketHandler, "/ws/room")
                 .setAllowedOrigins("*");
-    }
-
-    @Bean
-    public RoomWebSocketHandler roomWebSocketHandler() {
-        return new RoomWebSocketHandler();
     }
 }

@@ -1,0 +1,32 @@
+<view class="container">
+  <view class="header">
+    <view class="search-box">
+      <icon type="search" size="18" color="rgba(255,255,255,0.3)"></icon>
+      <input placeholder="搜索场地名称、地址" placeholder-class="placeholder-style" bindinput="onSearchInput" />
+    </view>
+  </view>
+
+  <scroll-view scroll-y class="venue-list" refresher-enabled refresher-triggered="{{refreshing}}" bindrefresherrefresh="onRefresh">
+    <view class="venue-card" wx:for="{{venues}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}">
+      <view class="venue-image">
+        <image src="{{item.imageUrls || '/images/default-venue.png'}}" mode="aspectFill"></image>
+      </view>
+      <view class="venue-info">
+        <view class="venue-name">{{item.name}}</view>
+        <view class="venue-meta">
+          <text class="rating">{{item.rating}} ⭐</text>
+          <text class="price">¥{{item.minPrice/100}}/h 起</text>
+        </view>
+        <view class="venue-address">{{item.address}}</view>
+        <view class="venue-tags">
+          <text class="tag">新风</text>
+          <text class="tag">免费茶水</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="empty-state" wx:if="{{venues.length === 0}}">
+      <text>暂无场地信息</text>
+    </view>
+  </scroll-view>
+</view>

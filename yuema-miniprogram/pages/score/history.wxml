@@ -1,0 +1,27 @@
+<view class="container">
+  <view class="room-info">
+    <text class="room-no">房间 #{{roomNo}}</text>
+    <text class="game-type">{{gameType}}</text>
+  </view>
+
+  <view class="history-list">
+    <view class="history-item" wx:for="{{history}}" wx:key="roundNo">
+      <view class="round-header">
+        <text class="round-no">第 {{item.roundNo}} 局</text>
+        <text class="round-time">{{item.time}}</text>
+      </view>
+      <view class="player-scores">
+        <view class="player-score" wx:for="{{item.playerScores}}" wx:for-item="ps" wx:key="userId">
+          <text class="nickname">{{ps.nickname}}</text>
+          <text class="score {{ps.scoreChange >= 0 ? 'plus' : 'minus'}}">
+            {{ps.scoreChange >= 0 ? '+' : ''}}{{ps.scoreChange}}
+          </text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <view class="empty-state" wx:if="{{history.length === 0}}">
+    <text>暂无局数记录</text>
+  </view>
+</view>

@@ -1,0 +1,51 @@
+.container {
+  background-color: #0f0f0f;
+  min-height: 100vh;
+  padding: 30rpx;
+}
+
+.form-container {
+  background: #1a1a1a;
+  border-radius: 24rpx;
+  padding: 0 30rpx;
+}
+
+.form-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 40rpx 0;
+  border-bottom: 1rpx solid rgba(255, 255, 255, 0.05);
+}
+
+.form-item:last-child {
+  border-bottom: none;
+}
+
+.label {
+  color: #fff;
+  font-size: 30rpx;
+}
+
+.picker-value {
+  color: #a78bfa;
+  font-size: 30rpx;
+}
+
+.picker-value.placeholder {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.btn-area {
+  margin-top: 60rpx;
+}
+
+.submit-btn {
+  background: #a78bfa !important;
+  color: #fff !important;
+  border-radius: 44rpx !important;
+  height: 88rpx !important;
+  line-height: 88rpx !important;
+  font-size: 32rpx !important;
+  font-weight: bold !important;
+}
