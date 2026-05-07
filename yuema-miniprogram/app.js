@@ -1,10 +1,19 @@
+/**
+ * 接口基址：最终请求形如 `${apiBaseUrl}/user/login`、`${apiBaseUrl}/user/avatar`
+ *（即 /api 前缀在 apiBaseUrl 里，不要再写成 /user/api/...）
+ *
+ * 真机注意：微信要求 request / uploadFile / downloadFile 使用「已配置的合法域名」，
+ * 通常须 HTTPS + 域名，一般不能填局域网 IP；开发者工具里勾选「不校验域名」仅对工具生效，
+ * 真机扫码预览仍会校验 → 会出现请求失败、Network 里 Provisional headers、库里 avatar_url 仍为 NULL。
+ * 真机联调可用：HTTPS 隧道/ngrok、部署到有证书域名，或使用开发者工具「真机调试」走调试通道。
+ */
 App({
   globalData: {
     userInfo: null,
     token: null,
     location: null, // {longitude, latitude}
     address: '', // 地址描述
-    // 修改为你的局域网 IP
+    // 本机调试改为当前电脑的局域网 IP；真机请改为可 HTTPS 访问的后端域名并在公众平台配置服务器域名
     apiBaseUrl: 'http://192.168.1.140:8080/api'
   },
 
@@ -15,7 +24,7 @@ App({
       this.globalData.token = token;
       this.getUserInfo();
     }
-    
+
     // 获取位置信息
     this.updateLocation();
   },
@@ -42,40 +51,110 @@ App({
     });
   },
 
-  // 登录
+  /**
+   * 头像是否为本地临时路径（需 wx.uploadFile 到服务端后才能持久化）
+   * 模拟器/不同基础库下可能是 wxfile://、http(s)://tmp/、或短路径，故放宽判断。
+   */
+  isTempAvatarPath(url) {
+    if (!url || typeof url !== 'string') {
+      return false;
+    }
+    const s = url.trim();
+    if (/^wxfile:\/\//i.test(s)) {
+      return true;
+    }
+    if (/^https?:\/\/tmp\//i.test(s)) {
+      return true;
+    }
+    // 开发工具里可能出现 http://127.0.0.1:port/tmp/... 等形式
+    if (/^https?:\/\/[^/]+\/tmp\//i.test(s)) {
+      return true;
+    }
+    return false;
+  },
+
+  /**
+   * 上传本地头像到服务端，返回 data.avatarUrl
+   */
+  uploadAvatar(filePath) {
+    return new Promise((resolve, reject) => {
+      if (!this.globalData.token) {
+        reject('未登录');
+        return;
+      }
+      wx.uploadFile({
+        url: `${this.globalData.apiBaseUrl}/user/avatar`,
+        filePath: filePath,
+        name: 'file',
+        header: {
+          Authorization: `Bearer ${this.globalData.token}`
+        },
+        success: (res) => {
+          const status = res.statusCode;
+          if (status !== undefined && status !== 200) {
+            reject(`头像上传失败 HTTP ${status}`);
+            return;
+          }
+          let body = res.data;
+          if (typeof body === 'string') {
+            try {
+              body = JSON.parse(body);
+            } catch (e) {
+              reject('头像上传响应解析失败');
+              return;
+            }
+          }
+          if (body.code === 200 && body.data && body.data.avatarUrl) {
+            if (this.globalData.userInfo) {
+              this.globalData.userInfo.avatarUrl = body.data.avatarUrl;
+            }
+            resolve(body.data);
+          } else {
+            reject((body && body.message) || '头像上传失败');
+          }
+        },
+        fail: (e) => {
+          reject((e && e.errMsg) || '头像上传网络失败');
+        }
+      });
+    });
+  },
+
+  // 登录：服务端用 code 换 openid，身份稳定
   login(nickname = null, avatarUrl = null) {
     return new Promise((resolve, reject) => {
       wx.login({
         success: (res) => {
-          if (res.code) {
-            // 调用后端登录接口
-            wx.request({
-              url: `${this.globalData.apiBaseUrl}/user/login`,
-              method: 'POST',
-              data: {
-                openid: 'user_' + res.code, // 使用真实 code 模拟 openid
-                nickname: nickname,
-                avatarUrl: avatarUrl
-              },
-              success: (result) => {
-                if (result.data.code === 200) {
-                  const data = result.data.data;
-                  this.globalData.token = data.token;
-                  this.globalData.userInfo = data;
-                  wx.setStorageSync('token', data.token);
-                  resolve(data);
-                } else if (result.data.code === 404) {
-                  // 返回特定对象表示需要完善资料
-                  resolve({ needProfile: true, openid: 'user_' + res.code });
-                } else {
-                  reject(result.data.message);
-                }
-              },
-              fail: reject
-            });
-          } else {
+          if (!res.code) {
             reject('微信登录失败');
+            return;
           }
+          wx.request({
+            url: `${this.globalData.apiBaseUrl}/user/login`,
+            method: 'POST',
+            header: {
+              'Content-Type': 'application/json'
+            },
+            data: {
+              code: res.code,
+              nickname: nickname,
+              avatarUrl: avatarUrl
+            },
+            success: (result) => {
+              if (result.data.code === 200) {
+                const data = result.data.data;
+                this.globalData.token = data.token;
+                this.globalData.userInfo = data;
+                wx.setStorageSync('token', data.token);
+                resolve(data);
+              } else if (result.data.code === 404) {
+                resolve({ needProfile: true });
+              } else {
+                reject(result.data.message || '登录失败');
+              }
+            },
+            fail: reject
+          });
         },
         fail: reject
       });
@@ -88,7 +167,7 @@ App({
       wx.request({
         url: `${this.globalData.apiBaseUrl}/user/info`,
         header: {
-          'Authorization': `Bearer ${this.globalData.token}`
+          Authorization: `Bearer ${this.globalData.token}`
         },
         success: (res) => {
           if (res.data.code === 200) {

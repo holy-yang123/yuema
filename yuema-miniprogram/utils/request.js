@@ -1,7 +1,8 @@
 const app = getApp();
 
-// 封装请求方法
+// 封装请求方法；silentBusinessCodes：这些业务 code 不弹全局 toast，仍 resolve（如登录 NEED_PROFILE）
 const request = (options) => {
+  const silentCodes = options.silentBusinessCodes || [];
   return new Promise((resolve, reject) => {
     wx.request({
       url: `${app.globalData.apiBaseUrl}${options.url}`,
@@ -14,7 +15,7 @@ const request = (options) => {
       },
       success: (res) => {
         if (res.statusCode === 200) {
-          if (res.data.code === 200) {
+          if (res.data.code === 200 || silentCodes.indexOf(res.data.code) !== -1) {
             resolve(res.data);
           } else {
             wx.showToast({
@@ -52,8 +53,8 @@ const request = (options) => {
 };
 
 module.exports = {
-  get: (url, data) => request({ url, method: 'GET', data }),
-  post: (url, data) => request({ url, method: 'POST', data }),
-  put: (url, data) => request({ url, method: 'PUT', data }),
-  del: (url, data) => request({ url, method: 'DELETE', data })
+  get: (url, data, extra = {}) => request({ url, method: 'GET', data, ...extra }),
+  post: (url, data, extra = {}) => request({ url, method: 'POST', data, ...extra }),
+  put: (url, data, extra = {}) => request({ url, method: 'PUT', data, ...extra }),
+  del: (url, data, extra = {}) => request({ url, method: 'DELETE', data, ...extra })
 };

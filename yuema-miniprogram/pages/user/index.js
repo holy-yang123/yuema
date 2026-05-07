@@ -5,7 +5,9 @@ Page({
   data: {
     userInfo: {},
     winRate: 0,
-    levelName: '雀士'
+    levelName: '雀士',
+    /** 弹窗打开后短延迟再允许点头像，降低连点触发「another chooseAvatar is in progress」 */
+    avatarPickDelay: false
   },
 
   onLoad() {
@@ -155,6 +157,10 @@ Page({
 
   // 触发登录
   async onLogin() {
+    if (this._loginBusy) {
+      return;
+    }
+    this._loginBusy = true;
     wx.showLoading({ title: '尝试登录...' });
     try {
       // 1. 先尝试静默登录
@@ -166,8 +172,14 @@ Page({
         this.setData({
           showLoginModal: true,
           tempNickname: '',
-          tempAvatarUrl: ''
+          tempAvatarUrl: '',
+          avatarPickDelay: true
         });
+        setTimeout(() => {
+          if (this.data.showLoginModal) {
+            this.setData({ avatarPickDelay: false });
+          }
+        }, 400);
       } else {
         // 3. 老用户，直接登录成功
         await this.loadUserInfo();
@@ -178,6 +190,8 @@ Page({
       wx.hideLoading();
       wx.showToast({ title: '登录失败', icon: 'none' });
       console.error(err);
+    } finally {
+      this._loginBusy = false;
     }
   },
 
@@ -187,6 +201,9 @@ Page({
 
   onChooseAvatar(e) {
     const { avatarUrl } = e.detail;
+    if (!avatarUrl) {
+      return;
+    }
     this.setData({
       tempAvatarUrl: avatarUrl
     });
@@ -200,23 +217,44 @@ Page({
 
   async confirmLogin() {
     const { tempNickname, tempAvatarUrl } = this.data;
-    
+
     if (!tempNickname) {
       wx.showToast({ title: '请输入昵称', icon: 'none' });
       return;
     }
 
-    wx.showLoading({ title: '登录中...' });
+    if (this._confirmLoginBusy) {
+      return;
+    }
+    this._confirmLoginBusy = true;
+    wx.showLoading({ title: '登录中...', mask: true });
     try {
-      await app.login(tempNickname, tempAvatarUrl);
+      // 临时本地路径不要写入登录接口（无法持久化）；其它非临时 URL 可随登录一次写入
+      const loginAvatar = app.isTempAvatarPath(tempAvatarUrl) ? null : tempAvatarUrl || null;
+      await app.login(tempNickname, loginAvatar);
+
+      if (tempAvatarUrl && app.isTempAvatarPath(tempAvatarUrl)) {
+        try {
+          await app.uploadAvatar(tempAvatarUrl);
+        } catch (upErr) {
+          console.error('头像上传失败:', upErr);
+          wx.showToast({
+            title: typeof upErr === 'string' ? upErr : '头像上传失败，可稍后重试',
+            icon: 'none',
+            duration: 2500
+          });
+        }
+      }
+
       await this.loadUserInfo();
       this.closeLoginModal();
-      wx.hideLoading();
       wx.showToast({ title: '登录成功', icon: 'success' });
     } catch (err) {
-      wx.hideLoading();
       wx.showToast({ title: '登录失败', icon: 'none' });
       console.error(err);
+    } finally {
+      wx.hideLoading();
+      this._confirmLoginBusy = false;
     }
   }
 });

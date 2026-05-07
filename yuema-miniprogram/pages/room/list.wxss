@@ -1,11 +1,16 @@
 .container {
-  background-color: #000000;
-  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background-color: #08090A;
+  box-sizing: border-box;
 }
 
 .header {
+  flex-shrink: 0;
   padding: 32rpx;
-  background-color: #000000;
+  background-color: #08090A;
   position: sticky;
   top: 0;
   z-index: 10;
@@ -64,6 +69,8 @@
 .room-list {
   padding: 32rpx;
   width: 100%;
+  box-sizing: border-box;
+  background-color: #08090A;
 }
 
 .room-card {

@@ -1,5 +1,6 @@
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\mapper\UserMapper.java
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\config\WebConfig.java
+F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\config\WxMiniAppProperties.java
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\service\UserService.java
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\entity\VenueRoom.java
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\dto\LoginDTO.java
@@ -10,6 +11,7 @@ F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\mapper\Score
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\websocket\RoomWebSocketHandler.java
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\config\CorsConfig.java
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\utils\RoomNoGenerator.java
+F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\service\WxMiniAppService.java
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\entity\ScoreRecord.java
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\entity\User.java
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\mapper\VenueRoomMapper.java
@@ -28,6 +30,7 @@ F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\service\Venu
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\controller\VenueController.java
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\config\WebSocketConfig.java
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\dto\ScoreRecordDTO.java
+F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\dto\UpdateUserDTO.java
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\service\ScoreService.java
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\dto\CreateRoomDTO.java
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\mapper\OrderMapper.java

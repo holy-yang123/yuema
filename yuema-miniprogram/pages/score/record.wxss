@@ -1,8 +1,9 @@
 .container {
-  background-color: #000000;
-  min-height: 100vh;
+  background-color: #08090A;
+  min-height: 100%;
   padding: 32rpx;
   padding-bottom: 180rpx;
+  box-sizing: border-box;
 }
 
 .score-header {

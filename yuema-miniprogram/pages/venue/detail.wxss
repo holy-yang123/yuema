@@ -1,7 +1,8 @@
 .container {
-  background-color: #000000;
-  min-height: 100vh;
+  background-color: #08090A;
+  min-height: 100%;
   padding-bottom: 140rpx;
+  box-sizing: border-box;
 }
 
 .banner {
@@ -18,7 +19,7 @@
 
 .info-section {
   padding: 40rpx 32rpx;
-  background-color: #000000;
+  background-color: #08090A;
 }
 
 .venue-header {

@@ -1,9 +1,9 @@
 const request = require('../utils/request');
 
 module.exports = {
-  // 登录
+  // 登录（若通过封装调用，404 NEED_PROFILE 需静默）
   login(data) {
-    return request.post('/user/login', data);
+    return request.post('/user/login', data, { silentBusinessCodes: [404] });
   },
 
   // 获取用户信息

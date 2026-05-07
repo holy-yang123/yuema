@@ -1,14 +1,19 @@
-<view class="container">
+<page-meta root-background-color="#08090A" background-color="#08090A" background-color-bottom="#08090A" background-text-style="light" />
+<view class="container home-page">
   <!-- 顶部问候 -->
   <view class="greeting">
     <view class="greeting-text">
       <view class="location-box" bindtap="reSelectLocation">
         <text class="location-icon">📍</text>
-        <text class="location-name">{{address || '获取位置中...'}}</text>
+        <view class="location-name-wrap">
+          <text class="location-name">{{address || '获取位置中...'}}</text>
+        </view>
         <text class="location-arrow">></text>
       </view>
-      <text class="greeting-hello">约麻</text>
-      <text class="greeting-sub">找到你的牌搭子</text>
+      <view class="greeting-headline">
+        <text class="greeting-hello">约麻</text>
+        <text class="greeting-sub">找到你的牌搭子</text>
+      </view>
     </view>
     <view class="greeting-avatar" bindtap="goToUser">
       <image src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill" class="avatar"/>
@@ -19,7 +24,7 @@
   <view class="search-bar">
     <view class="search-input">
       <text class="search-icon">⌕</text>
-      <input placeholder="搜索牌局、场地" disabled placeholder-style="color: rgba(255,255,255,0.3)"/>
+      <input placeholder="搜索牌局、场地" disabled placeholder-style="color: rgba(255,255,255,0.28); font-weight: 400"/>
     </view>
   </view>
 

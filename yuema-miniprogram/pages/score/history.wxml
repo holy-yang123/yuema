@@ -1,3 +1,4 @@
+<page-meta root-background-color="#08090A" background-color="#08090A" background-color-bottom="#08090A" background-text-style="light" />
 <view class="container">
   <view class="room-info">
     <text class="room-no">房间 #{{roomNo}}</text>

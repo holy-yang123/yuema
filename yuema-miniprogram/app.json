@@ -12,15 +12,17 @@
   ],
   "window": {
     "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#000000",
+    "navigationBarBackgroundColor": "#08090A",
     "navigationBarTitleText": "约麻",
     "navigationBarTextStyle": "white",
-    "backgroundColor": "#000000"
+    "backgroundColor": "#08090A",
+    "backgroundColorTop": "#08090A",
+    "backgroundColorBottom": "#08090A"
   },
   "tabBar": {
     "color": "#8A9096",
-    "selectedColor": "#28E088",
-    "backgroundColor": "#000000",
+    "selectedColor": "#4ae8b8",
+    "backgroundColor": "#08090A",
     "borderStyle": "black",
     "list": [
       {

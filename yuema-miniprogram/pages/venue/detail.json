@@ -1,4 +1,6 @@
 {
   "navigationBarTitleText": "场地详情",
+  "backgroundColor": "#08090A",
+  "backgroundTextStyle": "light",
   "usingComponents": {}
 }

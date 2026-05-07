@@ -1,11 +1,16 @@
 .container {
-  background-color: #000000;
-  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  background-color: #08090A;
+  box-sizing: border-box;
 }
 
 .header {
+  flex-shrink: 0;
   padding: 32rpx;
-  background-color: #000000;
+  background-color: #08090A;
   border-bottom: 1rpx solid #1F1F1F;
 }
 
@@ -32,6 +37,8 @@
 .venue-list {
   padding: 32rpx;
   width: 100%;
+  box-sizing: border-box;
+  background-color: #08090A;
 }
 
 .venue-card {

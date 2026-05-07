@@ -34,15 +34,15 @@ Page({
     });
   },
 
-  // 检查登录
+  // 检查登录：静默失败或 NEED_PROFILE（无 token）时仍加载首页公开数据
   async checkLogin() {
     if (!app.globalData.token) {
       try {
         await app.login();
-        this.loadData();
       } catch (err) {
         console.error('登录失败:', err);
       }
+      this.loadData();
     }
   },
 

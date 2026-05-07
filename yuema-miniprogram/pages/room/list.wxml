@@ -1,3 +1,4 @@
+<page-meta root-background-color="#08090A" background-color="#08090A" background-color-bottom="#08090A" background-text-style="light" />
 <view class="container">
   <view class="header">
     <view class="search-box">
@@ -11,7 +12,7 @@
     </view>
   </view>
 
-  <scroll-view scroll-y class="room-list" refresher-enabled refresher-triggered="{{refreshing}}" bindrefresherrefresh="onRefresh">
+  <scroll-view scroll-y class="room-list" style="height: {{scrollViewHeightPx}}px" refresher-enabled refresher-background="#08090A" refresher-triggered="{{refreshing}}" bindrefresherrefresh="onRefresh">
     <view class="room-card" wx:for="{{filteredRooms}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}">
       <view class="card-header">
         <view class="room-no">#{{item.roomNo}}</view>

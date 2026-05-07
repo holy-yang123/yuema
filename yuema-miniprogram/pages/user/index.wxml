@@ -1,3 +1,4 @@
+<page-meta root-background-color="#08090A" background-color="#08090A" background-color-bottom="#08090A" background-text-style="light" />
 <view class="container">
   <!-- 用户信息卡片 -->
   <view class="profile-hero">
@@ -104,7 +105,7 @@
       </view>
       
       <view class="login-form">
-        <button class="avatar-wrapper" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+        <button class="avatar-wrapper" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar" disabled="{{avatarPickDelay}}">
           <image class="modal-avatar" src="{{tempAvatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
           <view class="avatar-edit-tag">更换</view>
         </button>

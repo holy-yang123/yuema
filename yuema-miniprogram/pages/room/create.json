@@ -1,4 +1,6 @@
 {
   "navigationBarTitleText": "发起约局",
+  "backgroundColor": "#08090A",
+  "backgroundTextStyle": "light",
   "usingComponents": {}
 }

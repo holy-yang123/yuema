@@ -1,3 +1,4 @@
+<page-meta root-background-color="#08090A" background-color="#08090A" background-color-bottom="#08090A" background-text-style="light" />
 <view class="container">
   <!-- 房间信息 -->
   <view class="room-header-card">

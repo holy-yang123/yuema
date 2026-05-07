@@ -2,6 +2,8 @@ server:
   port: 8080
   servlet:
     context-path: /api
+  # 置于 Nginx/网关后时建议开启，便于拼接正确的 https 与 Host（头像外链等）
+  # forward-headers-strategy: framework
 
 spring:
   application:
@@ -36,6 +38,11 @@ spring:
     serialization:
       write-dates-as-timestamps: false
 
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 6MB
+
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
@@ -54,12 +61,16 @@ logging:
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{50} - %msg%n"
 
-# 微信小程序配置
+# 微信小程序配置（生产请填写真实 appid/secret；本地无密钥时可设 mock-enabled: true）
 wx:
   miniapp:
-    appid: your-app-id
-    secret: your-app-secret
+    appid: wx868ee601231a4e3f
+    secret: 38ee167eff1b9ff213bf270f94ff7454
+    mock-enabled: false
 
+# 真机展示头像：上传接口返回的 avatar_url 须为手机可访问的 HTTPS；建议在服务器域名备案域名下部署后端并配置：
+# yuema.public-base-url: https://api.yourdomain.com/api
+# 同时在微信公众平台配置「downloadFile 合法域名」为该域名（不含路径）。
 # JWT配置
 jwt:
   secret: your-jwt-secret-key-here

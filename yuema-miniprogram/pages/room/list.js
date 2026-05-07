@@ -7,6 +7,7 @@ Page({
     currentTab: 'all',
     refreshing: false,
     searchQuery: '',
+    scrollViewHeightPx: 400,
     gameTypeMap: {
       'sichuan': '四川麻将',
       'guobiao': '国标麻将',
@@ -15,11 +16,36 @@ Page({
   },
 
   onLoad() {
+    try {
+      const h = wx.getWindowInfo().windowHeight;
+      this.setData({ scrollViewHeightPx: Math.max(200, Math.floor(h * 0.62)) });
+    } catch (e) {}
     this.loadRooms();
+  },
+
+  onReady() {
+    this.updateScrollListHeight();
   },
 
   onShow() {
     this.loadRooms();
+    wx.nextTick(() => this.updateScrollListHeight());
+  },
+
+  updateScrollListHeight() {
+    try {
+      const win = wx.getWindowInfo();
+      wx.createSelectorQuery()
+        .in(this)
+        .select('.header')
+        .boundingClientRect()
+        .exec((res) => {
+          const rect = res && res[0];
+          if (!rect || typeof rect.bottom !== 'number') return;
+          const px = Math.max(120, Math.floor(win.windowHeight - rect.bottom));
+          this.setData({ scrollViewHeightPx: px });
+        });
+    } catch (e) {}
   },
 
   async loadRooms() {

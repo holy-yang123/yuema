@@ -11,7 +11,11 @@ public class User {
     
     @TableId(type = IdType.AUTO)
     private Long id;
-    
+
+    /**
+     * 须与表字段 openid 一致；显式映射避免命名策略误判，且插入时必须写入（NOT NULL）。
+     */
+    @TableField(value = "openid", insertStrategy = FieldStrategy.ALWAYS)
     private String openid;
     
     private String unionid;

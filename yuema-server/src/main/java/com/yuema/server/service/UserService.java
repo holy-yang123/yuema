@@ -6,6 +6,7 @@ import com.yuema.server.mapper.UserMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Service
 public class UserService extends ServiceImpl<UserMapper, User> {
@@ -19,6 +20,7 @@ public class UserService extends ServiceImpl<UserMapper, User> {
     }
 
     public User createUser(String openid, String nickname, String avatarUrl) {
+        Objects.requireNonNull(openid, "openid");
         User user = new User();
         user.setOpenid(openid);
         user.setNickname(nickname);
