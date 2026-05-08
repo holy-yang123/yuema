@@ -15,9 +15,13 @@ public class WebSocketConfig implements WebSocketConfigurer {
     @Autowired
     private RoomWebSocketHandler roomWebSocketHandler;
 
+    @Autowired
+    private JwtHandshakeInterceptor jwtHandshakeInterceptor;
+
     @Override
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         registry.addHandler(roomWebSocketHandler, "/ws/room")
+                .addInterceptors(jwtHandshakeInterceptor)
                 .setAllowedOrigins("*");
     }
 }

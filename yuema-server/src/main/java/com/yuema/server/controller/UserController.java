@@ -2,7 +2,11 @@ package com.yuema.server.controller;
 
 import com.yuema.server.dto.LoginDTO;
 import com.yuema.server.dto.UpdateUserDTO;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yuema.server.entity.User;
+import com.yuema.server.entity.UserGameRecord;
+import com.yuema.server.mapper.UserGameRecordMapper;
 import com.yuema.server.service.UserService;
 import com.yuema.server.service.WxMiniAppService;
 import com.yuema.server.utils.JwtUtil;
@@ -31,6 +35,9 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserGameRecordMapper userGameRecordMapper;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -97,6 +104,34 @@ public class UserController {
             return Result.error("用户不存在");
         }
         return Result.success(user);
+    }
+
+    @GetMapping("/game-records")
+    public Result<Page<UserGameRecord>> gameRecords(@RequestAttribute Long userId,
+                                                    @RequestParam(defaultValue = "1") long current,
+                                                    @RequestParam(defaultValue = "20") long size) {
+        Page<UserGameRecord> page = new Page<>(current, size);
+        userGameRecordMapper.selectPage(page, Wrappers.<UserGameRecord>lambdaQuery()
+                .eq(UserGameRecord::getUserId, userId)
+                .orderByDesc(UserGameRecord::getEndedAt));
+        return Result.success(page);
+    }
+
+    @GetMapping("/stats")
+    public Result<Map<String, Object>> stats(@RequestAttribute Long userId) {
+        User user = userService.getById(userId);
+        if (user == null) {
+            return Result.error("用户不存在");
+        }
+        int tg = user.getTotalGames() == null ? 0 : user.getTotalGames();
+        int wg = user.getWinGames() == null ? 0 : user.getWinGames();
+        int sc = user.getScore() == null ? 0 : user.getScore();
+        Map<String, Object> m = new HashMap<>();
+        m.put("totalGames", tg);
+        m.put("winGames", wg);
+        m.put("score", sc);
+        m.put("winRate", tg > 0 ? Math.round((wg * 100.0) / tg) : 0);
+        return Result.success(m);
     }
 
     @PutMapping("/info")

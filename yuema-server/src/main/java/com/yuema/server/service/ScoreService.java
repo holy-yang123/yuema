@@ -23,21 +23,21 @@ public class ScoreService extends ServiceImpl<ScoreRecordMapper, ScoreRecord> {
     @Autowired
     private RoomMemberMapper roomMemberMapper;
 
+    /**
+     * @return null 成功；ROUND_EXISTS 该局已有记分；ROOM_INVALID 房间不存在或未进行中
+     */
     @Transactional
-    public boolean recordScores(Long recorderId, ScoreRecordDTO dto) {
+    public String recordScores(Long recorderId, ScoreRecordDTO dto) {
         Room room = roomMapper.selectById(dto.getRoomId());
         if (room == null || room.getStatus() != 1) {
-            return false;
+            return "ROOM_INVALID";
         }
 
-        // 检查该局是否已记录
         List<ScoreRecord> existingRecords = baseMapper.selectByRoomAndRound(dto.getRoomId(), dto.getRoundNo());
         if (!existingRecords.isEmpty()) {
-            // 删除旧记录
-            existingRecords.forEach(record -> removeById(record.getId()));
+            return "ROUND_EXISTS";
         }
 
-        // 保存新记录
         for (ScoreRecordDTO.PlayerScoreDTO playerScore : dto.getPlayerScores()) {
             ScoreRecord record = new ScoreRecord();
             record.setRoomId(dto.getRoomId());
@@ -51,7 +51,7 @@ public class ScoreService extends ServiceImpl<ScoreRecordMapper, ScoreRecord> {
             save(record);
         }
 
-        return true;
+        return null;
     }
 
     public List<ScoreRecord> getRoomScores(Long roomId) {

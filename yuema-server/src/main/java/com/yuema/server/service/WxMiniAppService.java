@@ -4,6 +4,10 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.yuema.server.config.WxMiniAppProperties;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -20,6 +24,10 @@ public class WxMiniAppService {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    private volatile String cachedAccessToken;
+    private volatile long tokenExpiresAtMs;
+    private final Object accessTokenLock = new Object();
 
     /**
      * 使用 login code 换取稳定 openid。
@@ -62,5 +70,77 @@ public class WxMiniAppService {
             throw new IllegalStateException("微信未返回 openid");
         }
         return openid;
+    }
+
+    /**
+     * 获取小程序 access_token（约 2h 有效，提前 2 分钟刷新）
+     */
+    public String getAccessToken() {
+        if (wxMiniAppProperties.isMockEnabled()) {
+            return null;
+        }
+        String appid = wxMiniAppProperties.getAppid();
+        String secret = wxMiniAppProperties.getSecret();
+        if (appid == null || appid.isEmpty() || secret == null || secret.isEmpty()) {
+            throw new IllegalStateException("未配置 wx.miniapp.appid / secret");
+        }
+        long now = System.currentTimeMillis();
+        if (cachedAccessToken != null && now < tokenExpiresAtMs - 120_000L) {
+            return cachedAccessToken;
+        }
+        synchronized (accessTokenLock) {
+            if (cachedAccessToken != null && now < tokenExpiresAtMs - 120_000L) {
+                return cachedAccessToken;
+            }
+            URI uri = UriComponentsBuilder.fromHttpUrl("https://api.weixin.qq.com/cgi-bin/token")
+                    .queryParam("grant_type", "client_credential")
+                    .queryParam("appid", appid)
+                    .queryParam("secret", secret)
+                    .build()
+                    .encode()
+                    .toUri();
+            String body = restTemplate.getForObject(uri, String.class);
+            if (body == null || body.isEmpty()) {
+                throw new IllegalStateException("获取 access_token 无响应");
+            }
+            JSONObject json = JSON.parseObject(body);
+            if (json.containsKey("errcode") && json.getIntValue("errcode") != 0) {
+                throw new IllegalStateException("获取 access_token 失败: " + json.getString("errmsg"));
+            }
+            String token = json.getString("access_token");
+            int expiresIn = json.getIntValue("expires_in");
+            if (token == null || token.isEmpty()) {
+                throw new IllegalStateException("access_token 为空");
+            }
+            cachedAccessToken = token;
+            tokenExpiresAtMs = System.currentTimeMillis() + Math.max(expiresIn, 60) * 1000L;
+            return token;
+        }
+    }
+
+    /**
+     * 调用 getUnlimited 生成小程序码 PNG 字节；失败时抛出异常（响应体可能为 JSON）
+     */
+    public byte[] getWxaCodeUnlimited(String scene, String page) {
+        String token = getAccessToken();
+        String url = "https://api.weixin.qq.com/wxa/getwxacodeunlimit?access_token=" + token;
+        JSONObject req = new JSONObject();
+        req.put("scene", scene);
+        req.put("page", page);
+        req.put("check_path", false);
+        req.put("width", 280);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> entity = new HttpEntity<>(req.toJSONString(), headers);
+        ResponseEntity<byte[]> resp = restTemplate.postForEntity(url, entity, byte[].class);
+        byte[] bytes = resp.getBody();
+        if (bytes == null || bytes.length == 0) {
+            throw new IllegalStateException("小程序码响应为空");
+        }
+        if (bytes[0] == '{') {
+            JSONObject err = JSON.parseObject(new String(bytes, java.nio.charset.StandardCharsets.UTF_8));
+            throw new IllegalStateException("小程序码失败: " + err.getString("errmsg"));
+        }
+        return bytes;
     }
 }

@@ -53,4 +53,23 @@ public class UserService extends ServiceImpl<UserMapper, User> {
             updateById(user);
         }
     }
+
+    /**
+     * 牌局结束：累计总局数、胜局、积分（finalScore 可正可负）
+     */
+    public void accumulateGameResult(Long userId, int finalScore, boolean isWinner) {
+        User user = getById(userId);
+        if (user == null) {
+            return;
+        }
+        int tg = user.getTotalGames() == null ? 0 : user.getTotalGames();
+        int wg = user.getWinGames() == null ? 0 : user.getWinGames();
+        int sc = user.getScore() == null ? 0 : user.getScore();
+        user.setTotalGames(tg + 1);
+        if (isWinner) {
+            user.setWinGames(wg + 1);
+        }
+        user.setScore(sc + finalScore);
+        updateById(user);
+    }
 }

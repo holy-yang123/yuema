@@ -16,6 +16,11 @@ module.exports = {
     return request.get('/venue/detail', { venueId });
   },
 
+  /** 与 getVenueDetail 同义，兼容旧页面调用 */
+  getVenueInfo(venueId) {
+    return request.get('/venue/detail', { venueId });
+  },
+
   // 获取场地包间
   getVenueRooms(venueId) {
     return request.get('/venue/rooms', { venueId });

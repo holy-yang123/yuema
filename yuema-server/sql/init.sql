@@ -184,6 +184,58 @@ CREATE TABLE IF NOT EXISTS user_reviews (
     INDEX idx_room (room_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户评价表';
 
+-- 牌局聊天消息
+CREATE TABLE IF NOT EXISTS chat_messages (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT 'ID',
+    room_id BIGINT NOT NULL COMMENT '牌局ID',
+    user_id BIGINT NOT NULL COMMENT '发送者',
+    msg_type VARCHAR(16) NOT NULL DEFAULT 'text' COMMENT 'text/system',
+    content VARCHAR(500) NOT NULL COMMENT '内容',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '时间',
+    INDEX idx_room_created (room_id, id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='牌局聊天';
+
+-- 计分修改申请
+CREATE TABLE IF NOT EXISTS score_modify_requests (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT 'ID',
+    room_id BIGINT NOT NULL COMMENT '牌局ID',
+    round_no INT NOT NULL COMMENT '局号',
+    requester_id BIGINT NOT NULL COMMENT '房主',
+    new_payload TEXT NOT NULL COMMENT 'JSON: [{userId,scoreChange}]',
+    new_score_type VARCHAR(32) DEFAULT NULL,
+    new_remark VARCHAR(255) DEFAULT NULL,
+    status TINYINT NOT NULL DEFAULT 0 COMMENT '0:待处理 1:已通过 2:已拒绝 3:已取消',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_room_status (room_id, status)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='计分修改申请';
+
+CREATE TABLE IF NOT EXISTS score_modify_votes (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT 'ID',
+    request_id BIGINT NOT NULL COMMENT '申请ID',
+    voter_id BIGINT NOT NULL COMMENT '投票人',
+    vote TINYINT NOT NULL COMMENT '1:同意 2:拒绝',
+    voted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uk_req_voter (request_id, voter_id),
+    INDEX idx_request (request_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='计分修改投票';
+
+-- 用户单局战绩快照（牌局结束时写入）
+CREATE TABLE IF NOT EXISTS user_game_records (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT 'ID',
+    user_id BIGINT NOT NULL COMMENT '用户',
+    room_id BIGINT NOT NULL COMMENT '牌局',
+    game_type VARCHAR(32) DEFAULT NULL,
+    venue_name VARCHAR(128) DEFAULT NULL,
+    rounds INT DEFAULT 0 COMMENT '总局数',
+    final_score INT DEFAULT 0 COMMENT '本场累计分',
+    is_winner TINYINT DEFAULT 0 COMMENT '1:本场总分>0',
+    started_at TIMESTAMP NULL DEFAULT NULL,
+    ended_at TIMESTAMP NULL DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    INDEX idx_user_ended (user_id, ended_at DESC),
+    INDEX idx_room (room_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户战绩快照';
+
 -- 插入测试数据
 INSERT INTO users (openid, nickname, avatar_url, phone, level, status) VALUES
 ('test_openid_1', '测试用户1', 'https://example.com/avatar1.jpg', '13800138001', 1, 1),
