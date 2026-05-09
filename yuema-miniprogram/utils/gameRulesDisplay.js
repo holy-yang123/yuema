@@ -46,6 +46,21 @@ function parseGameRulesDisplay(room) {
   return { presetTags, customLines };
 }
 
+/**
+ * 列表/卡片区展示：预设玩法标签 + 自定义规则行，与详情「本场约定」信息同源，避免仅展示布尔项漏掉口头约定
+ * @param {object} room
+ * @returns {Array<{key:string,label:string}>}
+ */
+function buildRuleCardTags(room) {
+  const { presetTags, customLines } = parseGameRulesDisplay(room);
+  const tags = presetTags.map((t) => ({ key: t.key, label: t.label }));
+  customLines.forEach((line, i) => {
+    tags.push({ key: `customLine-${i}`, label: line });
+  });
+  return tags;
+}
+
 module.exports = {
-  parseGameRulesDisplay
+  parseGameRulesDisplay,
+  buildRuleCardTags
 };

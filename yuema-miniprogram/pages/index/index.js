@@ -3,7 +3,7 @@ const roomService = require('../../services/roomService');
 const venueService = require('../../services/venueService');
 const { LOGIN_PAGE } = require('../../utils/pageRoutes');
 const { GAME_TYPE_LABELS } = require('../../utils/gameTypeLabels');
-const { parseGameRulesDisplay } = require('../../utils/gameRulesDisplay');
+const { buildRuleCardTags } = require('../../utils/gameRulesDisplay');
 
 Page({
   behaviors: [require('../../behaviors/themeBehavior')],
@@ -66,9 +66,10 @@ Page({
       );
       const u = app.globalData.userInfo;
       const currentUserId = u ? (u.userId != null ? u.userId : u.id) : null;
+      // 预设细则 + customLines，与牌局列表卡片一致
       const roomList = (roomRes.data || []).slice(0, 5).map((r) => ({
         ...r,
-        ruleCardTags: parseGameRulesDisplay(r).presetTags
+        ruleCardTags: buildRuleCardTags(r)
       }));
 
       let venueList = [];

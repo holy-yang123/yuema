@@ -229,6 +229,27 @@
   font-weight: 500;
 }
 
+.member-subrow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12rpx;
+  margin-top: 6rpx;
+}
+
+.member-rep {
+  font-size: 22rpx;
+  color: var(--text-secondary);
+}
+
+.member-realname-tag {
+  font-size: 20rpx;
+  color: var(--tag-primary-fg);
+  background: rgba(217, 119, 87, 0.12);
+  padding: 2rpx 10rpx;
+  border-radius: 4rpx;
+}
+
 .member-role {
   font-size: 22rpx;
   color: var(--text-secondary);

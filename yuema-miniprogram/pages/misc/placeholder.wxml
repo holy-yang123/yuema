@@ -1,0 +1,8 @@
+<page-meta root-background-color="{{themeMeta.rootBg}}" background-color="{{themeMeta.bg}}" background-color-bottom="{{themeMeta.bgBottom}}" background-text-style="{{themeMeta.textStyle}}" />
+<view class="{{themeScopeClass}}">
+  <view class="placeholder-wrap safe-bottom">
+    <text class="placeholder-title font-display">{{pageTitle}}</text>
+    <text class="placeholder-desc">{{subtitle}}</text>
+    <button class="placeholder-btn" bindtap="onKnowTap">知道了</button>
+  </view>
+</view>

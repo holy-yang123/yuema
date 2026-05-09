@@ -19,6 +19,8 @@ F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\entity\Order
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\mapper\ScoreModifyRequestMapper.java
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\YuemaServerApplication.java
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\service\VenueService.java
+F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\dto\ReportNoShowDTO.java
+F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\mapper\RoomNoShowRecordMapper.java
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\config\JwtHandshakeInterceptor.java
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\dto\ScoreRecordDTO.java
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\dto\UpdateUserDTO.java
@@ -30,6 +32,7 @@ F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\controller\C
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\service\UserService.java
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\entity\VenueRoom.java
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\controller\ScoreController.java
+F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\entity\RoomNoShowRecord.java
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\config\CorsConfig.java
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\utils\RoomNoGenerator.java
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\service\WxMiniAppService.java
@@ -37,6 +40,7 @@ F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\mapper\Venue
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\entity\Room.java
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\controller\RoomController.java
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\mapper\ChatMessageMapper.java
+F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\dto\WxPhoneCodeDTO.java
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\entity\ScoreModifyRequest.java
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\entity\RoomMember.java
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\mapper\RoomMapper.java

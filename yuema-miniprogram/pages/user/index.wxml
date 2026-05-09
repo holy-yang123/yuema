@@ -13,6 +13,12 @@
       </view>
       <text class="profile-name">{{userInfo.id ? userInfo.nickname : '访客您好'}}</text>
       <text class="profile-title" wx:if="{{userInfo.id}}">{{levelName}}</text>
+      <!-- 信誉与弱实名状态：与房间成员列表字段对齐，便于用户自查 -->
+      <view class="profile-trust-row" wx:if="{{userInfo.id}}">
+        <text class="profile-trust-text">信誉 {{trustSummary.reputation}}</text>
+        <text class="profile-trust-dot">·</text>
+        <text class="profile-trust-text {{trustSummary.verified ? 'is-verified' : ''}}">{{trustSummary.realnameText}}</text>
+      </view>
       <button class="login-trigger-btn" wx:else bindtap="onLogin">点击登录账户</button>
     </view>
     <view class="profile-stats-row">
@@ -89,6 +95,14 @@
       <text class="menu-item-status">{{phoneMenuStatus}}</text>
       <text class="menu-arrow">›</text>
     </view>
+    <view class="menu-item" bindtap="openWxRealnameModal">
+      <view class="menu-icon-wrap">
+        <image class="menu-icon-img" src="{{themeIsDark ? '/images/icons/ic-edit-dark.svg' : '/images/icons/ic-edit.svg'}}" mode="aspectFit" />
+      </view>
+      <text class="menu-item-text">微信手机号实名</text>
+      <text class="menu-item-status">{{trustSummary.verified ? '已完成' : '推荐'}}</text>
+      <text class="menu-arrow">›</text>
+    </view>
     <view class="menu-item" bindtap="showAbout">
       <view class="menu-icon-wrap">
         <image class="menu-icon-img" src="{{themeIsDark ? '/images/icons/ic-about-dark.svg' : '/images/icons/ic-about.svg'}}" mode="aspectFit" />
@@ -118,9 +132,10 @@
           <view class="avatar-edit-tag">更换</view>
         </button>
         
+        <!-- value+bindinput：未失焦就点「进入约麻」时仍能读到昵称（与编辑资料弹窗一致） -->
         <view class="nickname-input-wrap">
           <text class="input-label">昵称</text>
-          <input type="nickname" class="nickname-input" placeholder="请输入昵称" bindblur="onNicknameBlur" />
+          <input type="nickname" class="nickname-input" placeholder="请输入昵称" value="{{tempNickname}}" bindinput="onLoginNicknameInput" bindblur="onNicknameBlur" />
         </view>
       </view>
 
@@ -147,6 +162,19 @@
         </view>
       </view>
       <button class="confirm-login-btn" bindtap="confirmEditProfile">保存</button>
+    </view>
+  </view>
+
+  <!-- 微信手机号快速验证：对接后端 /user/bind-wx-phone，标记 realname_verified -->
+  <view class="login-modal {{showWxRealnameModal ? 'show' : ''}}" wx:if="{{showWxRealnameModal}}">
+    <view class="login-modal-mask" bindtap="closeWxRealnameModal"></view>
+    <view class="login-modal-content">
+      <view class="modal-header">
+        <text class="modal-title">微信手机号实名</text>
+        <text class="modal-subtitle">使用微信官方手机号能力，提升账号可信度与组局安全</text>
+      </view>
+      <button class="confirm-login-btn" open-type="getPhoneNumber" bindgetphonenumber="onWxPhoneForRealname">授权微信手机号</button>
+      <button class="logout-btn wx-realname-cancel" bindtap="closeWxRealnameModal">取消</button>
     </view>
   </view>
 </view>

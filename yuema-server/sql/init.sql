@@ -17,6 +17,8 @@ CREATE TABLE IF NOT EXISTS users (
     score INT DEFAULT 0 COMMENT '积分',
     total_games INT DEFAULT 0 COMMENT '总对局数',
     win_games INT DEFAULT 0 COMMENT '胜局数',
+    reputation_score INT DEFAULT 100 COMMENT '信誉分(爽约等扣减)',
+    realname_verified TINYINT DEFAULT 0 COMMENT '可信身份核验(微信手机号等) 0否1是',
     status TINYINT DEFAULT 1 COMMENT '状态 0:禁用 1:正常',
     last_login_time TIMESTAMP NULL DEFAULT NULL COMMENT '最后登录时间',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
@@ -237,6 +239,18 @@ CREATE TABLE IF NOT EXISTS user_game_records (
     INDEX idx_user_ended (user_id, ended_at DESC),
     INDEX idx_room (room_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='用户战绩快照';
+
+-- 爽约扣分明细（与信誉分联动，每牌局每用户仅一条）
+CREATE TABLE IF NOT EXISTS room_no_show_records (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT COMMENT '主键',
+    room_id BIGINT NOT NULL COMMENT '牌局',
+    target_user_id BIGINT NOT NULL COMMENT '被认定爽约的用户',
+    reporter_id BIGINT NOT NULL COMMENT '房主',
+    deducted_points INT NOT NULL COMMENT '本次扣除信誉分',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '记录时间',
+    UNIQUE KEY uk_room_target (room_id, target_user_id),
+    INDEX idx_target (target_user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='爽约记录';
 
 -- 插入测试数据
 INSERT INTO users (openid, nickname, avatar_url, phone, level, status) VALUES

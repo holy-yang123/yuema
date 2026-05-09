@@ -68,6 +68,11 @@ wx:
     secret: 38ee167eff1b9ff213bf270f94ff7454
     mock-enabled: false
 
+# 信誉：房主标记「爽约」时单次扣分（不低于 1，扣后信誉不低于 0）
+yuema:
+  reputation:
+    no-show-penalty: 10
+
 # 真机展示头像：上传接口返回的 avatar_url 须为手机可访问的 HTTPS；建议在服务器域名备案域名下部署后端并配置：
 # yuema.public-base-url: https://api.yourdomain.com/api
 # 同时在微信公众平台配置「downloadFile 合法域名」为该域名（不含路径）。

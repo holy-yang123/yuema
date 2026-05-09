@@ -94,7 +94,11 @@
         </view>
         <view class="member-info">
           <text class="member-name">{{item.nickname}}</text>
-          <text class="member-role {{item.role === 1 ? 'is-owner' : ''}}">{{item.role === 1 ? '房主' : '玩家'}}</text>
+          <view class="member-subrow">
+            <text class="member-role {{item.role === 1 ? 'is-owner' : ''}}">{{item.role === 1 ? '房主' : '玩家'}}</text>
+            <text class="member-rep">信誉 {{item.reputationScore != null ? item.reputationScore : 100}}</text>
+            <text wx:if="{{item.realnameVerified === 1}}" class="member-realname-tag">已核验</text>
+          </view>
         </view>
       </view>
       <view class="member-item member-empty" wx:for="{{emptySeats}}" wx:key="index">

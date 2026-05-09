@@ -171,6 +171,19 @@ Page({
     };
     h.member_left = () => this.loadRoomDetail();
     h.member_kicked = () => this.loadRoomDetail();
+    // 爽约扣分后刷新成员信誉展示，避免整页重拉列表闪烁
+    h.reputation_update = (msg) => {
+      const d = msg.data;
+      if (!d || Number(d.roomId) !== Number(this.data.roomId)) {
+        return;
+      }
+      const uid = Number(d.userId);
+      const score = d.reputationScore;
+      const members = (this.data.members || []).map((m) =>
+        Number(m.userId) === uid ? { ...m, reputationScore: score } : m
+      );
+      this.setData({ members });
+    };
     h.room_transfer = () => this.loadRoomDetail();
     h.room_ended = () => this.loadRoomDetail();
     h.score_modify_request = () => this.refreshModifyPending();
@@ -457,6 +470,11 @@ Page({
     } else if (this.data.isOwner) {
       itemList.push('转让房主给 TA', '踢出牌局');
       actions.push('transfer', 'kick');
+      // 仅未结束牌局允许标记爽约，与后端 room_no_show_records 防重一致
+      if (this.data.room.status !== 2) {
+        itemList.push('标记爽约(扣信誉)');
+        actions.push('noshow');
+      }
     } else {
       return;
     }
@@ -470,6 +488,28 @@ Page({
           this.confirmKick(m.userId);
         } else if (act === 'transfer') {
           this.confirmTransfer(m.userId);
+        } else if (act === 'noshow') {
+          this.confirmNoShow(m.userId, m.nickname);
+        }
+      }
+    });
+  },
+
+  confirmNoShow(targetUserId, nickname) {
+    const name = nickname || '该玩家';
+    wx.showModal({
+      title: '标记爽约',
+      content: `确认「${name}」本场爽约？将扣减信誉分且本局不可重复标记。`,
+      success: async (r) => {
+        if (!r.confirm) {
+          return;
+        }
+        try {
+          await roomService.reportNoShow(this.data.roomId, targetUserId);
+          wx.showToast({ title: '已记录', icon: 'success' });
+          this.loadRoomDetail();
+        } catch (err) {
+          wx.showToast({ title: (err && err.message) || '操作失败', icon: 'none' });
         }
       }
     });

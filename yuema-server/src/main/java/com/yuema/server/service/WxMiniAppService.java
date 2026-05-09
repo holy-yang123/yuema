@@ -143,4 +143,50 @@ public class WxMiniAppService {
         }
         return bytes;
     }
+
+    /**
+     * 小程序 button「手机号快速验证」返回的 code，换取用户手机号（微信官方接口，用于弱实名/安全绑定）。
+     * mock 模式返回固定号，便于本地联调。
+     */
+    public String fetchWxPhoneNumber(String code) {
+        if (code == null || code.isEmpty()) {
+            throw new IllegalArgumentException("缺少手机号 code");
+        }
+        if (wxMiniAppProperties.isMockEnabled()) {
+            return "13800138000";
+        }
+        String token = getAccessToken();
+        String url = "https://api.weixin.qq.com/wxa/business/getuserphonenumber?access_token=" + token;
+        JSONObject req = new JSONObject();
+        req.put("code", code);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> entity = new HttpEntity<>(req.toJSONString(), headers);
+        ResponseEntity<String> resp = restTemplate.postForEntity(url, entity, String.class);
+        String body = resp.getBody();
+        if (body == null || body.isEmpty()) {
+            throw new IllegalStateException("getuserphonenumber 无响应体");
+        }
+        JSONObject json = JSON.parseObject(body);
+        if (json.getIntValue("errcode") != 0) {
+            throw new IllegalStateException(json.getString("errmsg"));
+        }
+        JSONObject phoneInfo = json.getJSONObject("phone_info");
+        if (phoneInfo == null) {
+            throw new IllegalStateException("无 phone_info");
+        }
+        String pure = phoneInfo.getString("purePhoneNumber");
+        String country = phoneInfo.getString("countryCode");
+        if (pure != null && !pure.isEmpty()) {
+            if (country != null && !country.isEmpty() && !"86".equals(country)) {
+                return "+" + country + pure;
+            }
+            return pure;
+        }
+        String phoneNumber = phoneInfo.getString("phoneNumber");
+        if (phoneNumber == null || phoneNumber.isEmpty()) {
+            throw new IllegalStateException("无手机号字段");
+        }
+        return phoneNumber;
+    }
 }

@@ -13,34 +13,43 @@
     </view>
   </view>
 
-  <scroll-view scroll-y class="room-list" style="height: {{scrollViewHeightPx}}px" refresher-enabled refresher-background="{{themeMeta.bg}}" refresher-triggered="{{refreshing}}" bindrefresherrefresh="onRefresh">
+  <!-- hall-room-scroll：与首页推荐区外层区分类名，避免样式语义混淆 -->
+  <scroll-view scroll-y class="hall-room-scroll" style="height: {{scrollViewHeightPx}}px" refresher-enabled refresher-background="{{themeMeta.bg}}" refresher-triggered="{{refreshing}}" bindrefresherrefresh="onRefresh">
     <view class="room-card" wx:for="{{filteredRooms}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}">
-      <view class="card-header">
-        <view class="room-no">#{{item.roomNo}}</view>
-        <view class="status-tag {{item.status === 0 ? 'waiting' : item.status === 1 ? 'playing' : 'ended'}}">
-          {{item.status === 0 ? '等待中' : item.status === 1 ? '进行中' : '已结束'}}
+      <view class="room-card-header">
+        <view class="room-card-left">
+          <text class="room-no-text">#{{item.roomNo}}</text>
+          <text class="room-game-type">{{gameTypeMap[item.gameType]}}</text>
+        </view>
+        <view class="status-pill {{item.status === 0 ? 'status-waiting' : item.status === 1 ? 'status-playing' : 'status-ended'}}">
+          <view class="status-dot"></view>
+          <text>{{item.status === 0 ? '等待中' : item.status === 1 ? '进行中' : '已结束'}}</text>
         </view>
       </view>
-      <view class="card-body">
-        <view class="info-row">
-          <text class="label">玩法</text>
-          <text class="value">{{gameTypeMap[item.gameType]}}</text>
+      <view class="room-card-body">
+        <view class="room-meta-row">
+          <text class="meta-label">人数</text>
+          <text class="meta-value">{{item.currentPlayers}}/{{item.maxPlayers}}</text>
         </view>
-        <view class="info-row">
-          <text class="label">人数</text>
-          <text class="value">{{item.currentPlayers}}/{{item.maxPlayers}}</text>
+        <view class="room-meta-row" wx:if="{{item.venueName}}">
+          <text class="meta-label">场地</text>
+          <text class="meta-value venue-name-text">{{item.venueName}}</text>
         </view>
-        <view class="info-row" wx:if="{{item.venueName}}">
-          <text class="label">场地</text>
-          <text class="value">{{item.venueName}}</text>
+        <view class="room-meta-row" wx:if="{{item.remark}}">
+          <text class="meta-label">备注</text>
+          <text class="meta-value room-card-remark">{{item.remark}}</text>
+        </view>
+        <!-- 与首页推荐牌局同一套 markup：规则标签 -->
+        <view class="room-rule-tags" wx:if="{{item.ruleCardTags && item.ruleCardTags.length}}">
+          <text class="room-rule-tag" wx:for="{{item.ruleCardTags}}" wx:for-item="tag" wx:key="key">{{tag.label}}</text>
         </view>
       </view>
-      <view class="card-footer" wx:if="{{item.status === 0}}">
+      <view class="room-card-footer" wx:if="{{item.status === 0}}">
         <block wx:if="{{currentUserId && item.creatorId === currentUserId}}">
-          <button class="owner-btn owner-btn-outline" size="mini" catchtap="goEditRoom" data-id="{{item.id}}">编辑</button>
-          <button class="owner-btn owner-btn-danger" size="mini" catchtap="confirmDeleteRoom" data-id="{{item.id}}">删除</button>
+          <button class="room-secondary-btn" size="mini" catchtap="goEditRoom" data-id="{{item.id}}">编辑</button>
+          <button class="room-danger-btn" size="mini" catchtap="confirmDeleteRoom" data-id="{{item.id}}">删除</button>
         </block>
-        <button wx:elif="{{!isMyRooms}}" class="join-btn" type="primary" size="mini" catchtap="onJoin" data-id="{{item.id}}">立即加入</button>
+        <button wx:elif="{{!isMyRooms}}" class="room-join-btn" size="mini" catchtap="onJoin" data-id="{{item.id}}">加入</button>
       </view>
     </view>
 

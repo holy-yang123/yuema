@@ -38,6 +38,17 @@ public class User {
     
     @TableField("win_games")
     private Integer winGames;
+
+    /** 信誉分：新用户默认 100，爽约等场景扣减，下限 0 */
+    @TableField("reputation_score")
+    private Integer reputationScore;
+
+    /**
+     * 可信身份核验标记：当前实现为微信「手机号快速验证」通过后置 1；
+     * 后续可接人脸/身份证三要素等强实名通道，仍写此字段或扩展等级字段。
+     */
+    @TableField("realname_verified")
+    private Integer realnameVerified;
     
     private Integer status;
     

@@ -44,6 +44,34 @@
   font-weight: 500;
 }
 
+.profile-trust-row {
+  margin-top: 12rpx;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8rpx;
+}
+
+.profile-trust-text {
+  font-size: 22rpx;
+  color: var(--text-secondary);
+}
+
+.profile-trust-text.is-verified {
+  color: var(--accent-orange);
+}
+
+.profile-trust-dot {
+  font-size: 22rpx;
+  color: var(--text-secondary);
+  opacity: 0.5;
+}
+
+.wx-realname-cancel {
+  margin-top: 24rpx;
+}
+
 /* 统计行 */
 .profile-stats-row {
   display: flex;

@@ -16,6 +16,11 @@ module.exports = {
     return request.put('/user/info', data);
   },
 
+  /** 微信手机号快速验证：弱实名，写入 realname_verified 并更新 phone */
+  bindWxPhone(data) {
+    return request.post('/user/bind-wx-phone', data);
+  },
+
   getStats() {
     return request.get('/user/stats');
   },

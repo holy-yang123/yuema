@@ -67,124 +67,204 @@
   background: var(--accent-orange);
 }
 
-.room-list {
+/* 牌局列表滚动区（类名独立，卡片样式与首页 pages/index/index.wxss 推荐牌局对齐） */
+.hall-room-scroll {
   padding: 32rpx;
   width: 100%;
   box-sizing: border-box;
   background-color: var(--bg);
 }
 
+/* —— 以下卡片块与首页 .room-card 系列保持一致 —— */
 .room-card {
-  width: 100%;
   background: var(--surface-solid);
-  border-radius: 16rpx;
-  padding: 32rpx;
-  margin-bottom: 32rpx;
+  border-radius: 22rpx;
+  padding: 34rpx 32rpx 32rpx;
+  margin-bottom: 22rpx;
   border: 1rpx solid var(--border);
-  box-shadow: var(--shadow-sm);
-  transition: border-color 0.2s ease;
+  box-shadow: var(--shadow);
 }
 
-.room-card:active {
-  border-color: var(--accent-orange-border);
-}
-
-.card-header {
+.room-card-header {
   display: flex;
+  align-items: flex-start;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24rpx;
+  gap: 20rpx;
+  margin-bottom: 22rpx;
 }
 
-.room-no {
-  font-size: 30rpx;
-  font-weight: 600;
-  color: var(--text);
-}
-
-.status-tag {
-  font-size: 20rpx;
-  padding: 4rpx 12rpx;
-  border-radius: 4rpx;
-  font-weight: 500;
-}
-
-.status-tag.waiting {
-  background: rgba(217, 119, 87, 0.12);
-  color: var(--tag-primary-fg);
-}
-
-.status-tag.playing {
-  background: var(--bg-muted);
-  color: var(--text-secondary);
-}
-
-.status-tag.ended {
-  background: rgba(255, 77, 79, 0.08);
-  color: var(--danger);
-}
-
-.card-body {
-  margin-bottom: 32rpx;
-}
-
-.info-row {
+.room-card-left {
   display: flex;
-  margin-bottom: 16rpx;
-  font-size: 26rpx;
-}
-
-.label {
-  color: var(--text-secondary);
-  width: 120rpx;
-}
-
-.value {
-  color: var(--text);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10rpx;
+  min-width: 0;
   flex: 1;
 }
 
-.card-footer {
+.room-no-text {
+  font-size: 32rpx;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: 0.5rpx;
+}
+
+.room-game-type {
+  font-size: 24rpx;
+  font-weight: 500;
+  color: var(--text-secondary);
+  letter-spacing: 0.3rpx;
+}
+
+.status-pill {
+  display: flex;
+  align-items: center;
+  padding: 10rpx 18rpx;
+  border-radius: 100rpx;
+  font-size: 22rpx;
+  font-weight: 500;
+  flex-shrink: 0;
+  border: 1rpx solid transparent;
+}
+
+.status-dot {
+  width: 12rpx;
+  height: 12rpx;
+  border-radius: 50%;
+  margin-right: 10rpx;
+}
+
+.status-waiting {
+  background: rgba(217, 119, 87, 0.12);
+  color: var(--tag-primary-fg);
+  border-color: rgba(217, 119, 87, 0.22);
+}
+
+.status-waiting .status-dot {
+  background: var(--accent-orange);
+  box-shadow: 0 0 12rpx rgba(217, 119, 87, 0.35);
+}
+
+.status-playing {
+  background: var(--bg-muted);
+  color: var(--text-secondary);
+  border-color: var(--border);
+}
+
+.status-playing .status-dot {
+  background: var(--text-secondary);
+}
+
+/* 首页推荐仅两种状态；大厅「全部」含已结束，沿用圆角胶囊与弱化警示色 */
+.status-ended {
+  background: rgba(255, 77, 79, 0.08);
+  color: var(--danger);
+  border-color: rgba(207, 19, 34, 0.22);
+}
+
+.status-ended .status-dot {
+  background: var(--danger);
+}
+
+.room-meta-row {
+  display: flex;
+  margin-top: 14rpx;
+  font-size: 26rpx;
+}
+
+.room-meta-row:first-child {
+  margin-top: 0;
+}
+
+.meta-label {
+  color: var(--text-secondary);
+  width: 80rpx;
+  font-weight: 400;
+}
+
+.meta-value {
+  color: var(--text-secondary);
+  flex: 1;
+}
+
+/* 与首页卡片一致：备注多行换行 */
+.room-card-remark {
+  min-width: 0;
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.45;
+}
+
+.room-rule-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10rpx;
+  margin-top: 18rpx;
+}
+
+.room-rule-tag {
+  font-size: 22rpx;
+  color: var(--tag-primary-fg);
+  background: rgba(217, 119, 87, 0.12);
+  padding: 6rpx 14rpx;
+  border-radius: 8rpx;
+}
+
+.room-card-footer {
+  margin-top: 28rpx;
+  border-top: 1rpx solid var(--border);
+  padding-top: 26rpx;
   display: flex;
   justify-content: flex-end;
   align-items: center;
   gap: 16rpx;
   flex-wrap: wrap;
-  border-top: 1rpx solid var(--bg-muted);
-  padding-top: 24rpx;
 }
 
-/* 本人等待中牌局：编辑 / 删除 */
-.owner-btn {
+.room-secondary-btn {
   margin: 0 !important;
-  border-radius: 10rpx !important;
-  font-size: 26rpx !important;
-  height: 64rpx !important;
-  padding: 0 28rpx !important;
-  font-weight: 600 !important;
-}
-
-.owner-btn-outline {
   background: var(--surface-solid) !important;
   color: var(--text-secondary) !important;
   border: 1rpx solid var(--border) !important;
+  border-radius: 14rpx !important;
+  padding: 14rpx 28rpx !important;
+  font-size: 26rpx !important;
+  font-weight: 600 !important;
 }
 
-.owner-btn-danger {
+.room-secondary-btn::after {
+  border: none;
+}
+
+.room-danger-btn {
+  margin: 0 !important;
   background: rgba(255, 77, 79, 0.12) !important;
   color: var(--danger) !important;
   border: 1rpx solid rgba(207, 19, 34, 0.35) !important;
+  border-radius: 14rpx !important;
+  padding: 14rpx 28rpx !important;
+  font-size: 26rpx !important;
+  font-weight: 600 !important;
 }
 
-.join-btn {
-  margin: 0 !important;
-  background: linear-gradient(145deg, #e08568 0%, var(--accent-orange) 100%) !important;
+.room-danger-btn::after {
+  border: none;
+}
+
+.room-join-btn {
+  background: linear-gradient(145deg, #e08568 0%, var(--accent-orange) 52%, #c96a4d 100%) !important;
   color: var(--btn-primary-text) !important;
-  border-radius: 10rpx !important;
+  border-radius: 14rpx !important;
+  padding: 14rpx 40rpx !important;
   font-size: 26rpx !important;
-  height: 64rpx !important;
-  padding: 0 32rpx !important;
   font-weight: 600 !important;
+  letter-spacing: 1rpx;
+  border: none !important;
+  box-shadow: 0 8rpx 22rpx rgba(217, 119, 87, 0.32);
+}
+
+.room-join-btn::after {
+  border: none;
 }
 
 .create-fab {

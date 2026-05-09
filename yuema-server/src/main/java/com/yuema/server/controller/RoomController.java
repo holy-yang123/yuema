@@ -2,6 +2,7 @@ package com.yuema.server.controller;
 
 import com.yuema.server.dto.CreateRoomDTO;
 import com.yuema.server.dto.JoinRoomDTO;
+import com.yuema.server.dto.ReportNoShowDTO;
 import com.yuema.server.entity.Room;
 import com.yuema.server.entity.RoomMember;
 import com.yuema.server.entity.User;
@@ -50,6 +51,42 @@ public class RoomController {
         return Result.success(room);
     }
 
+    /**
+     * 房主标记成员爽约：扣信誉分（每局每人仅一次），详见 RoomService.reportNoShow。
+     */
+    @PostMapping("/no-show")
+    public Result<Map<String, Object>> reportNoShow(@RequestAttribute Long userId,
+                                                    @RequestBody @Validated ReportNoShowDTO dto) {
+        String err = roomService.reportNoShow(dto.getRoomId(), userId, dto.getTargetUserId());
+        if (err != null) {
+            if ("NOT_FOUND".equals(err)) {
+                return Result.error("房间不存在");
+            }
+            if ("ENDED".equals(err)) {
+                return Result.error("牌局已结束");
+            }
+            if ("NOT_OWNER".equals(err)) {
+                return Result.error("仅房主可标记爽约");
+            }
+            if ("BAD_TARGET".equals(err)) {
+                return Result.error("不能对自己操作");
+            }
+            if ("ALREADY_DEDUCTED".equals(err)) {
+                return Result.error("本局已对该玩家扣过爽约分");
+            }
+            if ("NOT_MEMBER".equals(err)) {
+                return Result.error("目标不在房间内");
+            }
+            return Result.error("操作失败");
+        }
+        User u = userService.getById(dto.getTargetUserId());
+        int rep = u != null && u.getReputationScore() != null ? u.getReputationScore() : 0;
+        Map<String, Object> data = new HashMap<>();
+        data.put("targetUserId", dto.getTargetUserId());
+        data.put("reputationScore", rep);
+        return Result.success(data);
+    }
+
     @PostMapping("/join")
     public Result<Map<String, Object>> joinRoom(@RequestAttribute Long userId,
                                                  @RequestBody @Validated JoinRoomDTO dto) {
@@ -85,6 +122,11 @@ public class RoomController {
             map.put("avatarUrl", user != null ? user.getAvatarUrl() : "");
             map.put("role", m.getRole());
             map.put("seatNo", m.getSeatNo());
+            // 进房成员展示信誉与弱实名标记，便于组局前相互了解
+            int rep = user != null && user.getReputationScore() != null ? user.getReputationScore() : 100;
+            map.put("reputationScore", rep);
+            int rv = user != null && user.getRealnameVerified() != null ? user.getRealnameVerified() : 0;
+            map.put("realnameVerified", rv);
             return map;
         }).collect(Collectors.toList());
 

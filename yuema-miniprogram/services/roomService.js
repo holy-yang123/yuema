@@ -62,5 +62,10 @@ module.exports = {
 
   getRoomQrCode(roomId) {
     return request.get('/room/qrcode', { roomId });
+  },
+
+  /** 房主标记成员爽约，扣信誉分（每局每人仅一次） */
+  reportNoShow(roomId, targetUserId) {
+    return request.post('/room/no-show', { roomId, targetUserId });
   }
 };

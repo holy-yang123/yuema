@@ -1,5 +1,6 @@
 const roomService = require('../../services/roomService');
 const { GAME_TYPE_LABELS } = require('../../utils/gameTypeLabels');
+const { buildRuleCardTags } = require('../../utils/gameRulesDisplay');
 
 Page({
   behaviors: [require('../../behaviors/themeBehavior')],
@@ -76,8 +77,13 @@ Page({
       const app = typeof getApp === 'function' ? getApp() : null;
       const u = app && app.globalData ? app.globalData.userInfo : null;
       const currentUserId = u ? (u.userId != null ? u.userId : u.id) : null;
+      // 与首页卡片同源解析 gameRules，编辑保存后 onShow 刷新即可展示最新规则（含自定义条文）
+      const rooms = (res.data || []).map((r) => ({
+        ...r,
+        ruleCardTags: buildRuleCardTags(r)
+      }));
       this.setData({
-        rooms: res.data || [],
+        rooms,
         currentUserId
       }, () => {
         this.filterRooms();
@@ -127,7 +133,14 @@ Page({
       filtered = filtered.filter((r) => {
         const no = (r.roomNo && String(r.roomNo).toLowerCase()) || '';
         const typeLabel = this.data.gameTypeMap[r.gameType] || r.gameType || '';
-        return no.includes(query) || String(typeLabel).toLowerCase().includes(query);
+        const ruleHaystack = (r.ruleCardTags || []).map((t) => t.label).join(' ').toLowerCase();
+        const remarkHay = (r.remark && String(r.remark).toLowerCase()) || '';
+        return (
+          no.includes(query) ||
+          String(typeLabel).toLowerCase().includes(query) ||
+          ruleHaystack.includes(query) ||
+          remarkHay.includes(query)
+        );
       });
     }
 

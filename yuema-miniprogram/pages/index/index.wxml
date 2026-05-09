@@ -91,6 +91,10 @@
             <text class="meta-label">场地</text>
             <text class="meta-value venue-name-text">{{item.venueName}}</text>
           </view>
+          <view class="room-meta-row" wx:if="{{item.remark}}">
+            <text class="meta-label">备注</text>
+            <text class="meta-value room-card-remark">{{item.remark}}</text>
+          </view>
           <!-- 与详情页「本场约定」一致：含四川加底/加番单选结果 -->
           <view class="room-rule-tags" wx:if="{{item.ruleCardTags && item.ruleCardTags.length}}">
             <text class="room-rule-tag" wx:for="{{item.ruleCardTags}}" wx:for-item="tag" wx:key="key">{{tag.label}}</text>

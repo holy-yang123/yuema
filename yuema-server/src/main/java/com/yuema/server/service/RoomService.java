@@ -1,6 +1,7 @@
 package com.yuema.server.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,14 +10,18 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yuema.server.dto.CreateRoomDTO;
 import com.yuema.server.entity.Room;
 import com.yuema.server.entity.RoomMember;
+import com.yuema.server.entity.RoomNoShowRecord;
+import com.yuema.server.entity.User;
 import com.yuema.server.entity.UserGameRecord;
 import com.yuema.server.entity.Venue;
 import com.yuema.server.mapper.RoomMapper;
 import com.yuema.server.mapper.RoomMemberMapper;
+import com.yuema.server.mapper.RoomNoShowRecordMapper;
 import com.yuema.server.mapper.UserGameRecordMapper;
 import com.yuema.server.mapper.VenueMapper;
 import com.yuema.server.websocket.RoomWebSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,7 +53,14 @@ public class RoomService extends ServiceImpl<RoomMapper, Room> {
     private RoomWebSocketHandler roomWebSocketHandler;
 
     @Autowired
+    private RoomNoShowRecordMapper roomNoShowRecordMapper;
+
+    @Autowired
     private ObjectMapper objectMapper;
+
+    /** 单次爽约扣除的信誉分（配置项，默认见 application.yml） */
+    @Value("${yuema.reputation.no-show-penalty:10}")
+    private int noShowPenaltyPoints;
 
     @Transactional
     public Room createRoom(Long creatorId, CreateRoomDTO dto) {
@@ -469,6 +481,55 @@ public class RoomService extends ServiceImpl<RoomMapper, Room> {
 
     public List<RoomMember> getRoomMembers(Long roomId) {
         return roomMemberMapper.selectActiveMembers(roomId);
+    }
+
+    /**
+     * 房主认定某成员本场爽约：扣信誉分并写入防重表，房间内广播 reputation_update 便于前端刷新展示。
+     */
+    @Transactional
+    public String reportNoShow(Long roomId, Long reporterId, Long targetUserId) {
+        Room room = getById(roomId);
+        if (room == null) {
+            return "NOT_FOUND";
+        }
+        if (room.getStatus() != null && room.getStatus() == 2) {
+            return "ENDED";
+        }
+        if (room.getCreatorId() == null || !room.getCreatorId().equals(reporterId)) {
+            return "NOT_OWNER";
+        }
+        if (targetUserId == null || targetUserId.equals(reporterId)) {
+            return "BAD_TARGET";
+        }
+        long existed = roomNoShowRecordMapper.selectCount(Wrappers.<RoomNoShowRecord>lambdaQuery()
+                .eq(RoomNoShowRecord::getRoomId, roomId)
+                .eq(RoomNoShowRecord::getTargetUserId, targetUserId));
+        if (existed > 0) {
+            return "ALREADY_DEDUCTED";
+        }
+        RoomMember target = roomMemberMapper.selectByRoomAndUser(roomId, targetUserId);
+        if (target == null || target.getStatus() == null || target.getStatus() != 1) {
+            return "NOT_MEMBER";
+        }
+        int penalty = Math.max(1, noShowPenaltyPoints);
+        userService.decreaseReputation(targetUserId, penalty);
+
+        RoomNoShowRecord rec = new RoomNoShowRecord();
+        rec.setRoomId(roomId);
+        rec.setTargetUserId(targetUserId);
+        rec.setReporterId(reporterId);
+        rec.setDeductedPoints(penalty);
+        rec.setCreatedAt(LocalDateTime.now());
+        roomNoShowRecordMapper.insert(rec);
+
+        User after = userService.getById(targetUserId);
+        int rep = after != null && after.getReputationScore() != null ? after.getReputationScore() : 0;
+        Map<String, Object> bc = new HashMap<>();
+        bc.put("roomId", roomId);
+        bc.put("userId", targetUserId);
+        bc.put("reputationScore", rep);
+        roomWebSocketHandler.broadcast(roomId, "reputation_update", bc);
+        return null;
     }
 
     public boolean isActiveMember(Long roomId, Long userId) {

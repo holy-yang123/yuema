@@ -25,10 +25,16 @@ function buildInitialRuleBuckets() {
   };
 }
 
+/** JSON 布尔兼容：部分链路可能把 true 落成 1 */
+function ruleBoolTrue(v) {
+  return v === true || v === 1;
+}
+
 /** 解析服务端 game_rules 回填各玩法桶（切换玩法时保留未展示桶的数据） */
 function mergeGameRulesFromRoom(room) {
   const buckets = buildInitialRuleBuckets();
-  const raw = room.gameRules;
+  // 兼容字段名差异；gameRules 可能已是对象（网关二次解析时）
+  const raw = room.gameRules != null ? room.gameRules : room.game_rules;
   if (!raw) {
     return buckets;
   }
@@ -48,19 +54,19 @@ function mergeGameRulesFromRoom(room) {
     }
     const opts = GAME_RULE_OPTIONS[gt] || [];
     opts.forEach((o) => {
-      if (src[o.key] === true) {
+      if (ruleBoolTrue(src[o.key])) {
         buckets[gt][o.key] = true;
       }
     });
     // 四川：回填加底/加番；旧版仅 jiaDiJiaFan 为 true 时默认视为加底，便于用户改成明确项
     if (gt === 'sichuan' && src && typeof src === 'object') {
-      if (src.jiaDi === true) {
+      if (ruleBoolTrue(src.jiaDi)) {
         buckets[gt].jiaDi = true;
       }
-      if (src.jiaFan === true) {
+      if (ruleBoolTrue(src.jiaFan)) {
         buckets[gt].jiaFan = true;
       }
-      if (src.jiaDiJiaFan === true && src.jiaDi !== true && src.jiaFan !== true) {
+      if (ruleBoolTrue(src.jiaDiJiaFan) && !ruleBoolTrue(src.jiaDi) && !ruleBoolTrue(src.jiaFan)) {
         buckets[gt].jiaDi = true;
       }
     }
@@ -90,7 +96,7 @@ Page({
     currentGameTypeId: 'sichuan',
     /** 每条含 checked，避免 switch 绑定对象动态下标时多开关状态错乱 */
     ruleSwitchRows: [],
-    /** 四川玩法下「加底/加番」radio-group 的 value，与 ruleBuckets.sichuan 同步 */
+    /** 四川「加底/加番」单选：'jiaDi' | 'jiaFan' | '__none__'，与各 radio 的 checked 绑定 */
     sichuanJiaPick: SICHUAN_JIA_SCORE_RADIO_NONE,
     /** 按玩法分桶：布尔键 + customLines */
     ruleBuckets: buildInitialRuleBuckets(),
@@ -140,9 +146,9 @@ Page({
     }));
     let sichuanJiaPick = SICHUAN_JIA_SCORE_RADIO_NONE;
     if (gid === 'sichuan') {
-      if (bucket.jiaDi === true) {
+      if (ruleBoolTrue(bucket.jiaDi)) {
         sichuanJiaPick = 'jiaDi';
-      } else if (bucket.jiaFan === true) {
+      } else if (ruleBoolTrue(bucket.jiaFan)) {
         sichuanJiaPick = 'jiaFan';
       }
     }

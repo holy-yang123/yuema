@@ -23,11 +23,12 @@
       <!-- 四川：加底/加番为单选，写入 ruleBuckets.sichuan.jiaDi、jiaFan -->
       <view wx:if="{{currentGameTypeId === 'sichuan'}}" class="form-item form-item-jia-radio">
         <text class="label">加底 / 加番</text>
-        <radio-group class="jia-radio-group" value="{{sichuanJiaPick}}" bindchange="onSichuanJiaScoreChange">
+        <!-- 不用 radio-group 的 value：低基础库不生效，编辑回填后单选看起来全未选；改为各 radio 显式 checked -->
+        <radio-group class="jia-radio-group" bindchange="onSichuanJiaScoreChange">
           <!-- value 须与 utils/gameRuleSets.js 中 SICHUAN_JIA_SCORE_RADIO_NONE 一致 -->
-          <label class="jia-radio-item"><radio value="__none__" color="#d97757"/>不选</label>
-          <label class="jia-radio-item"><radio value="jiaDi" color="#d97757"/>加底</label>
-          <label class="jia-radio-item"><radio value="jiaFan" color="#d97757"/>加番</label>
+          <label class="jia-radio-item"><radio value="__none__" checked="{{sichuanJiaPick === '__none__'}}" color="#d97757"/>不选</label>
+          <label class="jia-radio-item"><radio value="jiaDi" checked="{{sichuanJiaPick === 'jiaDi'}}" color="#d97757"/>加底</label>
+          <label class="jia-radio-item"><radio value="jiaFan" checked="{{sichuanJiaPick === 'jiaFan'}}" color="#d97757"/>加番</label>
         </radio-group>
       </view>
       <view class="custom-rules-wrap">

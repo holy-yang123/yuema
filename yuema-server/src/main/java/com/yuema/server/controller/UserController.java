@@ -2,6 +2,7 @@ package com.yuema.server.controller;
 
 import com.yuema.server.dto.LoginDTO;
 import com.yuema.server.dto.UpdateUserDTO;
+import com.yuema.server.dto.WxPhoneCodeDTO;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.yuema.server.entity.User;
@@ -14,6 +15,7 @@ import com.yuema.server.vo.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -104,6 +106,28 @@ public class UserController {
             return Result.error("用户不存在");
         }
         return Result.success(user);
+    }
+
+    /**
+     * 微信手机号快速验证：换绑当前账号手机号并标记 realname_verified（弱实名，公安实人可后续对接同一字段或扩展）。
+     */
+    @PostMapping("/bind-wx-phone")
+    public Result<Void> bindWxPhone(@RequestAttribute Long userId,
+                                    @RequestBody @Validated WxPhoneCodeDTO dto) {
+        String err = userService.bindWxPhoneNumber(userId, dto.getCode());
+        if (err != null) {
+            if ("NOT_FOUND".equals(err)) {
+                return Result.error("用户不存在");
+            }
+            if ("PHONE_TAKEN".equals(err)) {
+                return Result.error("该手机号已绑定其他账号");
+            }
+            if (err.startsWith("WX_FAIL")) {
+                return Result.error("微信校验失败，请重试");
+            }
+            return Result.error("绑定失败");
+        }
+        return Result.success();
     }
 
     @GetMapping("/game-records")

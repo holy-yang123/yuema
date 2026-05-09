@@ -35,6 +35,7 @@ alwaysApply: true
    - **前置检查**：执行指令前，使用 ~.cursor/skills目录下的 superpowers skills 来指导工作流程。
 	优先使用 brainstorming（头脑风暴）开始新任务。
    若有合适的skill，直接调用执行，禁止自己硬来。
+   例如「凡涉及前端界面，必须先读 impeccable/frontend-design」
 	Skills 列表参见 ~.cursor/skills目录。
    - **精准读取**：不要每次都读取全部代码。必须先根据任务使用 Grep/Glob 定位到相关文件或代码段，再针对性地读取。
 

@@ -350,6 +350,14 @@
   flex: 1;
 }
 
+/* 卡片备注：允许换行，避免长文案撑破横向布局 */
+.room-card-remark {
+  min-width: 0;
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.45;
+}
+
 /* 推荐牌局卡片：玩法细则标签（与详情 rule-tag 风格统一略缩小） */
 .room-rule-tags {
   display: flex;

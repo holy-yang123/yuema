@@ -10,7 +10,8 @@
     "pages/venue/list",
     "pages/venue/detail",
     "pages/user/index",
-    "pages/user/history"
+    "pages/user/history",
+    "pages/misc/placeholder"
   ],
   "window": {
     "backgroundTextStyle": "dark",
