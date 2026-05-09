@@ -16,16 +16,20 @@ Page({
   },
 
   onLoad() {
-    this.checkLogin();
+    this.ensureLoggedIn();
   },
 
   onShow() {
-    if (app.globalData.token) {
-      this.setData({
-        address: app.globalData.address || this.data.address
+    if (!app.globalData.token) {
+      wx.reLaunch({
+        url: '/pages/user/login'
       });
-      this.loadData();
+      return;
     }
+    this.setData({
+      address: app.globalData.address || this.data.address
+    });
+    this.loadData();
   },
 
   onPullDownRefresh() {
@@ -34,15 +38,11 @@ Page({
     });
   },
 
-  // 检查登录：静默失败或 NEED_PROFILE（无 token）时仍加载首页公开数据
-  async checkLogin() {
+  ensureLoggedIn() {
     if (!app.globalData.token) {
-      try {
-        await app.login();
-      } catch (err) {
-        console.error('登录失败:', err);
-      }
-      this.loadData();
+      wx.reLaunch({
+        url: '/pages/user/login'
+      });
     }
   },
 

@@ -235,7 +235,7 @@ App({
   // 检查登录
   checkLogin() {
     if (!this.globalData.token) {
-      wx.navigateTo({
+      wx.reLaunch({
         url: '/pages/user/login'
       });
       return false;

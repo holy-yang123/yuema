@@ -7,10 +7,28 @@ Page({
     winRate: 0,
     levelName: '雀士',
     /** 弹窗打开后短延迟再允许点头像，降低连点触发「another chooseAvatar is in progress」 */
-    avatarPickDelay: false
+    avatarPickDelay: false,
+    showLoginModal: false,
+    /** 来自登录门禁页完善资料，成功后回首页 Tab */
+    fromLoginGate: false
   },
 
-  onLoad() {
+  onLoad(options) {
+    const q = options || {};
+    if (q.needProfile === '1') {
+      this.setData({
+        showLoginModal: true,
+        tempNickname: '',
+        tempAvatarUrl: '',
+        avatarPickDelay: true,
+        fromLoginGate: q.fromLoginGate === '1'
+      });
+      setTimeout(() => {
+        if (this.data.showLoginModal) {
+          this.setData({ avatarPickDelay: false });
+        }
+      }, 400);
+    }
     this.loadUserInfo();
   },
 
@@ -20,6 +38,9 @@ Page({
 
   // 加载用户信息
   async loadUserInfo() {
+    if (!app.globalData.token) {
+      return;
+    }
     try {
       const res = await userService.getUserInfo();
       const userInfo = res.data;
@@ -252,6 +273,12 @@ Page({
       await this.loadUserInfo();
       this.closeLoginModal();
       wx.showToast({ title: '登录成功', icon: 'success' });
+      if (this.data.fromLoginGate) {
+        this.setData({ fromLoginGate: false });
+        wx.switchTab({
+          url: '/pages/index/index'
+        });
+      }
     } catch (err) {
       wx.showToast({ title: '登录失败', icon: 'none' });
       console.error(err);

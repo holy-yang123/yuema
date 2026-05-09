@@ -1,9 +1,27 @@
-const app = getApp();
+// 禁止在模块顶层 getApp()：app.js 会在 App() 执行前 require 本文件，此时 getApp() 为 undefined
+
+function safeGetApp() {
+  try {
+    return typeof getApp === 'function' ? getApp() : null;
+  } catch (e) {
+    return null;
+  }
+}
 
 // 封装请求方法；silentBusinessCodes：这些业务 code 不弹全局 toast，仍 resolve（如登录 NEED_PROFILE）
 const request = (options) => {
   const silentCodes = options.silentBusinessCodes || [];
   return new Promise((resolve, reject) => {
+    const app = safeGetApp();
+    if (!app || !app.globalData) {
+      wx.showToast({
+        title: '应用未就绪',
+        icon: 'none'
+      });
+      reject(new Error('应用未就绪'));
+      return;
+    }
+
     wx.request({
       url: `${app.globalData.apiBaseUrl}${options.url}`,
       method: options.method || 'GET',
@@ -25,12 +43,17 @@ const request = (options) => {
             reject(res.data);
           }
         } else if (res.statusCode === 401) {
-          // Token过期，重新登录
-          wx.removeStorageSync('token');
-          app.globalData.token = null;
+          const a = safeGetApp();
+          if (a && a.globalData) {
+            wx.removeStorageSync('token');
+            a.globalData.token = null;
+          }
           wx.showToast({
             title: '登录已过期',
             icon: 'none'
+          });
+          wx.reLaunch({
+            url: '/pages/user/login'
           });
           reject(res);
         } else {

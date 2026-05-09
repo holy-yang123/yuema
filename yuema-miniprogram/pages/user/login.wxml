@@ -1,0 +1,8 @@
+<page-meta root-background-color="#08090A" background-color="#08090A" background-color-bottom="#08090A" background-text-style="light" />
+<view class="login-wrap">
+  <view class="login-brand">
+    <text class="login-title">约麻</text>
+    <text class="login-desc">登录后即可组局、记分与同步战绩</text>
+  </view>
+  <button class="login-btn" loading="{{loading}}" disabled="{{loading}}" bindtap="onWxLogin">微信登录</button>
+</view>
