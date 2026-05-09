@@ -23,6 +23,7 @@ function parseVenueImages(imageUrls) {
 }
 
 Page({
+  behaviors: [require('../../behaviors/themeBehavior')],
   data: {
     venue: null,
     bannerImages: ['/images/default-venue.png']

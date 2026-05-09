@@ -10,6 +10,7 @@
 const roomService = require('./services/roomService');
 const { LOGIN_PAGE } = require('./utils/pageRoutes');
 const { clearAuthAndGoLogin, shouldForceRelogin } = require('./utils/authRedirect');
+const theme = require('./utils/theme');
 
 App({
   globalData: {
@@ -20,10 +21,15 @@ App({
     /** 小程序码 scene / 扫码待加入的房间号 */
     pendingJoinRoomNo: null,
     // 本机调试改为当前电脑的局域网 IP；真机请改为可 HTTPS 访问的后端域名并在公众平台配置服务器域名
-    apiBaseUrl: 'http://192.168.1.140:8080/api'
+    apiBaseUrl: 'http://192.168.1.140:8080/api',
+    /** 与 wx.getStorageSync(yuema_theme_mode) 同步，供界面读取 */
+    themeMode: 'light'
   },
 
   onLaunch(options) {
+    const tm = theme.getThemeMode();
+    this.globalData.themeMode = tm;
+    theme.applyChrome(tm);
     // 品牌字体：需在微信公众平台 → 开发 → 开发管理 → 服务器域名 → downloadFile 合法域名 加入 fonts.gstatic.com，否则静默失败，回退为 app.wxss 中系统栈
     const onFontFail = (name, err) => {
       console.warn(`[loadFontFace] ${name}`, err);

@@ -3,6 +3,7 @@ const roomService = require('../../services/roomService');
 const scoreService = require('../../services/scoreService');
 
 Page({
+  behaviors: [require('../../behaviors/themeBehavior')],
   data: {
     roomId: null,
     roundNo: 1,

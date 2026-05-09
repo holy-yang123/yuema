@@ -1,22 +1,26 @@
-/* 与 app.wxss 令牌衔接：暖纸色底 + 橙绿点缀 */
+/* 背景交给外层 .theme-scope 渐变，登录层透明叠加以支持深色模式 */
 .login-page {
   position: relative;
   min-height: 100vh;
   box-sizing: border-box;
-  background: linear-gradient(168deg, #fdfcfa 0%, #faf8f2 42%, #f2ebe2 100%);
+  background: transparent;
+  /* 独立堆叠上下文 + 裁切：与 absolute canvas 同层，避免 fixed+2d canvas 在部分机型上盖住主界面 */
+  overflow: hidden;
+  isolation: isolate;
 }
 
+/* 改为在 .login-page 内 absolute：避免 fixed 与 WebView 合成顺序异常（约 1s 后 RAF 稳定即盖住上层） */
 .login-canvas {
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
+  width: 100%;
+  min-height: 100vh;
+  height: 100%;
   z-index: 0;
   pointer-events: none;
 }
 
-/* 静态装饰圆：替代 blur，兼容小程序渲染 */
 .login-deco {
   position: fixed;
   pointer-events: none;
@@ -29,7 +33,7 @@
   height: 520rpx;
   top: -180rpx;
   right: -140rpx;
-  background: radial-gradient(circle, rgba(217, 119, 87, 0.2) 0%, rgba(217, 119, 87, 0.06) 45%, transparent 68%);
+  background: radial-gradient(circle, var(--accent-orange-soft) 0%, rgba(217, 119, 87, 0.06) 45%, transparent 68%);
 }
 
 .login-deco--b {
@@ -40,6 +44,10 @@
   background: radial-gradient(circle, rgba(106, 155, 204, 0.14) 0%, transparent 65%);
 }
 
+.theme-scope--dark .login-deco--b {
+  background: radial-gradient(circle, rgba(126, 176, 212, 0.18) 0%, transparent 65%);
+}
+
 .login-deco--c {
   width: 280rpx;
   height: 280rpx;
@@ -48,14 +56,20 @@
   background: radial-gradient(circle, rgba(120, 140, 93, 0.12) 0%, transparent 70%);
 }
 
+.theme-scope--dark .login-deco--c {
+  background: radial-gradient(circle, rgba(146, 171, 116, 0.14) 0%, transparent 70%);
+}
+
 .login-layer {
   position: relative;
-  z-index: 1;
+  z-index: 50;
   min-height: 100vh;
   box-sizing: border-box;
   padding: 72rpx 48rpx 48rpx;
   display: flex;
   flex-direction: column;
+  /* 强制合成层，保证主内容叠在 absolute canvas 之上 */
+  transform: translateZ(0);
 }
 
 .login-main {
@@ -67,15 +81,14 @@
   padding-bottom: 48rpx;
 }
 
-/* 品牌卡片：浅色玻璃感 + 细边框 */
 .login-card {
   width: 100%;
   max-width: 620rpx;
   padding: 56rpx 44rpx 52rpx;
   border-radius: 28rpx;
-  background: rgba(255, 255, 255, 0.58);
-  border: 1rpx solid rgba(20, 20, 19, 0.06);
-  box-shadow: 0 24rpx 80rpx rgba(20, 20, 19, 0.06), 0 4rpx 16rpx rgba(217, 119, 87, 0.04);
+  background: var(--surface);
+  border: 1rpx solid var(--border);
+  box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -87,23 +100,27 @@
   font-weight: 600;
   letter-spacing: 6rpx;
   text-transform: uppercase;
-  color: #c45a3d;
+  color: var(--tag-primary-fg);
   margin-bottom: 36rpx;
   padding: 10rpx 28rpx;
   border-radius: 999rpx;
-  background: rgba(217, 119, 87, 0.1);
-  border: 1rpx solid rgba(217, 119, 87, 0.15);
+  background: var(--tag-primary-bg);
+  border: 1rpx solid var(--accent-orange-border);
   animation: login-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.06s both;
 }
 
 .login-title {
   font-size: 72rpx;
   font-weight: 700;
-  color: #141413;
+  color: var(--text);
   letter-spacing: 12rpx;
   line-height: 1.15;
-  text-shadow: 0 2rpx 0 rgba(255, 255, 255, 0.9);
+  text-shadow: 0 2rpx 0 rgba(255, 254, 251, 0.85);
   animation: login-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+}
+
+.theme-scope--dark .login-title {
+  text-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.35);
 }
 
 .login-title-line {
@@ -111,14 +128,18 @@
   height: 8rpx;
   margin-top: 28rpx;
   border-radius: 4rpx;
-  background: linear-gradient(90deg, #d97757 0%, #e8a090 50%, rgba(217, 119, 87, 0.35) 100%);
+  background: linear-gradient(90deg, var(--accent-orange) 0%, #e8a090 50%, rgba(217, 119, 87, 0.35) 100%);
   animation: login-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.14s both;
+}
+
+.theme-scope--dark .login-title-line {
+  background: linear-gradient(90deg, var(--accent-orange) 0%, #f0b49a 50%, rgba(232, 149, 114, 0.35) 100%);
 }
 
 .login-desc {
   margin-top: 32rpx;
   font-size: 28rpx;
-  color: #8a877c;
+  color: var(--text-secondary);
   text-align: center;
   line-height: 1.65;
   max-width: 520rpx;
@@ -139,16 +160,17 @@
 .login-chip {
   font-size: 24rpx;
   font-weight: 500;
-  color: #5c5a54;
+  color: var(--text);
+  opacity: 0.72;
   padding: 8rpx 20rpx;
   border-radius: 12rpx;
-  background: rgba(241, 237, 228, 0.95);
-  border: 1rpx solid rgba(20, 20, 19, 0.06);
+  background: var(--bg-soft);
+  border: 1rpx solid var(--border);
 }
 
 .login-dot {
   font-size: 22rpx;
-  color: #c9c5bb;
+  color: var(--text-secondary);
   padding: 0 4rpx;
 }
 
@@ -167,12 +189,16 @@
   border-radius: 20rpx;
   font-size: 32rpx;
   font-weight: 600;
-  color: #ffffff;
+  color: var(--btn-primary-text);
   background: linear-gradient(155deg, #e59172 0%, #d97757 38%, #c96a4d 100%);
   border: none;
-  box-shadow: 0 16rpx 44rpx rgba(217, 119, 87, 0.38), inset 0 2rpx 0 rgba(255, 255, 255, 0.22);
+  box-shadow: 0 16rpx 44rpx var(--btn-primary-shadow), inset 0 2rpx 0 rgba(255, 255, 255, 0.22);
   animation: login-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.28s both;
-  transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.15s ease;
+  transition: transform 220ms var(--ease-out), opacity 220ms var(--ease-out), box-shadow 220ms var(--ease-out);
+}
+
+.theme-scope--dark .login-btn {
+  background: linear-gradient(155deg, #f0a080 0%, #e89572 38%, #d98462 100%);
 }
 
 .login-btn::after {
@@ -183,7 +209,7 @@
 .login-btn--pressed {
   transform: scale(0.98);
   opacity: 0.94;
-  box-shadow: 0 10rpx 28rpx rgba(217, 119, 87, 0.28), inset 0 2rpx 0 rgba(255, 255, 255, 0.15);
+  box-shadow: 0 10rpx 28rpx var(--btn-primary-shadow), inset 0 2rpx 0 rgba(255, 255, 255, 0.12);
 }
 
 .login-hint {
@@ -191,20 +217,19 @@
   margin-top: 28rpx;
   padding: 0 8rpx;
   font-size: 22rpx;
-  color: #b0aea5;
+  color: var(--text-secondary);
   text-align: center;
   line-height: 1.55;
   animation: login-rise 0.8s cubic-bezier(0.22, 1, 0.36, 1) 0.34s both;
 }
 
+/* 入场仅位移、不改 opacity：部分机型上 both+opacity 动画未跑完会长期停在 from，界面全透明仍可点击 */
 @keyframes login-rise {
   from {
-    opacity: 0;
     transform: translateY(32rpx);
   }
 
   to {
-    opacity: 1;
     transform: translateY(0);
   }
 }

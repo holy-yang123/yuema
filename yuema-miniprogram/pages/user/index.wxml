@@ -1,4 +1,5 @@
-<page-meta root-background-color="#faf9f5" background-color="#faf9f5" background-color-bottom="#faf9f5" background-text-style="dark" />
+<page-meta root-background-color="{{themeMeta.rootBg}}" background-color="{{themeMeta.bg}}" background-color-bottom="{{themeMeta.bgBottom}}" background-text-style="{{themeMeta.textStyle}}" />
+<view class="{{themeScopeClass}}">
 <view class="container">
   <!-- 用户信息卡片 -->
   <view class="profile-hero">
@@ -35,29 +36,29 @@
   <!-- 功能菜单 -->
   <view class="menu-group">
     <view class="menu-item" bindtap="goToMyRooms">
-      <view class="menu-icon-wrap icon-game">
-        <text>🎮</text>
+      <view class="menu-icon-wrap">
+        <image class="menu-icon-img" src="{{themeIsDark ? '/images/icons/ic-game-dark.svg' : '/images/icons/ic-game.svg'}}" mode="aspectFit" />
       </view>
       <text class="menu-item-text">我的牌局</text>
       <text class="menu-arrow">›</text>
     </view>
     <view class="menu-item" bindtap="goToHistory">
-      <view class="menu-icon-wrap icon-chart">
-        <text>📊</text>
+      <view class="menu-icon-wrap">
+        <image class="menu-icon-img" src="{{themeIsDark ? '/images/icons/ic-chart-dark.svg' : '/images/icons/ic-chart.svg'}}" mode="aspectFit" />
       </view>
       <text class="menu-item-text">历史战绩</text>
       <text class="menu-arrow">›</text>
     </view>
     <view class="menu-item" bindtap="goToFriends">
-      <view class="menu-icon-wrap icon-friends">
-        <text>👥</text>
+      <view class="menu-icon-wrap">
+        <image class="menu-icon-img" src="{{themeIsDark ? '/images/icons/ic-friends-dark.svg' : '/images/icons/ic-friends.svg'}}" mode="aspectFit" />
       </view>
       <text class="menu-item-text">我的好友</text>
       <text class="menu-arrow">›</text>
     </view>
     <view class="menu-item" bindtap="goToOrders">
-      <view class="menu-icon-wrap icon-order">
-        <text>📝</text>
+      <view class="menu-icon-wrap">
+        <image class="menu-icon-img" src="{{themeIsDark ? '/images/icons/ic-order-dark.svg' : '/images/icons/ic-order.svg'}}" mode="aspectFit" />
       </view>
       <text class="menu-item-text">我的订单</text>
       <text class="menu-arrow">›</text>
@@ -66,24 +67,31 @@
 
   <!-- 设置菜单 -->
   <view class="menu-group">
+    <view class="menu-item menu-item--switch">
+      <view class="menu-icon-wrap">
+        <image class="menu-icon-img" src="{{themeIsDark ? '/images/icons/ic-sun-dark.svg' : '/images/icons/ic-moon.svg'}}" mode="aspectFit" />
+      </view>
+      <text class="menu-item-text">深色模式</text>
+      <switch class="theme-switch" checked="{{themeIsDark}}" bindchange="onThemeDarkChange" color="{{themeSwitchColor}}" />
+    </view>
     <view class="menu-item" bindtap="editProfile">
-      <view class="menu-icon-wrap icon-edit">
-        <text>✏️</text>
+      <view class="menu-icon-wrap">
+        <image class="menu-icon-img" src="{{themeIsDark ? '/images/icons/ic-edit-dark.svg' : '/images/icons/ic-edit.svg'}}" mode="aspectFit" />
       </view>
       <text class="menu-item-text">编辑资料</text>
       <text class="menu-arrow">›</text>
     </view>
     <view class="menu-item" bindtap="bindPhone">
-      <view class="menu-icon-wrap icon-phone">
-        <text>📱</text>
+      <view class="menu-icon-wrap">
+        <image class="menu-icon-img" src="{{themeIsDark ? '/images/icons/ic-phone-dark.svg' : '/images/icons/ic-phone.svg'}}" mode="aspectFit" />
       </view>
       <text class="menu-item-text">绑定手机</text>
       <text class="menu-item-status">{{userInfo.phone ? '已绑定' : '未绑定'}}</text>
       <text class="menu-arrow">›</text>
     </view>
     <view class="menu-item" bindtap="showAbout">
-      <view class="menu-icon-wrap icon-about">
-        <text>ℹ️</text>
+      <view class="menu-icon-wrap">
+        <image class="menu-icon-img" src="{{themeIsDark ? '/images/icons/ic-about-dark.svg' : '/images/icons/ic-about.svg'}}" mode="aspectFit" />
       </view>
       <text class="menu-item-text">关于约麻</text>
       <text class="menu-arrow">›</text>
@@ -119,4 +127,5 @@
       <button class="confirm-login-btn" bindtap="confirmLogin">进入约麻</button>
     </view>
   </view>
+</view>
 </view>

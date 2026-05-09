@@ -1,5 +1,6 @@
-<page-meta root-background-color="#fdfcfa" background-color="#fdfcfa" background-color-bottom="#f3efe6" background-text-style="dark" />
+<page-meta root-background-color="{{themeMeta.rootBg}}" background-color="{{themeMeta.bg}}" background-color-bottom="{{themeMeta.bgBottom}}" background-text-style="{{themeMeta.textStyle}}" />
 <!-- canvas 氛围层；装饰圆与主内容在上层 z-index 分层 -->
+<view class="{{themeScopeClass}}">
 <view class="login-page">
   <canvas type="2d" id="login-bg" class="login-canvas"></canvas>
   <view class="login-deco login-deco--a"></view>
@@ -26,4 +27,5 @@
       <text class="login-hint">使用微信账号快速登录，信息安全由微信平台保障</text>
     </view>
   </view>
+</view>
 </view>

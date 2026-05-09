@@ -17,21 +17,21 @@
   display: block;
   font-size: 36rpx;
   font-weight: 700;
-  color: #141413;
+  color: var(--text);
 }
 
 .stats-num.win {
-  color: #788c5d;
+  color: var(--accent-green);
 }
 
 .stats-num.lose {
-  color: #ff4d4f;
+  color: var(--danger);
 }
 
 .stats-label {
   display: block;
   font-size: 22rpx;
-  color: #b0aea5;
+  color: var(--text-secondary);
   margin-top: 8rpx;
 }
 
@@ -39,12 +39,12 @@
   font-size: 32rpx;
   font-weight: 600;
   margin: 8rpx 0 24rpx;
-  color: #141413;
+  color: var(--text);
 }
 
 .empty-tip {
   font-size: 26rpx;
-  color: #b0aea5;
+  color: var(--text-secondary);
   text-align: center;
   padding: 48rpx 0;
 }
@@ -59,17 +59,17 @@
 .record-game {
   font-size: 30rpx;
   font-weight: 600;
-  color: #141413;
+  color: var(--text);
 }
 
 .record-time {
   font-size: 22rpx;
-  color: #b0aea5;
+  color: var(--text-secondary);
 }
 
 .record-meta {
   font-size: 24rpx;
-  color: #b0aea5;
+  color: var(--text-secondary);
   margin-bottom: 16rpx;
 }
 
@@ -92,7 +92,7 @@
   line-height: 54rpx !important;
   font-size: 22rpx !important;
   background: rgba(217, 119, 87, 0.12) !important;
-  color: #c45a3d !important;
+  color: var(--tag-primary-fg) !important;
   border: 1rpx solid rgba(217, 119, 87, 0.35) !important;
   border-radius: 8rpx !important;
 }
@@ -107,17 +107,17 @@
 }
 
 .record-score.win {
-  color: #788c5d;
+  color: var(--accent-green);
 }
 
 .record-score.lose {
-  color: #ff4d4f;
+  color: var(--danger);
 }
 
 .record-badge {
   font-size: 22rpx;
-  color: #ffffff;
-  background: #d97757;
+  color: var(--btn-primary-text);
+  background: var(--accent-orange);
   padding: 4rpx 16rpx;
   border-radius: 8rpx;
 }
@@ -125,6 +125,6 @@
 .load-more {
   text-align: center;
   font-size: 24rpx;
-  color: #b0aea5;
+  color: var(--text-secondary);
   padding: 24rpx;
 }

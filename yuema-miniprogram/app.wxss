@@ -2,44 +2,96 @@ view, scroll-view, text, button, input {
   box-sizing: border-box;
 }
 
-/* Anthropic 风格浅色令牌：集中定义便于全站一致 */
+/**
+ * 页面级仅保留与主题无关的基础排版；主题色与渐变在 .theme-scope 上定义，
+ * 便于在个人中心切换浅色 / 深色（见 utils/theme.js + behaviors/themeBehavior.js）。
+ */
 page {
+  --font-display: 'Poppins', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  --font-body: 'Lora', 'Noto Serif SC', 'Songti SC', 'PingFang SC', serif;
+  /* 动效：ease-out，避免弹性；时长与 skill 建议的 150–300ms 对齐 */
+  --ease-out: cubic-bezier(0.25, 0.1, 0.25, 1);
+  --duration: 220ms;
+  height: 100%;
+  font-family: var(--font-body);
+  font-size: 28rpx;
+  line-height: 1.55;
+  letter-spacing: 0.2rpx;
+  background-color: transparent;
+}
+
+.font-display {
+  font-family: var(--font-display);
+}
+
+/* ---- 浅色主题（与改版前 page 令牌一致）---- */
+.theme-scope {
   --bg: #faf9f5;
   --bg-soft: #f3f1ea;
   --bg-muted: #e8e6dc;
   --text: #141413;
   --text-secondary: #b0aea5;
   --accent-orange: #d97757;
+  --accent-orange-soft: rgba(217, 119, 87, 0.12);
+  --accent-orange-border: rgba(217, 119, 87, 0.35);
   --accent-blue: #6a9bcc;
   --accent-green: #788c5d;
   --surface: rgba(255, 255, 255, 0.92);
-  --surface-solid: #ffffff;
+  --surface-solid: #fffefb;
   --border: rgba(20, 20, 19, 0.08);
   --shadow: 0 12rpx 48rpx rgba(20, 20, 19, 0.08);
   --shadow-sm: 0 6rpx 24rpx rgba(20, 20, 19, 0.06);
-  /* loadFontFace 成功前回退系统字体；标题区可用 font-display / font-body 类 */
-  --font-display: 'Poppins', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
-  --font-body: 'Lora', 'Noto Serif SC', 'Songti SC', 'PingFang SC', serif;
-}
+  --list-row: rgba(255, 255, 255, 0.72);
+  --tag-primary-bg: rgba(217, 119, 87, 0.12);
+  --tag-primary-fg: #c45a3d;
+  --tag-warning-bg: rgba(255, 171, 0, 0.12);
+  --tag-warning-fg: #c97800;
+  --avatar-gradient-end: #dcd8cc;
+  --btn-primary-text: #fffefb;
+  --btn-primary-shadow: rgba(217, 119, 87, 0.35);
+  --danger: #cf1322;
 
-/* scroll-view 与页面页底一致，避免下拉刷新露异色 */
-scroll-view {
-  background-color: var(--bg);
-}
-
-page {
-  height: 100%;
+  min-height: 100%;
+  width: 100%;
+  box-sizing: border-box;
   font-family: var(--font-body);
+  color: var(--text);
   background-color: var(--bg);
   background-image: linear-gradient(180deg, #fdfcfa 0%, var(--bg) 35%, var(--bg-soft) 100%);
-  color: var(--text);
-  font-size: 28rpx;
-  line-height: 1.55;
-  letter-spacing: 0.2rpx;
 }
 
-.font-display {
-  font-family: var(--font-display);
+/* ---- 深色主题：暖灰炭底 + 同色相配强调（略提亮橙）---- */
+.theme-scope--dark {
+  --bg: #1c1c1a;
+  --bg-soft: #242422;
+  --bg-muted: #32322f;
+  --text: #ebe9e3;
+  --text-secondary: #9c9a93;
+  --accent-orange: #e89572;
+  --accent-orange-soft: rgba(232, 149, 114, 0.16);
+  --accent-orange-border: rgba(232, 149, 114, 0.42);
+  --accent-blue: #7eb0d4;
+  --accent-green: #92ab74;
+  --surface: rgba(44, 44, 42, 0.94);
+  --surface-solid: #2c2c2a;
+  --border: rgba(235, 233, 227, 0.09);
+  --shadow: 0 12rpx 48rpx rgba(0, 0, 0, 0.34);
+  --shadow-sm: 0 6rpx 24rpx rgba(0, 0, 0, 0.22);
+  --list-row: rgba(255, 255, 255, 0.05);
+  --tag-primary-bg: rgba(232, 149, 114, 0.18);
+  --tag-primary-fg: #f0c4b0;
+  --tag-warning-bg: rgba(255, 186, 66, 0.14);
+  --tag-warning-fg: #e8b86a;
+  --avatar-gradient-end: #454540;
+  --btn-primary-text: #fffefb;
+  --btn-primary-shadow: rgba(232, 149, 114, 0.28);
+  --danger: #f87171;
+
+  background-image: linear-gradient(180deg, #262624 0%, var(--bg) 40%, #181816 100%);
+}
+
+.theme-scope scroll-view {
+  background-color: transparent;
 }
 
 /* 通用容器 */
@@ -48,7 +100,12 @@ page {
   padding-bottom: 40rpx;
 }
 
-/* ---- 卡片（浅色表面 + 柔和投影）---- */
+/* 页面渐变定义在外层 .theme-scope；内层 container 勿铺纯色盖住背景 */
+.theme-scope > .container {
+  background-color: transparent;
+}
+
+/* ---- 卡片 ---- */
 .card {
   background: var(--surface);
   border-radius: 20rpx;
@@ -56,9 +113,17 @@ page {
   margin-bottom: 24rpx;
   border: 1rpx solid var(--border);
   box-shadow: var(--shadow);
+  transition: opacity var(--duration) var(--ease-out), transform var(--duration) var(--ease-out),
+    box-shadow var(--duration) var(--ease-out);
 }
 
-/* ---- 按钮：主色为指南橙 accent ---- */
+.card.surface-press:active {
+  opacity: 0.94;
+  transform: translateY(2rpx);
+  box-shadow: var(--shadow-sm);
+}
+
+/* ---- 按钮 ---- */
 .btn {
   display: flex;
   align-items: center;
@@ -68,7 +133,7 @@ page {
   font-size: 30rpx;
   font-weight: 600;
   border: none;
-  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: opacity var(--duration) var(--ease-out), transform var(--duration) var(--ease-out);
 }
 
 .btn::after {
@@ -77,8 +142,12 @@ page {
 
 .btn-primary {
   background: linear-gradient(145deg, #e08568 0%, #d97757 48%, #c96a4d 100%);
-  color: #ffffff;
-  box-shadow: 0 8rpx 28rpx rgba(217, 119, 87, 0.35);
+  color: var(--btn-primary-text);
+  box-shadow: 0 8rpx 28rpx var(--btn-primary-shadow);
+}
+
+.theme-scope--dark .btn-primary {
+  background: linear-gradient(145deg, #f0a080 0%, #e89572 48%, #d98462 100%);
 }
 
 .btn-primary:active {
@@ -97,7 +166,7 @@ page {
   background: var(--bg-muted);
 }
 
-/* ---- 输入框（浅底可读）---- */
+/* ---- 输入框 ---- */
 .input {
   height: 88rpx;
   padding: 0 24rpx;
@@ -117,7 +186,7 @@ page {
   display: flex;
   align-items: center;
   padding: 32rpx;
-  background: rgba(255, 255, 255, 0.72);
+  background: var(--list-row);
   border-bottom: 1rpx solid var(--border);
 }
 
@@ -132,13 +201,13 @@ page {
 }
 
 .tag-primary {
-  background: rgba(217, 119, 87, 0.12);
-  color: #c45a3d;
+  background: var(--tag-primary-bg);
+  color: var(--tag-primary-fg);
 }
 
 .tag-warning {
-  background: rgba(255, 171, 0, 0.12);
-  color: #c97800;
+  background: var(--tag-warning-bg);
+  color: var(--tag-warning-fg);
 }
 
 /* ---- 文本语义色 ---- */
@@ -164,7 +233,7 @@ page {
   width: 80rpx;
   height: 80rpx;
   border-radius: 14rpx;
-  background: linear-gradient(145deg, var(--bg-muted) 0%, #dcd8cc 100%);
+  background: linear-gradient(145deg, var(--bg-muted) 0%, var(--avatar-gradient-end) 100%);
   border: 1rpx solid var(--border);
 }
 

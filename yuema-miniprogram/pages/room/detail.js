@@ -31,6 +31,7 @@ const chatService = require('../../services/chatService');
 const { createRoomSocket } = require('../../utils/socket');
 
 Page({
+  behaviors: [require('../../behaviors/themeBehavior')],
   data: {
     roomId: null,
     room: {},

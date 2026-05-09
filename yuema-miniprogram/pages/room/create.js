@@ -59,6 +59,7 @@ function mergeGameRulesFromRoom(room) {
 }
 
 Page({
+  behaviors: [require('../../behaviors/themeBehavior')],
   data: {
     /** 非空表示编辑模式（供 WXML 按钮文案） */
     editRoomId: null,
@@ -199,10 +200,10 @@ Page({
     const key = e.currentTarget.dataset.key;
     const checked = e.detail.value;
     const gid = this.data.currentGameTypeId;
-    const nextCopy = { ...this.data.activeBucketCopy, [key]: checked };
+    // 不用整对象替换 activeBucketCopy，避免 wx:for 下 switch 整组重建导致顶部区域闪屏
     this.setData({
       [`ruleBuckets.${gid}.${key}`]: checked,
-      activeBucketCopy: nextCopy
+      [`activeBucketCopy.${key}`]: checked
     });
   },
 
@@ -227,12 +228,11 @@ Page({
       return;
     }
     arr.push(t);
-    const nextBucket = { ...this.data.ruleBuckets[gid], customLines: arr };
     this.setData({
       [`ruleBuckets.${gid}.customLines`]: arr,
+      'activeBucketCopy.customLines': arr,
       customLineInput: '',
-      displayCustomLines: arr,
-      activeBucketCopy: nextBucket
+      displayCustomLines: arr
     });
   },
 
@@ -242,11 +242,10 @@ Page({
     const arr = (this.data.ruleBuckets[gid].customLines || []).slice();
     if (idx >= 0 && idx < arr.length) {
       arr.splice(idx, 1);
-      const nextBucket = { ...this.data.ruleBuckets[gid], customLines: arr };
       this.setData({
         [`ruleBuckets.${gid}.customLines`]: arr,
-        displayCustomLines: arr,
-        activeBucketCopy: nextBucket
+        'activeBucketCopy.customLines': arr,
+        displayCustomLines: arr
       });
     }
   },

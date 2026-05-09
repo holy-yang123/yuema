@@ -35,7 +35,7 @@
 .greeting-hello {
   font-size: 48rpx;
   font-weight: 600;
-  color: #141413;
+  color: var(--text);
   letter-spacing: 1rpx;
   flex-shrink: 0;
 }
@@ -67,7 +67,7 @@
 
 .location-name {
   font-size: 24rpx;
-  color: #c45a3d;
+  color: var(--tag-primary-fg);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -76,7 +76,7 @@
 
 .location-arrow {
   font-size: 20rpx;
-  color: #d97757;
+  color: var(--accent-orange);
   margin-left: 10rpx;
   opacity: 0.65;
   flex-shrink: 0;
@@ -84,7 +84,7 @@
 
 .greeting-sub {
   font-size: 24rpx;
-  color: #b0aea5;
+  color: var(--text-secondary);
   flex-shrink: 0;
   text-align: right;
   max-width: 280rpx;
@@ -129,7 +129,7 @@
 
 .search-icon {
   font-size: 30rpx;
-  color: #b0aea5;
+  color: var(--text-secondary);
   margin-right: 20rpx;
   opacity: 0.95;
 }
@@ -137,7 +137,7 @@
 .search-input input {
   flex: 1;
   font-size: 28rpx;
-  color: #141413;
+  color: var(--text);
 }
 
 /* 快捷入口 */
@@ -186,27 +186,27 @@
 
 .action-create {
   background: rgba(217, 119, 87, 0.12);
-  color: #c45a3d;
+  color: var(--tag-primary-fg);
 }
 
 .action-join {
   background: rgba(106, 155, 204, 0.14);
-  color: #4a7aad;
+  color: var(--accent-blue);
 }
 
 .action-venue {
   background: rgba(120, 140, 93, 0.14);
-  color: #5f7349;
+  color: var(--accent-green);
 }
 
 .action-history {
   background: rgba(176, 174, 165, 0.18);
-  color: #7a7870;
+  color: var(--text-secondary);
 }
 
 .action-label {
   font-size: 28rpx;
-  color: #141413;
+  color: var(--text);
   font-weight: 500;
   letter-spacing: 0.5rpx;
 }
@@ -228,13 +228,13 @@
   margin-bottom: 0;
   font-size: 34rpx;
   font-weight: 600;
-  color: #141413;
+  color: var(--text);
   letter-spacing: 1rpx;
 }
 
 .section-more {
   font-size: 24rpx;
-  color: #d97757;
+  color: var(--accent-orange);
   font-weight: 500;
   letter-spacing: 0.5rpx;
   opacity: 0.98;
@@ -270,14 +270,14 @@
 .room-no-text {
   font-size: 32rpx;
   font-weight: 600;
-  color: #141413;
+  color: var(--text);
   letter-spacing: 0.5rpx;
 }
 
 .room-game-type {
   font-size: 24rpx;
   font-weight: 500;
-  color: #b0aea5;
+  color: var(--text-secondary);
   letter-spacing: 0.3rpx;
 }
 
@@ -301,23 +301,23 @@
 
 .status-waiting {
   background: rgba(217, 119, 87, 0.12);
-  color: #c45a3d;
+  color: var(--tag-primary-fg);
   border-color: rgba(217, 119, 87, 0.22);
 }
 
 .status-waiting .status-dot {
-  background: #d97757;
+  background: var(--accent-orange);
   box-shadow: 0 0 12rpx rgba(217, 119, 87, 0.35);
 }
 
 .status-playing {
   background: rgba(176, 174, 165, 0.15);
-  color: #7a7870;
+  color: var(--text-secondary);
   border-color: rgba(20, 20, 19, 0.08);
 }
 
 .status-playing .status-dot {
-  background: #b0aea5;
+  background: var(--text-secondary);
 }
 
 .room-meta-row {
@@ -331,13 +331,13 @@
 }
 
 .meta-label {
-  color: #b0aea5;
+  color: var(--text-secondary);
   width: 80rpx;
   font-weight: 400;
 }
 
 .meta-value {
-  color: #7a7870;
+  color: var(--text-secondary);
   flex: 1;
 }
 
@@ -355,8 +355,8 @@
 /* 本人牌局：次要操作按钮（编辑） */
 .room-secondary-btn {
   margin: 0 !important;
-  background: #ffffff !important;
-  color: #7a7870 !important;
+  background: var(--surface-solid) !important;
+  color: var(--text-secondary) !important;
   border: 1rpx solid rgba(20, 20, 19, 0.15) !important;
   border-radius: 14rpx !important;
   padding: 14rpx 28rpx !important;
@@ -372,7 +372,7 @@
 .room-danger-btn {
   margin: 0 !important;
   background: rgba(255, 77, 79, 0.12) !important;
-  color: #cf1322 !important;
+  color: var(--danger) !important;
   border: 1rpx solid rgba(207, 19, 34, 0.35) !important;
   border-radius: 14rpx !important;
   padding: 14rpx 28rpx !important;
@@ -385,8 +385,8 @@
 }
 
 .room-join-btn {
-  background: linear-gradient(145deg, #e08568 0%, #d97757 52%, #c96a4d 100%) !important;
-  color: #ffffff !important;
+  background: linear-gradient(145deg, #e08568 0%, var(--accent-orange) 52%, #c96a4d 100%) !important;
+  color: var(--btn-primary-text) !important;
   border-radius: 14rpx !important;
   padding: 14rpx 40rpx !important;
   font-size: 26rpx !important;
@@ -427,18 +427,18 @@
 .venue-card-name {
   font-size: 28rpx;
   font-weight: 600;
-  color: #141413;
+  color: var(--text);
   letter-spacing: 0.3rpx;
 }
 
 .venue-price {
-  color: #d97757;
+  color: var(--accent-orange);
   font-size: 24rpx;
   font-weight: 600;
 }
 
 .venue-card-address {
-  color: #b0aea5;
+  color: var(--text-secondary);
   font-size: 22rpx;
   line-height: 1.45;
 }
@@ -449,7 +449,7 @@
   flex-direction: column;
   align-items: center;
   padding: 72rpx 32rpx 48rpx;
-  color: #b0aea5;
+  color: var(--text-secondary);
 }
 
 .empty-icon {
@@ -460,7 +460,7 @@
 
 .empty-text {
   font-size: 28rpx;
-  color: #7a7870;
+  color: var(--text-secondary);
   letter-spacing: 0.5rpx;
 }
 

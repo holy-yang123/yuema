@@ -1,4 +1,5 @@
-<page-meta root-background-color="#faf9f5" background-color="#faf9f5" background-color-bottom="#faf9f5" background-text-style="dark" />
+<page-meta root-background-color="{{themeMeta.rootBg}}" background-color="{{themeMeta.bg}}" background-color-bottom="{{themeMeta.bgBottom}}" background-text-style="{{themeMeta.textStyle}}" />
+<view class="{{themeScopeClass}}">
 <view class="container">
   <!-- 头部信息 -->
   <view class="score-header">
@@ -131,4 +132,5 @@
       <button class="btn btn-primary" bindtap="submitModify" disabled="{{modifyTotal !== 0 || submitting}}">提交申请</button>
     </view>
   </view>
+</view>
 </view>

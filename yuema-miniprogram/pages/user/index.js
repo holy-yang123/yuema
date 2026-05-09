@@ -1,7 +1,9 @@
 const app = getApp();
 const userService = require('../../services/userService');
+const themeUtil = require('../../utils/theme');
 
 Page({
+  behaviors: [require('../../behaviors/themeBehavior')],
   data: {
     userInfo: {},
     winRate: 0,
@@ -34,6 +36,14 @@ Page({
 
   onShow() {
     this.loadUserInfo();
+  },
+
+  /** 个人中心开关：持久化并刷新壳层与本页主题容器（见 utils/theme.js） */
+  onThemeDarkChange(e) {
+    const mode = e.detail.value ? 'dark' : 'light';
+    themeUtil.saveThemeMode(mode);
+    themeUtil.applyChrome(mode);
+    this.setData(themeUtil.getThemeUIData(mode));
   },
 
   // 加载用户信息

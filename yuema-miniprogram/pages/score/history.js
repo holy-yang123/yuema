@@ -8,6 +8,7 @@ const gameTypeMap = {
 };
 
 Page({
+  behaviors: [require('../../behaviors/themeBehavior')],
   data: {
     history: [],
     roomNo: '',

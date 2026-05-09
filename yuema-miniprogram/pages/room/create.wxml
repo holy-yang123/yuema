@@ -1,4 +1,5 @@
-<page-meta root-background-color="#faf9f5" background-color="#faf9f5" background-color-bottom="#faf9f5" background-text-style="dark" />
+<page-meta root-background-color="{{themeMeta.rootBg}}" background-color="{{themeMeta.bg}}" background-color-bottom="{{themeMeta.bgBottom}}" background-text-style="{{themeMeta.textStyle}}" />
+<view class="{{themeScopeClass}}">
 <view class="container">
   <view class="form-container">
     <view class="form-item">
@@ -13,9 +14,11 @@
     <!-- 当前玩法下的预设规则开关 -->
     <block wx:if="{{currentRuleOptions.length > 0}}">
       <view class="rules-section-title">玩法细则</view>
-      <view class="form-item" wx:for="{{currentRuleOptions}}" wx:key="key">
+      <view class="form-item form-item-switch" hover-class="none" wx:for="{{currentRuleOptions}}" wx:key="key">
         <text class="label">{{item.label}}</text>
-        <switch checked="{{activeBucketCopy[item.key]}}" data-key="{{item.key}}" bindchange="onRuleSwitch" color="#d97757"/>
+        <view class="rule-switch-wrap">
+          <switch checked="{{activeBucketCopy[item.key]}}" data-key="{{item.key}}" bindchange="onRuleSwitch" color="#d97757"/>
+        </view>
       </view>
       <view class="custom-rules-wrap">
         <text class="custom-rules-hint">自定义规则（每条≤40字，最多5条）</text>
@@ -23,9 +26,15 @@
           <text class="custom-line-text">{{item}}</text>
           <text class="custom-line-del" data-index="{{idx}}" bindtap="removeCustomLine">删除</text>
         </view>
-        <view class="custom-add-row">
-          <input class="custom-add-input" value="{{customLineInput}}" maxlength="40" bindinput="onCustomLineInput" placeholder="补充口头约定，如封顶、坐序"/>
-          <button class="custom-add-btn" bindtap="addCustomLine" size="mini">添加</button>
+        <view class="custom-add-block">
+          <input
+            class="custom-add-input"
+            value="{{customLineInput}}"
+            maxlength="40"
+            bindinput="onCustomLineInput"
+            placeholder="补充口头约定，如封顶、坐序"
+          />
+          <button class="custom-add-btn" bindtap="addCustomLine">添加</button>
         </view>
       </view>
     </block>
@@ -65,4 +74,5 @@
     <!-- 编辑模式标题由 onLoad 设置，按钮文案区分创建/保存 -->
     <button class="submit-btn" bindtap="submit">{{editRoomId ? '保存修改' : '创建房间'}}</button>
   </view>
+</view>
 </view>

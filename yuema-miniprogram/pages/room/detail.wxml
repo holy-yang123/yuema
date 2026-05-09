@@ -1,4 +1,5 @@
-<page-meta root-background-color="#faf9f5" background-color="#faf9f5" background-color-bottom="#faf9f5" background-text-style="dark" />
+<page-meta root-background-color="{{themeMeta.rootBg}}" background-color="{{themeMeta.bg}}" background-color-bottom="{{themeMeta.bgBottom}}" background-text-style="{{themeMeta.textStyle}}" />
+<view class="{{themeScopeClass}}">
 <view class="container detail-page">
   <!-- 房间信息 -->
   <view class="room-header-card">
@@ -187,4 +188,5 @@
     <text class="invite-tip">扫码进入牌局（房间进行中时若已满或未在等待中可能无法加入）</text>
     <button class="btn btn-secondary" bindtap="closeInvite">关闭</button>
   </view>
+</view>
 </view>

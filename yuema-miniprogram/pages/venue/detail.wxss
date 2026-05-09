@@ -1,5 +1,5 @@
 .container {
-  background-color: #faf9f5;
+  background-color: var(--bg);
   min-height: 100%;
   padding-bottom: 140rpx;
   box-sizing: border-box;
@@ -19,7 +19,7 @@
 
 .info-section {
   padding: 40rpx 32rpx;
-  background-color: #faf9f5;
+  background-color: var(--bg);
 }
 
 .venue-header {
@@ -30,14 +30,14 @@
 }
 
 .venue-name {
-  color: #141413;
+  color: var(--text);
   font-size: 40rpx;
   font-weight: 600;
   letter-spacing: -1rpx;
 }
 
 .venue-rating {
-  color: #e8a820;
+  color: var(--tag-warning-fg);
   font-size: 28rpx;
   font-weight: 500;
 }
@@ -45,7 +45,7 @@
 .venue-address {
   display: flex;
   justify-content: space-between;
-  color: #b0aea5;
+  color: var(--text-secondary);
   font-size: 26rpx;
   margin-bottom: 16rpx;
 }
@@ -58,22 +58,22 @@
 
 .quick-link {
   font-size: 26rpx;
-  color: #d97757;
+  color: var(--accent-orange);
 }
 
 .distance {
-  color: #788c5d;
+  color: var(--accent-green);
   font-weight: 500;
 }
 
 .detail-section {
   padding: 40rpx 32rpx;
-  background-color: #ffffff;
-  border-top: 1rpx solid #e8e6dc;
+  background-color: var(--surface-solid);
+  border-top: 1rpx solid var(--bg-muted);
 }
 
 .section-title {
-  color: #141413;
+  color: var(--text);
   font-size: 32rpx;
   font-weight: 600;
   margin-bottom: 24rpx;
@@ -89,11 +89,11 @@
   transform: translateY(-50%);
   width: 4rpx;
   height: 24rpx;
-  background: #d97757;
+  background: var(--accent-orange);
 }
 
 .section-content {
-  color: #b0aea5;
+  color: var(--text-secondary);
   font-size: 28rpx;
   line-height: 1.8;
 }
@@ -106,8 +106,8 @@
   display: flex;
   gap: 20rpx;
   padding: 24rpx 32rpx calc(24rpx + env(safe-area-inset-bottom));
-  background: #ffffff;
-  border-top: 1rpx solid #e8e6dc;
+  background: var(--surface-solid);
+  border-top: 1rpx solid var(--bg-muted);
   z-index: 100;
   box-shadow: 0 -8rpx 28rpx rgba(20, 20, 19, 0.06);
 }
@@ -127,12 +127,12 @@
 }
 
 .btn-foot.primary {
-  background: linear-gradient(145deg, #e08568 0%, #d97757 100%) !important;
-  color: #ffffff !important;
+  background: linear-gradient(145deg, #e08568 0%, var(--accent-orange) 100%) !important;
+  color: var(--btn-primary-text) !important;
 }
 
 .btn-foot.secondary {
-  background: #faf9f5 !important;
-  color: #141413 !important;
-  border: 1rpx solid #e8e6dc !important;
+  background: var(--bg) !important;
+  color: var(--text) !important;
+  border: 1rpx solid var(--bg-muted) !important;
 }

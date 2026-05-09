@@ -1,4 +1,5 @@
-<page-meta root-background-color="#faf9f5" background-color="#faf9f5" background-color-bottom="#faf9f5" background-text-style="dark" />
+<page-meta root-background-color="{{themeMeta.rootBg}}" background-color="{{themeMeta.bg}}" background-color-bottom="{{themeMeta.bgBottom}}" background-text-style="{{themeMeta.textStyle}}" />
+<view class="{{themeScopeClass}}">
 <view class="container">
   <swiper class="banner" indicator-dots autoplay circular wx:if="{{bannerImages.length}}">
     <swiper-item wx:for="{{bannerImages}}" wx:key="*this">
@@ -30,4 +31,5 @@
     <button class="btn-foot secondary" bindtap="goToBook">预订说明</button>
     <button class="btn-foot primary" bindtap="openMap">打开地图</button>
   </view>
+</view>
 </view>

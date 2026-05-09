@@ -1,12 +1,12 @@
 .container {
-  background-color: #faf9f5;
+  background-color: var(--bg);
   min-height: 100%;
   padding: 32rpx;
   box-sizing: border-box;
 }
 
 .room-info {
-  background: #ffffff;
+  background: var(--surface-solid);
   padding: 32rpx;
   border-radius: 16rpx;
   margin-bottom: 32rpx;
@@ -18,19 +18,19 @@
 }
 
 .room-no {
-  color: #141413;
+  color: var(--text);
   font-size: 30rpx;
   font-weight: 600;
 }
 
 .game-type {
-  color: #d97757;
+  color: var(--accent-orange);
   font-size: 26rpx;
   font-weight: 500;
 }
 
 .history-item {
-  background: #ffffff;
+  background: var(--surface-solid);
   border-radius: 16rpx;
   padding: 32rpx;
   margin-bottom: 24rpx;
@@ -43,17 +43,17 @@
   justify-content: space-between;
   margin-bottom: 24rpx;
   padding-bottom: 24rpx;
-  border-bottom: 1rpx solid #e8e6dc;
+  border-bottom: 1rpx solid var(--bg-muted);
 }
 
 .round-no {
-  color: #141413;
+  color: var(--text);
   font-size: 28rpx;
   font-weight: 600;
 }
 
 .round-time {
-  color: #b0aea5;
+  color: var(--text-secondary);
   font-size: 22rpx;
 }
 
@@ -70,7 +70,7 @@
 }
 
 .nickname {
-  color: #b0aea5;
+  color: var(--text-secondary);
   font-size: 26rpx;
 }
 
@@ -80,17 +80,17 @@
 }
 
 .plus {
-  color: #788c5d;
+  color: var(--accent-green);
 }
 
 .minus {
-  color: #FF4D4F;
+  color: var(--danger);
 }
 
 .empty-state {
   display: flex;
   justify-content: center;
   padding-top: 160rpx;
-  color: #b0aea5;
+  color: var(--text-secondary);
   font-size: 28rpx;
 }

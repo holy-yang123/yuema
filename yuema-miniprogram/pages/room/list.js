@@ -1,6 +1,7 @@
 const roomService = require('../../services/roomService');
 
 Page({
+  behaviors: [require('../../behaviors/themeBehavior')],
   data: {
     rooms: [],
     filteredRooms: [],

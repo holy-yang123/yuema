@@ -2,6 +2,7 @@ const userService = require('../../services/userService');
 const app = getApp();
 
 Page({
+  behaviors: [require('../../behaviors/themeBehavior')],
   data: {
     stats: {
       totalGames: 0,

@@ -1,4 +1,5 @@
 const app = getApp();
+const theme = require('../../utils/theme');
 
 /** 固定种子：同 seed 下粒子初始分布一致，体现可控随机 */
 const BG_SEED = 20240509;
@@ -15,7 +16,15 @@ function mulberry32(seed) {
 Page({
   data: {
     loading: false,
-    btnPressed: false
+    btnPressed: false,
+    /** 登录页不用 themeBehavior：避免每次 onShow setData 导致 2d canvas 与入场动画异常（返回后约 1s 空白） */
+    themeScopeClass: 'theme-scope',
+    themeMeta: {
+      rootBg: '#faf9f5',
+      bg: '#faf9f5',
+      bgBottom: '#faf9f5',
+      textStyle: 'dark'
+    }
   },
 
   _running: false,
@@ -24,22 +33,45 @@ Page({
   _w: 0,
   _h: 0,
   _particles: [],
+  /** 与存储对比，仅切换主题时才 setData，减少整页重绘 */
+  _lastAppliedThemeMode: null,
+  /** onReady 已执行：区分首次（仅 onReady 绑 canvas）与再次 onShow（栈返回需重绑） */
+  _pageReady: false,
+
+  onLoad() {
+    this._pageReady = false;
+    const m = theme.getThemeMode();
+    theme.applyChrome(m);
+    this._lastAppliedThemeMode = m;
+    this.setData(theme.getThemeUIData(m));
+  },
 
   onShow() {
+    // 清除全局 loading：其它页 reLaunch/异常路径可能未 hide，mask 默认 false 时仍可点到下层，表现为「只有登录中遮罩」
+    wx.hideLoading();
+    const m = theme.getThemeMode();
+    theme.applyChrome(m);
+    if (m !== this._lastAppliedThemeMode) {
+      this._lastAppliedThemeMode = m;
+      this.setData(theme.getThemeUIData(m));
+    }
     if (app.globalData.token) {
       wx.switchTab({
         url: '/pages/index/index'
       });
       return;
     }
-    // 从其它页返回时再启动动画（onReady 已启动时避免重复 init）
-    if (this._ctx && !this._running) {
-      this._startBgLoop();
+    // 首次绑定交给 onReady，避免与 onShow 各调一次 _bindCanvasAndStart；仅页面已就绪后（再次 onShow）才重绑，应对 canvas 被系统回收
+    if (this._pageReady) {
+      wx.nextTick(() => {
+        this._bindCanvasAndStart();
+      });
     }
   },
 
   onReady() {
-    this._initCanvasBg();
+    this._pageReady = true;
+    this._bindCanvasAndStart();
   },
 
   onHide() {
@@ -48,19 +80,31 @@ Page({
 
   onUnload() {
     this._stopBgLoop();
+    this._canvasBindRetries = 0;
+    // 离开登录栈时收起可能未配对的 showLoading，避免返回其它页面仍盖着遮罩
+    wx.hideLoading();
   },
 
-  /** type=2d canvas：轻量粒子流场，页面隐藏即停绘省电 */
-  _initCanvasBg() {
+  /** type=2d canvas：每次绑定前先停环，避免返回页面后双 RAF 或失效上下文 */
+  _bindCanvasAndStart() {
+    this._stopBgLoop();
     const query = wx.createSelectorQuery().in(this);
     query
       .select('#login-bg')
       .fields({ node: true, size: true })
       .exec((res) => {
         const info = res && res[0];
-        if (!info || !info.node) {
+        if (!info || !info.node || !info.width || !info.height) {
+          if (!this._canvasBindRetries) {
+            this._canvasBindRetries = 0;
+          }
+          if (this._canvasBindRetries < 8) {
+            this._canvasBindRetries += 1;
+            setTimeout(() => this._bindCanvasAndStart(), 50);
+          }
           return;
         }
+        this._canvasBindRetries = 0;
         const canvas = info.node;
         const ctx = canvas.getContext('2d');
         const dpr = wx.getSystemInfoSync().pixelRatio || 1;
@@ -107,11 +151,18 @@ Page({
     if (!ctx || !w || !h) {
       return;
     }
-    // 与页面 CSS 渐变呼应，避免 canvas 与纯色底脱节
+    // 与当前主题背景一致（深色下勿铺浅色底盖住上层视觉）
+    const dark = theme.getThemeMode() === 'dark';
     const bg = ctx.createLinearGradient(0, 0, w, h);
-    bg.addColorStop(0, '#fdfcfa');
-    bg.addColorStop(0.5, '#faf8f2');
-    bg.addColorStop(1, '#f2ebe2');
+    if (dark) {
+      bg.addColorStop(0, '#262624');
+      bg.addColorStop(0.5, '#1c1c1a');
+      bg.addColorStop(1, '#181816');
+    } else {
+      bg.addColorStop(0, '#fdfcfa');
+      bg.addColorStop(0.5, '#faf8f2');
+      bg.addColorStop(1, '#f2ebe2');
+    }
     ctx.fillStyle = bg;
     ctx.fillRect(0, 0, w, h);
     const t = tMs * 0.00012;

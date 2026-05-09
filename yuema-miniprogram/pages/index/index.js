@@ -4,6 +4,7 @@ const venueService = require('../../services/venueService');
 const { LOGIN_PAGE } = require('../../utils/pageRoutes');
 
 Page({
+  behaviors: [require('../../behaviors/themeBehavior')],
   data: {
     roomList: [],
     venueList: [],

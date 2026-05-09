@@ -3,21 +3,21 @@
   flex-direction: column;
   height: 100%;
   overflow: hidden;
-  background-color: #faf9f5;
+  background-color: var(--bg);
   box-sizing: border-box;
 }
 
 .header {
   flex-shrink: 0;
   padding: 32rpx;
-  background-color: #faf9f5;
-  border-bottom: 1rpx solid #e8e6dc;
+  background-color: var(--bg);
+  border-bottom: 1rpx solid var(--bg-muted);
 }
 
 .search-box {
   display: flex;
   align-items: center;
-  background: #ffffff;
+  background: var(--surface-solid);
   border-radius: 12rpx;
   padding: 16rpx 24rpx;
   border: 1rpx solid rgba(20, 20, 19, 0.08);
@@ -27,24 +27,24 @@
 .search-box input {
   flex: 1;
   margin-left: 20rpx;
-  color: #141413;
+  color: var(--text);
   font-size: 28rpx;
 }
 
 .placeholder-style {
-  color: #b0aea5;
+  color: var(--text-secondary);
 }
 
 .venue-list {
   padding: 32rpx;
   width: 100%;
   box-sizing: border-box;
-  background-color: #faf9f5;
+  background-color: var(--bg);
 }
 
 .venue-card {
   width: 100%;
-  background: #ffffff;
+  background: var(--surface-solid);
   border-radius: 16rpx;
   margin-bottom: 32rpx;
   overflow: hidden;
@@ -58,13 +58,13 @@
 
 .venue-card:active {
   border-color: rgba(217, 119, 87, 0.35);
-  background: #fdfcfa;
+  background: var(--bg-soft);
 }
 
 .venue-image {
   width: 160rpx;
   height: 160rpx;
-  background: #e8e6dc;
+  background: var(--bg-muted);
   border-radius: 12rpx;
   flex-shrink: 0;
 }
@@ -84,7 +84,7 @@
 }
 
 .venue-name {
-  color: #141413;
+  color: var(--text);
   font-size: 30rpx;
   font-weight: 600;
   margin-bottom: 8rpx;
@@ -98,19 +98,19 @@
 }
 
 .rating {
-  color: #e8a820;
+  color: var(--tag-warning-fg);
   font-size: 24rpx;
   font-weight: 500;
 }
 
 .price {
-  color: #d97757;
+  color: var(--accent-orange);
   font-size: 26rpx;
   font-weight: 600;
 }
 
 .venue-address {
-  color: #b0aea5;
+  color: var(--text-secondary);
   font-size: 22rpx;
   margin-bottom: 12rpx;
   display: -webkit-box;
@@ -126,7 +126,7 @@
 
 .tag {
   font-size: 18rpx;
-  color: #7a7870;
+  color: var(--text-secondary);
   background: rgba(232, 230, 220, 0.8);
   padding: 4rpx 10rpx;
   border-radius: 4rpx;
@@ -137,6 +137,6 @@
   display: flex;
   justify-content: center;
   padding-top: 160rpx;
-  color: #b0aea5;
+  color: var(--text-secondary);
   font-size: 28rpx;
 }

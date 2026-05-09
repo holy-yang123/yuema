@@ -1,4 +1,5 @@
-<page-meta root-background-color="#faf9f5" background-color="#faf9f5" background-color-bottom="#faf9f5" background-text-style="dark" />
+<page-meta root-background-color="{{themeMeta.rootBg}}" background-color="{{themeMeta.bg}}" background-color-bottom="{{themeMeta.bgBottom}}" background-text-style="{{themeMeta.textStyle}}" />
+<view class="{{themeScopeClass}}">
 <view class="container">
   <view class="room-info">
     <text class="room-no">房间 #{{roomNo}}</text>
@@ -25,4 +26,5 @@
   <view class="empty-state" wx:if="{{history.length === 0}}">
     <text>暂无局数记录</text>
   </view>
+</view>
 </view>

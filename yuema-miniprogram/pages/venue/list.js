@@ -26,6 +26,7 @@ function firstCoverImage(imageUrls) {
 }
 
 Page({
+  behaviors: [require('../../behaviors/themeBehavior')],
   data: {
     allVenues: [],
     filteredVenues: [],
