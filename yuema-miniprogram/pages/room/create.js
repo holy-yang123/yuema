@@ -1,6 +1,84 @@
 const roomService = require('../../services/roomService');
 const venueService = require('../../services/venueService');
 const { GAME_RULE_OPTIONS, SICHUAN_JIA_SCORE_RADIO_NONE } = require('../../utils/gameRuleSets');
+const { splitPickerDateTime, pickScheduleFields } = require('../../utils/roomScheduleDisplay');
+
+/** 创建页日期默认值 yyyy-MM-dd */
+function todayYmd() {
+  const d = new Date();
+  const m = d.getMonth() + 1;
+  const day = d.getDate();
+  return `${d.getFullYear()}-${m < 10 ? `0${m}` : m}-${day < 10 ? `0${day}` : day}`;
+}
+
+/** 预计时长：仅 3–24 小时（分钟入库），符合「牌局时间三小时起」 */
+function buildDurationHourOptions() {
+  const opts = [];
+  for (let h = 3; h <= 24; h += 1) {
+    opts.push({ label: `${h}小时`, value: h * 60 });
+  }
+  return opts;
+}
+
+/** 本地日期 yyyy-MM-dd + 时间 HH:mm → 毫秒时间戳 */
+function localDateTimeMs(dateStr, timeStr) {
+  if (!dateStr || !timeStr) {
+    return NaN;
+  }
+  const ps = dateStr.split('-').map((x) => parseInt(x, 10));
+  const pt = timeStr.split(':').map((x) => parseInt(x, 10));
+  if (ps.length !== 3 || pt.length < 2) {
+    return NaN;
+  }
+  const [y, mo, d] = ps;
+  const [hh, mm] = pt;
+  if ([y, mo, d, hh, mm].some((n) => Number.isNaN(n))) {
+    return NaN;
+  }
+  return new Date(y, mo - 1, d, hh, mm, 0, 0).getTime();
+}
+
+/** 将本地时间戳落到当前分钟起始，便于与日期控件选项对齐比较 */
+function floorLocalMsToMinute(ms) {
+  const x = new Date(ms);
+  x.setSeconds(0, 0);
+  return x.getTime();
+}
+
+/** 当前本地时刻，格式 HH:mm（与 time picker 同一粒度） */
+function currentHmFlooredStr() {
+  const x = new Date();
+  x.setSeconds(0, 0);
+  const h = x.getHours();
+  const m = x.getMinutes();
+  const pad = (n) => (n < 10 ? `0${n}` : `${n}`);
+  return `${pad(h)}:${pad(m)}`;
+}
+
+/** 止须至少晚于起 3 小时（毫秒） */
+const THREE_H_MS = 3 * 60 * 60 * 1000;
+
+/** 本地毫秒 → yyyy-MM-dd、HH:mm */
+function msToYmdHm(ms) {
+  const d = new Date(ms);
+  const pad = (n) => (n < 10 ? `0${n}` : `${n}`);
+  const y = d.getFullYear();
+  const mo = d.getMonth() + 1;
+  const day = d.getDate();
+  return {
+    ymd: `${y}-${pad(mo)}-${pad(day)}`,
+    hm: `${pad(d.getHours())}:${pad(d.getMinutes())}`
+  };
+}
+
+/** 起时刻 + 3 小时的毫秒时间戳 */
+function minEndMsFromBegin(beginDay, beginTime) {
+  const tb = localDateTimeMs(beginDay, beginTime);
+  if (Number.isNaN(tb)) {
+    return NaN;
+  }
+  return tb + THREE_H_MS;
+}
 
 /** 初始化某一玩法的空桶（布尔默认 false + customLines） */
 function emptyBucket(gameType) {
@@ -110,7 +188,20 @@ Page({
     maxPlayersIndex: 2,
     venues: [],
     venueIndex: -1,
-    selectedLocation: null // {address, latitude, longitude}
+    selectedLocation: null, // {address, latitude, longitude}
+    /** picker 缺省日期锚点（未选日期时仍可弹出合法 date 控件） */
+    swDefaultDate: '',
+    swBeginDate: '',
+    swBeginTime: '',
+    swEndDate: '',
+    swEndTime: '',
+    /** date 模式 picker 最小日期（首日帧即用 todayYmd，避免 start 为空） */
+    scheduleMinDate: todayYmd(),
+    /** 选中日为今天时，time picker 的 start（不能早于当前时刻） */
+    swBeginTimePickerStart: '00:00',
+    swEndTimePickerStart: '00:00',
+    durationOptions: buildDurationHourOptions(),
+    durationIndex: 0
   },
 
   async onLoad(options) {
@@ -123,13 +214,98 @@ Page({
         wx.setNavigationBarTitle({ title: '编辑牌局' });
       }
     }
-    this.setData({ editRoomId });
+    const anchor = todayYmd();
+    this.setData({ editRoomId, scheduleMinDate: anchor, swDefaultDate: anchor });
     await this.loadVenues();
     if (editRoomId) {
       await this.prefillEditForm(editRoomId);
+      this.refreshScheduleTimeLimits();
     } else {
-      this.syncRuleUi();
+      // 新建：「开始时间（起）」默认当前时刻（分钟），并联动默认「止」=起+3h
+      const nowHm = currentHmFlooredStr();
+      this.setData(
+        {
+          swBeginDate: anchor,
+          swBeginTime: nowHm
+        },
+        () => {
+          this.applyDefaultEndFromBegin();
+          this.syncRuleUi();
+          this.refreshScheduleTimeLimits();
+        }
+      );
     }
+  },
+
+  onShow() {
+    // 跨日或时钟走动后刷新：日期下限 + 今日时间 picker 的 start + 钳制已选时间
+    this.refreshScheduleTimeLimits();
+  },
+
+  /**
+   * 今日选中日期的时刻不得早于当前：刷新 time 的 start，并把已选时刻钳到当前分钟之后
+   */
+  refreshScheduleTimeLimits() {
+    const today = todayYmd();
+    const nowHm = currentHmFlooredStr();
+    const nowMs = floorLocalMsToMinute(Date.now());
+    const { swBeginDate, swEndDate, swBeginTime, swEndTime, swDefaultDate } = this.data;
+    // 未点日期时 WXML 仍用 swDefaultDate 展示「今天」，逻辑必须与展示一致，否则 time 的 start 会误为 00:00 可选过去时刻
+    const beginDay = swBeginDate || swDefaultDate || today;
+    const endDay = swEndDate || swDefaultDate || today;
+    const patch = {
+      scheduleMinDate: today,
+      swDefaultDate: today,
+      swBeginTimePickerStart: beginDay === today ? nowHm : '00:00',
+      swEndTimePickerStart: endDay === today ? nowHm : '00:00'
+    };
+    if (beginDay === today && swBeginTime) {
+      const t = localDateTimeMs(beginDay, swBeginTime);
+      if (!Number.isNaN(t) && t < nowMs) {
+        patch.swBeginTime = nowHm;
+      }
+    }
+    if (endDay === today && swEndTime) {
+      const t = localDateTimeMs(endDay, swEndTime);
+      if (!Number.isNaN(t) && t < nowMs) {
+        patch.swEndTime = nowHm;
+      }
+    }
+    // 止 ≥ max(当前, 起+3h)（默认填充后此处兜底编辑旧数据）
+    const beginTimeEff = patch.swBeginTime !== undefined ? patch.swBeginTime : swBeginTime;
+    if (beginTimeEff) {
+      const minAfterBegin = minEndMsFromBegin(beginDay, beginTimeEff);
+      if (!Number.isNaN(minAfterBegin)) {
+        const minEndOk = Math.max(nowMs, minAfterBegin);
+        const endDayEff = swEndDate || swDefaultDate || today;
+        const endTimeEff = patch.swEndTime !== undefined ? patch.swEndTime : swEndTime;
+        if (endTimeEff) {
+          const te = localDateTimeMs(endDayEff, endTimeEff);
+          if (!Number.isNaN(te) && te < minEndOk) {
+            const { ymd, hm } = msToYmdHm(minEndOk);
+            patch.swEndDate = ymd;
+            patch.swEndTime = hm;
+          }
+        }
+      }
+    }
+    this.setData(patch);
+  },
+
+  /** 选了「开始时间（起）」后默认把「止」设为起 + 3 小时（跨日自动换格） */
+  applyDefaultEndFromBegin() {
+    const { swBeginDate, swBeginTime, swDefaultDate } = this.data;
+    const beginDay = swBeginDate || swDefaultDate;
+    if (!beginDay || !swBeginTime) {
+      return;
+    }
+    let msEnd = minEndMsFromBegin(beginDay, swBeginTime);
+    if (Number.isNaN(msEnd)) {
+      return;
+    }
+    msEnd = Math.max(floorLocalMsToMinute(Date.now()), msEnd);
+    const { ymd, hm } = msToYmdHm(msEnd);
+    this.setData({ swEndDate: ymd, swEndTime: hm });
   },
 
   /** 根据 gameTypeIndex 刷新当前玩法下的规则选项列表 */
@@ -188,9 +364,32 @@ Page({
           longitude: lng
         };
       }
+      const sch = pickScheduleFields(room);
+      const b = splitPickerDateTime(sch.begin);
+      const ept = splitPickerDateTime(sch.end);
+      const { durationOptions } = this.data;
+      let durationIndex = 0;
+      if (sch.minutes != null) {
+        const m = Number(sch.minutes);
+        const exact = durationOptions.findIndex((o) => o.value === m);
+        if (exact >= 0) {
+          durationIndex = exact;
+        } else {
+          // 历史数据：映射到 3–24 小时档（低于 3 小时视为 3 小时）
+          const hrs = Math.max(3, Math.min(24, Math.round(m / 60)));
+          const mapped = durationOptions.findIndex((o) => o.value === hrs * 60);
+          durationIndex = mapped >= 0 ? mapped : 0;
+        }
+      }
       const ruleBuckets = mergeGameRulesFromRoom(room);
       this.setData(
         {
+          swDefaultDate: todayYmd(),
+          swBeginDate: b.date || '',
+          swBeginTime: b.time || '',
+          swEndDate: ept.date || '',
+          swEndTime: ept.time || '',
+          durationIndex,
           gameTypeIndex: gtIdx,
           maxPlayersIndex: mpIdx,
           venueIndex: vIdx,
@@ -198,7 +397,10 @@ Page({
           ruleBuckets,
           remark: room.remark || ''
         },
-        () => this.syncRuleUi()
+        () => {
+          this.syncRuleUi();
+          this.refreshScheduleTimeLimits();
+        }
       );
     } catch (err) {
       console.error('prefill edit', err);
@@ -229,6 +431,102 @@ Page({
 
   onVenueChange(e) {
     this.setData({ venueIndex: e.detail.value });
+  },
+
+  onSwBeginDateChange(e) {
+    const v = e.detail.value || '';
+    this.setData({ swBeginDate: v }, () => {
+      if (this.data.swBeginTime) {
+        this.applyDefaultEndFromBegin();
+      }
+      this.refreshScheduleTimeLimits();
+    });
+  },
+  onSwBeginTimeChange(e) {
+    const v = e.detail.value || '';
+    const today = todayYmd();
+    const nowMs = floorLocalMsToMinute(Date.now());
+    const beginDay = this.data.swBeginDate || this.data.swDefaultDate || today;
+    if (beginDay === today && v) {
+      const t = localDateTimeMs(beginDay, v);
+      if (!Number.isNaN(t) && t < nowMs) {
+        wx.showToast({ title: '不能早于当前时间', icon: 'none' });
+        const nowHm = currentHmFlooredStr();
+        this.setData({ swBeginTime: nowHm }, () => {
+          this.applyDefaultEndFromBegin();
+          this.refreshScheduleTimeLimits();
+        });
+        return;
+      }
+    }
+    this.setData({ swBeginTime: v }, () => {
+      if (v) {
+        this.applyDefaultEndFromBegin();
+      }
+      this.refreshScheduleTimeLimits();
+    });
+  },
+  onSwEndDateChange(e) {
+    const v = e.detail.value || '';
+    this.setData({ swEndDate: v }, () => {
+      this.enforceEndWindowRules(() => this.refreshScheduleTimeLimits());
+    });
+  },
+  onSwEndTimeChange(e) {
+    const v = e.detail.value || '';
+    const today = todayYmd();
+    const nowMs = floorLocalMsToMinute(Date.now());
+    const endDay = this.data.swEndDate || this.data.swDefaultDate || today;
+    if (endDay === today && v) {
+      const t = localDateTimeMs(endDay, v);
+      if (!Number.isNaN(t) && t < nowMs) {
+        wx.showToast({ title: '不能早于当前时间', icon: 'none' });
+        this.setData({ swEndTime: currentHmFlooredStr() }, () => {
+          this.enforceEndWindowRules(() => this.refreshScheduleTimeLimits());
+        });
+        return;
+      }
+    }
+    this.setData({ swEndTime: v }, () => {
+      this.enforceEndWindowRules(() => this.refreshScheduleTimeLimits());
+    });
+  },
+
+  /** 手动改「止」：须 ≥ 当前且 ≥ 起+3h，否则钳到 max(当前,起+3h) */
+  enforceEndWindowRules(done) {
+    const cb = typeof done === 'function' ? done : () => {};
+    const { swBeginDate, swBeginTime, swEndDate, swEndTime, swDefaultDate } = this.data;
+    const beginDay = swBeginDate || swDefaultDate;
+    const endDay = swEndDate || swDefaultDate;
+    if (!swEndTime || !endDay) {
+      cb();
+      return;
+    }
+    const nowMs = floorLocalMsToMinute(Date.now());
+    const te = localDateTimeMs(endDay, swEndTime);
+    if (Number.isNaN(te)) {
+      cb();
+      return;
+    }
+    let targetMs = nowMs;
+    if (swBeginTime && beginDay) {
+      const minAfterBegin = minEndMsFromBegin(beginDay, swBeginTime);
+      if (!Number.isNaN(minAfterBegin)) {
+        targetMs = Math.max(nowMs, minAfterBegin);
+      }
+    }
+    if (te < targetMs) {
+      wx.showToast({ title: '须不早于当前时间，且至少晚于开始时间（起）三小时', icon: 'none' });
+      const { ymd, hm } = msToYmdHm(targetMs);
+      this.setData({ swEndDate: ymd, swEndTime: hm }, cb);
+      return;
+    }
+    cb();
+  },
+
+  onDurationChange(e) {
+    const i = parseInt(e.detail.value, 10);
+    this.setData({ durationIndex: !isNaN(i) ? i : 0 });
   },
 
   /** 预设规则开关：写入当前玩法桶 */
@@ -329,6 +627,60 @@ Page({
       remark
     } = this.data;
 
+    const {
+      swBeginDate,
+      swBeginTime,
+      swEndDate,
+      swEndTime,
+      swDefaultDate,
+      durationOptions: durOpts,
+      durationIndex: durIdx
+    } = this.data;
+    const beginDaySubmit = swBeginDate || swDefaultDate;
+    const endDaySubmit = swEndDate || swDefaultDate;
+    // ISO 本地日期时间，便于 Jackson 反序列化为 LocalDateTime（未点日期时与界面默认日一致）
+    const startWindowBegin =
+      beginDaySubmit && swBeginTime ? `${beginDaySubmit}T${swBeginTime}:00` : null;
+    const startWindowEnd = endDaySubmit && swEndTime ? `${endDaySubmit}T${swEndTime}:00` : null;
+    const dopt = durOpts[durIdx];
+    const durationMinutes = dopt && dopt.value != null ? dopt.value : null;
+
+    const nowMinuteMs = floorLocalMsToMinute(Date.now());
+    if (beginDaySubmit && swBeginTime) {
+      const tb = localDateTimeMs(beginDaySubmit, swBeginTime);
+      if (Number.isNaN(tb)) {
+        wx.showToast({ title: '请完整选择开始时间（起）', icon: 'none' });
+        return;
+      }
+      if (tb < nowMinuteMs) {
+        wx.showToast({ title: '开始时间（起）不能早于当前时间', icon: 'none' });
+        return;
+      }
+    }
+    if (endDaySubmit && swEndTime) {
+      const te = localDateTimeMs(endDaySubmit, swEndTime);
+      if (Number.isNaN(te)) {
+        wx.showToast({ title: '请完整选择开始时间（止）', icon: 'none' });
+        return;
+      }
+      if (te < nowMinuteMs) {
+        wx.showToast({ title: '开始时间（止）不能早于当前时间', icon: 'none' });
+        return;
+      }
+    }
+    if (beginDaySubmit && swBeginTime && endDaySubmit && swEndTime) {
+      const tb = localDateTimeMs(beginDaySubmit, swBeginTime);
+      const te = localDateTimeMs(endDaySubmit, swEndTime);
+      if (!Number.isNaN(tb) && !Number.isNaN(te) && te < tb + THREE_H_MS) {
+        wx.showToast({ title: '开始时间（止）须至少晚于开始时间（起）三小时', icon: 'none' });
+        return;
+      }
+    }
+    if (!durationMinutes || durationMinutes < 180) {
+      wx.showToast({ title: '预计牌局时长至少为3小时', icon: 'none' });
+      return;
+    }
+
     const data = {
       gameType: gameTypes[gameTypeIndex].id,
       maxPlayers: maxPlayersOptions[maxPlayersIndex],
@@ -336,7 +688,10 @@ Page({
       latitude: venueIndex === -1 && this.data.selectedLocation ? this.data.selectedLocation.latitude : null,
       longitude: venueIndex === -1 && this.data.selectedLocation ? this.data.selectedLocation.longitude : null,
       gameRules: ruleBuckets,
-      remark: (remark || '').trim()
+      remark: (remark || '').trim(),
+      startWindowBegin,
+      startWindowEnd,
+      durationMinutes
     };
 
     try {

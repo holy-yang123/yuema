@@ -1,6 +1,7 @@
 const roomService = require('../../services/roomService');
 const { GAME_TYPE_LABELS } = require('../../utils/gameTypeLabels');
 const { buildRuleCardTags } = require('../../utils/gameRulesDisplay');
+const { attachScheduleDisplay } = require('../../utils/roomScheduleDisplay');
 
 Page({
   behaviors: [require('../../behaviors/themeBehavior')],
@@ -79,7 +80,7 @@ Page({
       const currentUserId = u ? (u.userId != null ? u.userId : u.id) : null;
       // 与首页卡片同源解析 gameRules，编辑保存后 onShow 刷新即可展示最新规则（含自定义条文）
       const rooms = (res.data || []).map((r) => ({
-        ...r,
+        ...attachScheduleDisplay(r),
         ruleCardTags: buildRuleCardTags(r)
       }));
       this.setData({

@@ -3,6 +3,7 @@ const roomService = require('../../services/roomService');
 const scoreService = require('../../services/scoreService');
 const { GAME_TYPE_LABELS } = require('../../utils/gameTypeLabels');
 const { parseGameRulesDisplay } = require('../../utils/gameRulesDisplay');
+const { attachScheduleDisplay } = require('../../utils/roomScheduleDisplay');
 const chatService = require('../../services/chatService');
 const { createRoomSocket } = require('../../utils/socket');
 
@@ -281,9 +282,10 @@ Page({
       }
 
       const ruleDisp = parseGameRulesDisplay(data.room);
+      const room = attachScheduleDisplay(data.room);
 
       this.setData({
-        room: data.room,
+        room,
         members: data.members,
         emptySeats,
         isOwner,

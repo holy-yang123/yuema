@@ -235,14 +235,42 @@ Page({
 
   /** 微信 getPhoneNumber 回调：换绑手机号并置 realname_verified */
   async onWxPhoneForRealname(e) {
-    const em = (e && e.detail && e.detail.errMsg) || '';
-    if (em.indexOf('fail') >= 0) {
-      wx.showToast({ title: '未授权或失败', icon: 'none' });
+    const d = (e && e.detail) || {};
+    const em = d.errMsg || '';
+    // 失败原因见微信文档 errMsg；统一打日志便于真机调试（开发者工具里常无 code）
+    if (em && em.indexOf('fail') >= 0) {
+      console.error('[getPhoneNumber]', d);
+      let title = '授权失败，请重试';
+      if (em.indexOf('deny') >= 0 || em.indexOf('cancel') >= 0) {
+        title = '已取消或未同意授权';
+      } else if (em.indexOf('data empty') >= 0) {
+        // 开发者工具/模拟器常见：微信不下发手机号临时凭证，须真机预览调试
+        title = '请用手机扫码真机预览（工具内常返回 data empty）';
+      } else if (
+        em.indexOf('jsapi has no permission') >= 0 ||
+        em.indexOf('operateWXData') >= 0 ||
+        Number(d.errno) === 102
+      ) {
+        // 真机也会出现：与「是否真机」无关，是公众平台未授予该 JSAPI（隐私指引/主体类型等）
+        wx.showModal({
+          title: '未开通手机号接口权限',
+          content:
+            '控制台若出现 errno 102 / jsapi has no permission：请到微信公众平台 → 设置 → 服务内容声明 → 用户隐私保护指引，补充说明并勾选「手机号」相关接口；并确认主体与类目符合微信要求（个人主体往往无法使用手机号快速验证，需企业认证等）。保存后重新上传体验版再试。',
+          showCancel: false
+        });
+        return;
+      } else if (em.indexOf('no permission') >= 0) {
+        title = '无接口权限：请检查隐私指引与小程序认证状态';
+      } else if (em.indexOf('privacy') >= 0 || em.indexOf('api scope') >= 0) {
+        title = '请在后台配置用户隐私保护指引';
+      }
+      wx.showToast({ title, icon: 'none', duration: 2800 });
       return;
     }
-    const code = e.detail && e.detail.code;
+    const code = d.code;
     if (!code) {
-      wx.showToast({ title: '请重试', icon: 'none' });
+      console.error('[getPhoneNumber] 无 code', d);
+      wx.showToast({ title: '未拿到授权凭证，请真机重试', icon: 'none' });
       return;
     }
     wx.showLoading({ title: '校验中', mask: true });

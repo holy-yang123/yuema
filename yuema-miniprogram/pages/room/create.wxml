@@ -59,6 +59,36 @@
       </picker>
     </view>
 
+    <!-- 计划开始时间窗口 + 预计时长：写入 rooms.start_window_* / duration_minutes -->
+    <view class="form-item form-item-column form-item-schedule">
+      <text class="label">开始时间（起）</text>
+      <view class="schedule-dt-row">
+        <picker mode="date" start="{{scheduleMinDate}}" end="2037-12-31" value="{{swBeginDate || swDefaultDate}}" bindchange="onSwBeginDateChange">
+          <view class="picker-value schedule-picker-half {{!swBeginDate ? 'placeholder' : ''}}">{{swBeginDate ? swBeginDate : '日期'}}</view>
+        </picker>
+        <picker mode="time" start="{{swBeginTimePickerStart}}" end="23:59" value="{{swBeginTime || swBeginTimePickerStart}}" bindchange="onSwBeginTimeChange">
+          <view class="picker-value schedule-picker-half {{!swBeginTime ? 'placeholder' : ''}}">{{swBeginTime ? swBeginTime : '时间'}}</view>
+        </picker>
+      </view>
+    </view>
+    <view class="form-item form-item-column form-item-schedule">
+      <text class="label">开始时间（止）</text>
+      <view class="schedule-dt-row">
+        <picker mode="date" start="{{scheduleMinDate}}" end="2037-12-31" value="{{swEndDate || swDefaultDate}}" bindchange="onSwEndDateChange">
+          <view class="picker-value schedule-picker-half {{!swEndDate ? 'placeholder' : ''}}">{{swEndDate ? swEndDate : '日期'}}</view>
+        </picker>
+        <picker mode="time" start="{{swEndTimePickerStart}}" end="23:59" value="{{swEndTime || swEndTimePickerStart}}" bindchange="onSwEndTimeChange">
+          <view class="picker-value schedule-picker-half {{!swEndTime ? 'placeholder' : ''}}">{{swEndTime ? swEndTime : '时间'}}</view>
+        </picker>
+      </view>
+    </view>
+    <view class="form-item">
+      <text class="label">预计牌局时长</text>
+      <picker bindchange="onDurationChange" value="{{durationIndex}}" range="{{durationOptions}}" range-key="label">
+        <view class="picker-value">{{durationOptions[durationIndex].label}}</view>
+      </picker>
+    </view>
+
     <view class="form-item">
       <text class="label">场地(可选)</text>
       <picker bindchange="onVenueChange" value="{{venueIndex}}" range="{{venues}}" range-key="name">

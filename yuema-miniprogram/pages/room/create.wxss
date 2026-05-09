@@ -45,6 +45,25 @@
   border-bottom: none;
 }
 
+/* 计划开始：日期+时间并排，与单列 label 对齐 */
+.form-item-schedule .label {
+  align-self: flex-start;
+  margin-bottom: 16rpx;
+}
+
+.schedule-dt-row {
+  display: flex;
+  flex-direction: row;
+  gap: 24rpx;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.schedule-picker-half {
+  flex: 1;
+  min-width: 0;
+}
+
 .rules-section-title {
   padding: 32rpx 0 16rpx;
   font-size: 26rpx;

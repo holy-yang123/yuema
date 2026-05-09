@@ -41,6 +41,18 @@ public class Room {
     
     @TableField("end_time")
     private LocalDateTime endTime;
+
+    /** 计划开始时间窗口起点（与实际开局 start_time 分离） */
+    @TableField("start_window_begin")
+    private LocalDateTime startWindowBegin;
+
+    /** 计划开始时间窗口终点 */
+    @TableField("start_window_end")
+    private LocalDateTime startWindowEnd;
+
+    /** 预计牌局时长（分钟）；小程序按小时选档时为整小时×60 */
+    @TableField("duration_minutes")
+    private Integer durationMinutes;
     
     @TableField("base_score")
     private Integer baseScore;

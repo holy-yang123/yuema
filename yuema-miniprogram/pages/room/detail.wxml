@@ -26,6 +26,14 @@
         <text class="meta-cell-label">场地</text>
         <text class="meta-cell-value">{{room.venueName}}</text>
       </view>
+      <view class="meta-cell" wx:if="{{room.scheduleDisplayStart}}">
+        <text class="meta-cell-label">开始范围</text>
+        <text class="meta-cell-value">{{room.scheduleDisplayStart}}</text>
+      </view>
+      <view class="meta-cell" wx:if="{{room.scheduleDisplayDuration}}">
+        <text class="meta-cell-label">预计时长</text>
+        <text class="meta-cell-value">{{room.scheduleDisplayDuration}}</text>
+      </view>
       <view class="meta-cell" wx:if="{{room.baseScore}}">
         <text class="meta-cell-label">底分</text>
         <text class="meta-cell-value">{{room.baseScore}}</text>

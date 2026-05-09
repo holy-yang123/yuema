@@ -87,6 +87,11 @@ public class RoomService extends ServiceImpl<RoomMapper, Room> {
         }
 
         room.setStartTime(dto.getStartTime());
+        // 计划时间窗口与时长：交由校验方法统一约束，与实际开局 start_time 分离
+        validateScheduleFields(dto.getStartWindowBegin(), dto.getStartWindowEnd(), dto.getDurationMinutes());
+        room.setStartWindowBegin(dto.getStartWindowBegin());
+        room.setStartWindowEnd(dto.getStartWindowEnd());
+        room.setDurationMinutes(dto.getDurationMinutes());
         room.setBaseScore(dto.getBaseScore() != null ? dto.getBaseScore() : 1);
         room.setTaiFee(dto.getTaiFee() != null ? dto.getTaiFee() : 0);
         room.setRemark(dto.getRemark());
@@ -158,6 +163,21 @@ public class RoomService extends ServiceImpl<RoomMapper, Room> {
         if (dto.getStartTime() != null) {
             room.setStartTime(dto.getStartTime());
         }
+
+        // 计划窗口/时长：与 startTime 相同，仅非 null 时写入；合并后校验避免部分更新留下非法组合
+        LocalDateTime mergedBegin = dto.getStartWindowBegin() != null ? dto.getStartWindowBegin() : room.getStartWindowBegin();
+        LocalDateTime mergedEnd = dto.getStartWindowEnd() != null ? dto.getStartWindowEnd() : room.getStartWindowEnd();
+        Integer mergedDur = dto.getDurationMinutes() != null ? dto.getDurationMinutes() : room.getDurationMinutes();
+        validateScheduleFields(mergedBegin, mergedEnd, mergedDur);
+        if (dto.getStartWindowBegin() != null) {
+            room.setStartWindowBegin(dto.getStartWindowBegin());
+        }
+        if (dto.getStartWindowEnd() != null) {
+            room.setStartWindowEnd(dto.getStartWindowEnd());
+        }
+        if (dto.getDurationMinutes() != null) {
+            room.setDurationMinutes(dto.getDurationMinutes());
+        }
         if (dto.getBaseScore() != null) {
             room.setBaseScore(dto.getBaseScore());
         }
@@ -174,6 +194,35 @@ public class RoomService extends ServiceImpl<RoomMapper, Room> {
 
         updateById(room);
         return null;
+    }
+
+    /**
+     * 计划窗口与时长：起、止均≥当前分钟；止≥起+3 小时；时长必填 3–24 小时（180–1440 分钟）。
+     */
+    private void validateScheduleFields(LocalDateTime startWindowBegin, LocalDateTime startWindowEnd, Integer durationMinutes) {
+        if (durationMinutes == null || durationMinutes < 180 || durationMinutes > 1440) {
+            throw new IllegalArgumentException("预计牌局时长须在 3–24 小时之间");
+        }
+        LocalDateTime nowFloor = LocalDateTime.now().withSecond(0).withNano(0);
+        if (startWindowBegin != null) {
+            LocalDateTime b = startWindowBegin.withSecond(0).withNano(0);
+            if (b.isBefore(nowFloor)) {
+                throw new IllegalArgumentException("开始时间（起）不能早于当前时间");
+            }
+        }
+        if (startWindowEnd != null) {
+            LocalDateTime e = startWindowEnd.withSecond(0).withNano(0);
+            if (e.isBefore(nowFloor)) {
+                throw new IllegalArgumentException("开始时间（止）不能早于当前时间");
+            }
+        }
+        if (startWindowBegin != null && startWindowEnd != null) {
+            LocalDateTime b = startWindowBegin.withSecond(0).withNano(0);
+            LocalDateTime e = startWindowEnd.withSecond(0).withNano(0);
+            if (e.isBefore(b.plusHours(3))) {
+                throw new IllegalArgumentException("开始时间（止）须至少晚于开始时间（起）三小时");
+            }
+        }
     }
 
     /**

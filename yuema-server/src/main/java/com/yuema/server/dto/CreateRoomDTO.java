@@ -13,6 +13,13 @@ public class CreateRoomDTO {
     private BigDecimal longitude;
     private BigDecimal latitude;
     private LocalDateTime startTime;
+
+    /** 计划开始时间窗口（卡片展示；与实际开局 start_time 无关） */
+    private LocalDateTime startWindowBegin;
+    private LocalDateTime startWindowEnd;
+    /** 预计牌局时长（分钟）；前端按小时选档时为整小时×60，合法区间 1–1440 */
+    private Integer durationMinutes;
+
     private Integer baseScore;
     private Integer taiFee;
     private String remark;

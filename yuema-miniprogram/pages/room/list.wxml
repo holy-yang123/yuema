@@ -31,6 +31,14 @@
           <text class="meta-label">人数</text>
           <text class="meta-value">{{item.currentPlayers}}/{{item.maxPlayers}}</text>
         </view>
+        <view class="room-meta-row" wx:if="{{item.scheduleDisplayStart}}">
+          <text class="meta-label">开始范围</text>
+          <text class="meta-value">{{item.scheduleDisplayStart}}</text>
+        </view>
+        <view class="room-meta-row" wx:if="{{item.scheduleDisplayDuration}}">
+          <text class="meta-label">预计时长</text>
+          <text class="meta-value">{{item.scheduleDisplayDuration}}</text>
+        </view>
         <view class="room-meta-row" wx:if="{{item.venueName}}">
           <text class="meta-label">场地</text>
           <text class="meta-value venue-name-text">{{item.venueName}}</text>

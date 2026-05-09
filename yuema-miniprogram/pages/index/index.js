@@ -4,6 +4,7 @@ const venueService = require('../../services/venueService');
 const { LOGIN_PAGE } = require('../../utils/pageRoutes');
 const { GAME_TYPE_LABELS } = require('../../utils/gameTypeLabels');
 const { buildRuleCardTags } = require('../../utils/gameRulesDisplay');
+const { attachScheduleDisplay } = require('../../utils/roomScheduleDisplay');
 
 Page({
   behaviors: [require('../../behaviors/themeBehavior')],
@@ -68,7 +69,7 @@ Page({
       const currentUserId = u ? (u.userId != null ? u.userId : u.id) : null;
       // 预设细则 + customLines，与牌局列表卡片一致
       const roomList = (roomRes.data || []).slice(0, 5).map((r) => ({
-        ...r,
+        ...attachScheduleDisplay(r),
         ruleCardTags: buildRuleCardTags(r)
       }));
 
