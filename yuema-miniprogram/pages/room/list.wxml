@@ -3,7 +3,7 @@
 <view class="container">
   <view class="header">
     <view class="search-box">
-      <icon type="search" size="18" color="rgba(255,255,255,0.3)"></icon>
+      <icon type="search" size="18" color="{{themeSearchIconColor}}"></icon>
       <input placeholder="搜索房间号、玩法" placeholder-class="placeholder-style" bindinput="onSearchInput" />
     </view>
     <view class="filter-tabs">

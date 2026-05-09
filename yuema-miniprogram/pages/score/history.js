@@ -1,11 +1,6 @@
 const scoreService = require('../../services/scoreService');
 const roomService = require('../../services/roomService');
-
-const gameTypeMap = {
-  sichuan: '四川麻将',
-  guobiao: '国标麻将',
-  guangdong: '广东麻将'
-};
+const { GAME_TYPE_LABELS } = require('../../utils/gameTypeLabels');
 
 Page({
   behaviors: [require('../../behaviors/themeBehavior')],
@@ -49,7 +44,7 @@ Page({
       });
       this.setData({
         roomNo: room.roomNo || '',
-        gameType: gameTypeMap[room.gameType] || room.gameType || '',
+        gameType: GAME_TYPE_LABELS[room.gameType] || room.gameType || '',
         history
       });
     } catch (err) {

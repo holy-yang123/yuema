@@ -11,14 +11,24 @@
       </picker>
     </view>
 
-    <!-- 当前玩法下的预设规则开关 -->
-    <block wx:if="{{currentRuleOptions.length > 0}}">
+    <!-- 当前玩法下的预设规则开关（每行 item.checked，避免 checked 绑定对象动态下标导致多开关联动异常） -->
+    <block wx:if="{{ruleSwitchRows.length > 0}}">
       <view class="rules-section-title">玩法细则</view>
-      <view class="form-item form-item-switch" hover-class="none" wx:for="{{currentRuleOptions}}" wx:key="key">
+      <view class="form-item form-item-switch" hover-class="none" wx:for="{{ruleSwitchRows}}" wx:key="key">
         <text class="label">{{item.label}}</text>
         <view class="rule-switch-wrap">
-          <switch checked="{{activeBucketCopy[item.key]}}" data-key="{{item.key}}" bindchange="onRuleSwitch" color="#d97757"/>
+          <switch checked="{{item.checked}}" data-key="{{item.key}}" bindchange="onRuleSwitch" color="#d97757"/>
         </view>
+      </view>
+      <!-- 四川：加底/加番为单选，写入 ruleBuckets.sichuan.jiaDi、jiaFan -->
+      <view wx:if="{{currentGameTypeId === 'sichuan'}}" class="form-item form-item-jia-radio">
+        <text class="label">加底 / 加番</text>
+        <radio-group class="jia-radio-group" value="{{sichuanJiaPick}}" bindchange="onSichuanJiaScoreChange">
+          <!-- value 须与 utils/gameRuleSets.js 中 SICHUAN_JIA_SCORE_RADIO_NONE 一致 -->
+          <label class="jia-radio-item"><radio value="__none__" color="#d97757"/>不选</label>
+          <label class="jia-radio-item"><radio value="jiaDi" color="#d97757"/>加底</label>
+          <label class="jia-radio-item"><radio value="jiaFan" color="#d97757"/>加番</label>
+        </radio-group>
       </view>
       <view class="custom-rules-wrap">
         <text class="custom-rules-hint">自定义规则（每条≤40字，最多5条）</text>

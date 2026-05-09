@@ -20,6 +20,10 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+/**
+ * 牌局房间 WebSocket：会话表 {@link #roomSessions} 为进程内静态结构。
+ * 单实例部署时广播完整；多实例水平扩展时，各 JVM 内存不共享，需另行引入 Redis/消息队列等做跨节点推送。
+ */
 @Slf4j
 @Component
 public class RoomWebSocketHandler extends TextWebSocketHandler {

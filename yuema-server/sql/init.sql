@@ -86,7 +86,8 @@ CREATE TABLE IF NOT EXISTS score_records (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     INDEX idx_room_id (room_id),
     INDEX idx_user_id (user_id),
-    INDEX idx_round_no (room_id, round_no)
+    INDEX idx_round_no (room_id, round_no),
+    UNIQUE KEY uk_room_round_user (room_id, round_no, user_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='计分记录表';
 
 -- 场地表

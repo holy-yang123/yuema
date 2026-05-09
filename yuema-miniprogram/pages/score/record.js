@@ -48,7 +48,6 @@ Page({
         avatarUrl: m.avatarUrl,
         score: 0
       }));
-      this.setData({ players: members, isOwner });
 
       const roundRes = await scoreService.getRoundScores(this.data.roomId, this.data.roundNo);
       const existing = roundRes.data || [];
@@ -61,24 +60,34 @@ Page({
           ...p,
           score: byUser[p.userId] != null ? byUser[p.userId] : 0
         }));
+        const snap = this.buildModifySnapshot(merged);
+        const totalScore = merged.reduce((s, p) => s + p.score, 0);
+        // 一次 setData：减少布局与与 data 不同步风险
         this.setData({
           players: merged,
+          isOwner,
           roundLocked: true,
           scoreType: existing[0].scoreType || this.data.scoreType,
-          remark: existing[0].remark || ''
+          remark: existing[0].remark || '',
+          modifyPlayers: snap.modifyPlayers,
+          modifyTotal: snap.modifyTotal,
+          totalScore
         });
-        this.calculateTotal();
-        this.buildModifyPlayersFrom(merged);
       } else {
-        this.setData({ roundLocked: false });
-        this.calculateTotal();
+        this.setData({
+          players: members,
+          isOwner,
+          roundLocked: false,
+          totalScore: 0
+        });
       }
     } catch (err) {
       console.error('加载成员失败:', err);
     }
   },
 
-  buildModifyPlayersFrom(players) {
+  /** 由 players 派生修改弹层数据，不触发 setData，供合并更新使用 */
+  buildModifySnapshot(players) {
     const modifyPlayers = players.map((p) => ({
       userId: p.userId,
       nickname: p.nickname,
@@ -86,12 +95,16 @@ Page({
       score: p.score
     }));
     const modifyTotal = modifyPlayers.reduce((s, p) => s + p.score, 0);
-    this.setData({ modifyPlayers, modifyTotal });
+    return { modifyPlayers, modifyTotal };
   },
 
   openModifyModal() {
-    this.buildModifyPlayersFrom(this.data.players);
-    this.setData({ showModifyModal: true });
+    const snap = this.buildModifySnapshot(this.data.players);
+    this.setData({
+      showModifyModal: true,
+      modifyPlayers: snap.modifyPlayers,
+      modifyTotal: snap.modifyTotal
+    });
   },
 
   closeModifyModal() {
@@ -106,24 +119,26 @@ Page({
     const index = e.currentTarget.dataset.index;
     const value = e.detail.value;
     const score = value === '' ? 0 : parseInt(value, 10);
-    const players = this.data.players;
-    const currentScore = players[index].score;
-    players[index].score = currentScore >= 0 ? score : -score;
-    this.setData({ players });
-    this.calculateTotal();
-  },
-
-  calculateTotal() {
-    const total = this.data.players.reduce((sum, p) => sum + p.score, 0);
-    this.setData({ totalScore: total });
+    // 拷贝后再改，避免直接改 this.data 引用导致渲染/逻辑异常
+    const players = this.data.players.map((p, i) => {
+      if (i !== index) {
+        return p;
+      }
+      const cur = p.score;
+      const next = cur >= 0 ? score : -score;
+      return { ...p, score: next };
+    });
+    const totalScore = players.reduce((sum, p) => sum + p.score, 0);
+    this.setData({ players, totalScore });
   },
 
   toggleSign(e) {
     const index = e.currentTarget.dataset.index;
-    const players = this.data.players;
-    players[index].score = -players[index].score;
-    this.setData({ players });
-    this.calculateTotal();
+    const players = this.data.players.map((p, i) =>
+      i === index ? { ...p, score: -p.score } : p
+    );
+    const totalScore = players.reduce((sum, p) => sum + p.score, 0);
+    this.setData({ players, totalScore });
   },
 
   onRemarkInput(e) {
@@ -134,53 +149,49 @@ Page({
     const index = e.currentTarget.dataset.index;
     const value = e.detail.value;
     const score = value === '' ? 0 : parseInt(value, 10);
-    const modifyPlayers = this.data.modifyPlayers;
-    const currentScore = modifyPlayers[index].score;
-    modifyPlayers[index].score = currentScore >= 0 ? score : -score;
+    const modifyPlayers = this.data.modifyPlayers.map((p, i) => {
+      if (i !== index) {
+        return p;
+      }
+      const cur = p.score;
+      const next = cur >= 0 ? score : -score;
+      return { ...p, score: next };
+    });
     const modifyTotal = modifyPlayers.reduce((s, p) => s + p.score, 0);
     this.setData({ modifyPlayers, modifyTotal });
   },
 
   toggleModifySign(e) {
     const index = e.currentTarget.dataset.index;
-    const modifyPlayers = this.data.modifyPlayers;
-    modifyPlayers[index].score = -modifyPlayers[index].score;
+    const modifyPlayers = this.data.modifyPlayers.map((p, i) =>
+      i === index ? { ...p, score: -p.score } : p
+    );
     const modifyTotal = modifyPlayers.reduce((s, p) => s + p.score, 0);
     this.setData({ modifyPlayers, modifyTotal });
   },
 
   quickSetZimo() {
-    const players = this.data.players;
-    if (players.length !== 4) {
+    const base = this.data.players;
+    if (base.length !== 4) {
       wx.showToast({ title: '仅支持4人模板', icon: 'none' });
       return;
     }
-    players[0].score = 3;
-    players[1].score = -1;
-    players[2].score = -1;
-    players[3].score = -1;
-    this.setData({
-      players,
-      scoreType: 'zimo'
-    });
-    this.calculateTotal();
+    const template = [3, -1, -1, -1];
+    const players = base.map((p, i) => ({ ...p, score: template[i] }));
+    const totalScore = 0;
+    this.setData({ players, scoreType: 'zimo', totalScore });
   },
 
   quickSetDianpao() {
-    const players = this.data.players;
-    if (players.length !== 4) {
+    const base = this.data.players;
+    if (base.length !== 4) {
       wx.showToast({ title: '仅支持4人模板', icon: 'none' });
       return;
     }
-    players[0].score = 1;
-    players[1].score = -1;
-    players[2].score = 0;
-    players[3].score = 0;
-    this.setData({
-      players,
-      scoreType: 'dianpao'
-    });
-    this.calculateTotal();
+    const template = [1, -1, 0, 0];
+    const players = base.map((p, i) => ({ ...p, score: template[i] }));
+    const totalScore = 0;
+    this.setData({ players, scoreType: 'dianpao', totalScore });
   },
 
   clearAll() {
@@ -188,8 +199,7 @@ Page({
       ...p,
       score: 0
     }));
-    this.setData({ players });
-    this.calculateTotal();
+    this.setData({ players, totalScore: 0 });
   },
 
   async submitScore() {

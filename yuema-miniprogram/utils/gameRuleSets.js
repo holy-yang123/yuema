@@ -1,11 +1,13 @@
 /**
  * 各玩法预设规则 key → 界面文案（与后端 game_rules JSON 布尔键一致）
  */
+/** 四川「加底/加番」单选组在 radio-group 里用的「不选」占位 value */
+const SICHUAN_JIA_SCORE_RADIO_NONE = '__none__';
+
 const GAME_RULE_OPTIONS = {
   sichuan: [
     { key: 'huanSanZhang', label: '换三张' },
-    { key: 'xueLiuChengHe', label: '血流成河' },
-    { key: 'jiaDiJiaFan', label: '加底加番' }
+    { key: 'xueLiuChengHe', label: '血流成河' }
   ],
   guobiao: [
     { key: 'baFanQiHe', label: '八番起和' },
@@ -21,5 +23,6 @@ const GAME_RULE_OPTIONS = {
 };
 
 module.exports = {
-  GAME_RULE_OPTIONS
+  GAME_RULE_OPTIONS,
+  SICHUAN_JIA_SCORE_RADIO_NONE
 };

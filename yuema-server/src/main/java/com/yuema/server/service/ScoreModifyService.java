@@ -54,6 +54,10 @@ public class ScoreModifyService {
     @Autowired
     private RoomWebSocketHandler roomWebSocketHandler;
 
+    /**
+     * 创建修改申请：先查「是否已有待处理」再 insert，极端并发下仍可能双插；
+     * 若需硬防可在库上为「待处理」维度加唯一约束（如虚拟列 + UNIQUE），当前与业务频率由应用层事务承担。
+     */
     @Transactional
     public String createRequest(Long userId, ScoreRecordDTO dto) {
         Room room = roomMapper.selectById(dto.getRoomId());

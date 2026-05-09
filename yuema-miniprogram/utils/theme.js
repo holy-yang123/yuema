@@ -78,6 +78,12 @@ function getThemeUIData(mode) {
     themeIsDark: m === 'dark',
     themeScopeClass: m === 'dark' ? 'theme-scope theme-scope--dark' : 'theme-scope',
     themeSwitchColor: m === 'dark' ? '#e89572' : '#d97757',
+    // 深色下 placeholder / 搜索图标须提亮，否则落在 surface 上对比不足（首页禁用搜索框、牌局列表原生 icon）
+    themeInputPlaceholderStyle:
+      m === 'dark'
+        ? 'color: rgba(235,233,227,0.45); font-weight: 400'
+        : 'color: rgba(20,20,19,0.35); font-weight: 400',
+    themeSearchIconColor: m === 'dark' ? 'rgba(235,233,227,0.5)' : 'rgba(20,20,19,0.35)',
     themeMeta: {
       rootBg: c.pageMetaRootBg,
       bg: c.pageMetaBg,

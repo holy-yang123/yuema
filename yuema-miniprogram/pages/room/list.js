@@ -1,4 +1,5 @@
 const roomService = require('../../services/roomService');
+const { GAME_TYPE_LABELS } = require('../../utils/gameTypeLabels');
 
 Page({
   behaviors: [require('../../behaviors/themeBehavior')],
@@ -13,11 +14,7 @@ Page({
     isMyRooms: false,
     /** 用于判断是否本人发布的牌局 */
     currentUserId: null,
-    gameTypeMap: {
-      'sichuan': '四川麻将',
-      'guobiao': '国标麻将',
-      'guangdong': '广东麻将'
-    }
+    gameTypeMap: { ...GAME_TYPE_LABELS }
   },
 
   onLoad(options) {

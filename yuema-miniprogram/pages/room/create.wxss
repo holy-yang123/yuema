@@ -174,3 +174,27 @@
 .submit-btn:active {
   opacity: 0.88;
 }
+
+/* 四川加底/加番单选：纵向排列避免挤占开关行 */
+.form-item-jia-radio {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 20rpx;
+}
+
+.form-item-jia-radio .label {
+  align-self: flex-start;
+}
+
+.jia-radio-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 28rpx 36rpx;
+}
+
+.jia-radio-item {
+  display: inline-flex;
+  align-items: center;
+  font-size: 26rpx;
+  color: var(--text);
+}

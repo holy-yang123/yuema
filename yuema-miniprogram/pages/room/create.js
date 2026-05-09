@@ -1,6 +1,6 @@
 const roomService = require('../../services/roomService');
 const venueService = require('../../services/venueService');
-const { GAME_RULE_OPTIONS } = require('../../utils/gameRuleSets');
+const { GAME_RULE_OPTIONS, SICHUAN_JIA_SCORE_RADIO_NONE } = require('../../utils/gameRuleSets');
 
 /** 初始化某一玩法的空桶（布尔默认 false + customLines） */
 function emptyBucket(gameType) {
@@ -9,6 +9,11 @@ function emptyBucket(gameType) {
   opts.forEach((o) => {
     b[o.key] = false;
   });
+  // 四川麻将：加底/加番为单选，与 gameRulesDisplay / 后端 JSON 中 jiaDi、jiaFan 布尔一致
+  if (gameType === 'sichuan') {
+    b.jiaDi = false;
+    b.jiaFan = false;
+  }
   return b;
 }
 
@@ -47,6 +52,18 @@ function mergeGameRulesFromRoom(room) {
         buckets[gt][o.key] = true;
       }
     });
+    // 四川：回填加底/加番；旧版仅 jiaDiJiaFan 为 true 时默认视为加底，便于用户改成明确项
+    if (gt === 'sichuan' && src && typeof src === 'object') {
+      if (src.jiaDi === true) {
+        buckets[gt].jiaDi = true;
+      }
+      if (src.jiaFan === true) {
+        buckets[gt].jiaFan = true;
+      }
+      if (src.jiaDiJiaFan === true && src.jiaDi !== true && src.jiaFan !== true) {
+        buckets[gt].jiaDi = true;
+      }
+    }
     if (Array.isArray(src.customLines)) {
       buckets[gt].customLines = src.customLines
         .map((s) => String(s).trim())
@@ -71,16 +88,16 @@ Page({
     gameTypeIndex: 0,
     /** 与 picker 同步，供 WXML 绑定 ruleBuckets[currentGameTypeId] */
     currentGameTypeId: 'sichuan',
-    /** 当前玩法下的预设项列表，用于 wx:for */
-    currentRuleOptions: [],
+    /** 每条含 checked，避免 switch 绑定对象动态下标时多开关状态错乱 */
+    ruleSwitchRows: [],
+    /** 四川玩法下「加底/加番」radio-group 的 value，与 ruleBuckets.sichuan 同步 */
+    sichuanJiaPick: SICHUAN_JIA_SCORE_RADIO_NONE,
     /** 按玩法分桶：布尔键 + customLines */
     ruleBuckets: buildInitialRuleBuckets(),
     /** 本条自定义规则输入草稿 */
     customLineInput: '',
     /** 当前玩法桶下的自定义条展示列表（与 ruleBuckets 同步，便于 WXML 绑定） */
     displayCustomLines: [],
-    /** 当前玩法桶的浅拷贝（供 switch 绑定，避免 WXML 双层动态路径） */
-    activeBucketCopy: emptyBucket('sichuan'),
     /** 全局备注，对应 rooms.remark */
     remark: '',
     maxPlayersOptions: [2, 3, 4],
@@ -116,11 +133,24 @@ Page({
     const opts = GAME_RULE_OPTIONS[gid] || [];
     const bucket = ruleBuckets[gid] || emptyBucket(gid);
     const lines = bucket.customLines || [];
+    const ruleSwitchRows = opts.map((o) => ({
+      key: o.key,
+      label: o.label,
+      checked: !!bucket[o.key]
+    }));
+    let sichuanJiaPick = SICHUAN_JIA_SCORE_RADIO_NONE;
+    if (gid === 'sichuan') {
+      if (bucket.jiaDi === true) {
+        sichuanJiaPick = 'jiaDi';
+      } else if (bucket.jiaFan === true) {
+        sichuanJiaPick = 'jiaFan';
+      }
+    }
     this.setData({
       currentGameTypeId: gid,
-      currentRuleOptions: opts,
+      ruleSwitchRows,
       displayCustomLines: lines,
-      activeBucketCopy: { ...bucket }
+      sichuanJiaPick
     });
   },
 
@@ -200,10 +230,24 @@ Page({
     const key = e.currentTarget.dataset.key;
     const checked = e.detail.value;
     const gid = this.data.currentGameTypeId;
-    // 不用整对象替换 activeBucketCopy，避免 wx:for 下 switch 整组重建导致顶部区域闪屏
+    const ruleSwitchRows = (this.data.ruleSwitchRows || []).map((row) =>
+      row.key === key ? { ...row, checked } : row
+    );
     this.setData({
       [`ruleBuckets.${gid}.${key}`]: checked,
-      [`activeBucketCopy.${key}`]: checked
+      ruleSwitchRows
+    });
+  },
+
+  /** 四川麻将：加底与加番互斥，与列表/详情卡片展示逻辑一致 */
+  onSichuanJiaScoreChange(e) {
+    const v = e.detail.value;
+    const isDi = v === 'jiaDi';
+    const isFan = v === 'jiaFan';
+    this.setData({
+      sichuanJiaPick: v,
+      'ruleBuckets.sichuan.jiaDi': isDi,
+      'ruleBuckets.sichuan.jiaFan': isFan
     });
   },
 
@@ -230,7 +274,6 @@ Page({
     arr.push(t);
     this.setData({
       [`ruleBuckets.${gid}.customLines`]: arr,
-      'activeBucketCopy.customLines': arr,
       customLineInput: '',
       displayCustomLines: arr
     });
@@ -244,7 +287,6 @@ Page({
       arr.splice(idx, 1);
       this.setData({
         [`ruleBuckets.${gid}.customLines`]: arr,
-        'activeBucketCopy.customLines': arr,
         displayCustomLines: arr
       });
     }

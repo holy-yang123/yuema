@@ -10,6 +10,7 @@ import com.yuema.server.mapper.RoomMemberMapper;
 import com.yuema.server.mapper.ScoreRecordMapper;
 import com.yuema.server.websocket.RoomWebSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -42,17 +43,22 @@ public class ScoreService extends ServiceImpl<ScoreRecordMapper, ScoreRecord> {
             return "ROUND_EXISTS";
         }
 
-        for (ScoreRecordDTO.PlayerScoreDTO playerScore : dto.getPlayerScores()) {
-            ScoreRecord record = new ScoreRecord();
-            record.setRoomId(dto.getRoomId());
-            record.setRoundNo(dto.getRoundNo());
-            record.setUserId(playerScore.getUserId());
-            record.setScoreChange(playerScore.getScoreChange());
-            record.setScoreType(dto.getScoreType());
-            record.setRecorderId(recorderId);
-            record.setStatus(1);
-            record.setRemark(dto.getRemark());
-            save(record);
+        try {
+            for (ScoreRecordDTO.PlayerScoreDTO playerScore : dto.getPlayerScores()) {
+                ScoreRecord record = new ScoreRecord();
+                record.setRoomId(dto.getRoomId());
+                record.setRoundNo(dto.getRoundNo());
+                record.setUserId(playerScore.getUserId());
+                record.setScoreChange(playerScore.getScoreChange());
+                record.setScoreType(dto.getScoreType());
+                record.setRecorderId(recorderId);
+                record.setStatus(1);
+                record.setRemark(dto.getRemark());
+                save(record);
+            }
+        } catch (DataIntegrityViolationException e) {
+            // 并发下另一事务已写入 uk_room_round_user，与 ROUND_EXISTS 语义一致，事务整体回滚
+            return "ROUND_EXISTS";
         }
 
         Map<String, Object> summary = getScoreSummary(dto.getRoomId());

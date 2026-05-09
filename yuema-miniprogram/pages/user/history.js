@@ -1,5 +1,6 @@
 const userService = require('../../services/userService');
 const app = getApp();
+const { GAME_TYPE_LABELS } = require('../../utils/gameTypeLabels');
 
 Page({
   behaviors: [require('../../behaviors/themeBehavior')],
@@ -14,11 +15,7 @@ Page({
     current: 1,
     pages: 1,
     loading: false,
-    gameTypeMap: {
-      sichuan: '四川麻将',
-      guobiao: '国标麻将',
-      guangdong: '广东麻将'
-    },
+    gameTypeMap: { ...GAME_TYPE_LABELS },
     shareRecord: null
   },
 

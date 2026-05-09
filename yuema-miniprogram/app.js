@@ -11,6 +11,8 @@ const roomService = require('./services/roomService');
 const { LOGIN_PAGE } = require('./utils/pageRoutes');
 const { clearAuthAndGoLogin, shouldForceRelogin } = require('./utils/authRedirect');
 const theme = require('./utils/theme');
+// 与 utils/request 统一：401、非 JSON、业务需重登等路径一致，避免双轨维护
+const http = require('./utils/request');
 
 App({
   globalData: {
@@ -79,6 +81,11 @@ App({
 
     // 获取位置信息
     this.updateLocation();
+  },
+
+  // 从后台回前台、分享返回等场景再同步导航栏/窗口色，避免仍停在 app.json 浅色配置
+  onShow() {
+    theme.applyChrome(theme.getThemeMode());
   },
 
   /** 登录成功后或启动时已有 token：消费待加入房间 */
@@ -209,7 +216,7 @@ App({
     });
   },
 
-  // 登录：服务端用 code 换 openid，身份稳定
+  // 登录：服务端用 code 换 openid，身份稳定（走 http.post，与全局请求层行为一致）
   login(nickname = null, avatarUrl = null) {
     return new Promise((resolve, reject) => {
       wx.login({
@@ -218,63 +225,45 @@ App({
             reject('微信登录失败');
             return;
           }
-          wx.request({
-            url: `${this.globalData.apiBaseUrl}/user/login`,
-            method: 'POST',
-            header: {
-              'Content-Type': 'application/json'
-            },
-            data: {
-              code: res.code,
-              nickname: nickname,
-              avatarUrl: avatarUrl
-            },
-            success: (result) => {
-              if (result.data.code === 200) {
-                const data = result.data.data;
+          // silentBusinessCodes：NEED_PROFILE 时业务码 404，不弹「请求失败」toast，由下面分支处理
+          http
+            .post(
+              '/user/login',
+              {
+                code: res.code,
+                nickname: nickname,
+                avatarUrl: avatarUrl
+              },
+              { silentBusinessCodes: [404] }
+            )
+            .then((body) => {
+              if (body.code === 200) {
+                const data = body.data;
                 this.globalData.token = data.token;
                 this.globalData.userInfo = data;
                 wx.setStorageSync('token', data.token);
                 this.tryConsumePendingJoin();
                 resolve(data);
-              } else if (result.data.code === 404) {
+              } else if (body.code === 404) {
                 resolve({ needProfile: true });
               } else {
-                reject(result.data.message || '登录失败');
+                reject(body.message || '登录失败');
               }
-            },
-            fail: reject
-          });
+            })
+            .catch((err) => {
+              reject((err && err.message) || err || '登录失败');
+            });
         },
         fail: reject
       });
     });
   },
 
-  // 获取用户信息
+  // 获取用户信息（走封装请求；401 / 需重登 已由 request 内 clearAuthAndGoLogin）
   getUserInfo() {
-    return new Promise((resolve, reject) => {
-      wx.request({
-        url: `${this.globalData.apiBaseUrl}/user/info`,
-        header: {
-          Authorization: `Bearer ${this.globalData.token}`
-        },
-        success: (res) => {
-          if (res.data.code === 200) {
-            this.globalData.userInfo = res.data.data;
-            resolve(res.data.data);
-          } else if (shouldForceRelogin(res.data)) {
-            // 启动拉用户信息失败：与封装 request 一致，清态回登录（避免出现未捕获的 MiniProgramError）
-            clearAuthAndGoLogin({
-              toastTitle: res.data.message || '请重新登录'
-            });
-            reject(res.data);
-          } else {
-            reject(res.data.message);
-          }
-        },
-        fail: reject
-      });
+    return http.get('/user/info').then((body) => {
+      this.globalData.userInfo = body.data;
+      return body.data;
     });
   },
 

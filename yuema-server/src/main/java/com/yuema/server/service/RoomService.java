@@ -57,7 +57,8 @@ public class RoomService extends ServiceImpl<RoomMapper, Room> {
         room.setCreatorId(creatorId);
         room.setStatus(0);
         room.setGameType(dto.getGameType());
-        room.setMaxPlayers(dto.getMaxPlayers());
+        // 避免 max_players 为 null 时 join 比较拆箱 NPE（HTTP 500）
+        room.setMaxPlayers(dto.getMaxPlayers() != null ? dto.getMaxPlayers() : 4);
         room.setCurrentPlayers(1);
         room.setVenueId(dto.getVenueId());
         room.setLongitude(dto.getLongitude());
@@ -119,7 +120,9 @@ public class RoomService extends ServiceImpl<RoomMapper, Room> {
         }
 
         room.setGameType(dto.getGameType());
-        room.setMaxPlayers(dto.getMaxPlayers());
+        if (dto.getMaxPlayers() != null) {
+            room.setMaxPlayers(dto.getMaxPlayers());
+        }
         room.setVenueId(dto.getVenueId());
         room.setLongitude(dto.getLongitude());
         room.setLatitude(dto.getLatitude());
@@ -167,6 +170,14 @@ public class RoomService extends ServiceImpl<RoomMapper, Room> {
     private String normalizeGameRulesJson(JsonNode node) {
         if (node == null || node.isNull() || node.isMissingNode()) {
             return null;
+        }
+        // 客户端偶发将对象二次序列化为字符串，此处展开避免落库前抛 500
+        if (node.isTextual()) {
+            try {
+                node = objectMapper.readTree(node.asText());
+            } catch (Exception e) {
+                throw new IllegalArgumentException("gameRules 不是合法 JSON");
+            }
         }
         if (!node.isObject()) {
             throw new IllegalArgumentException("gameRules 须为 JSON 对象");
@@ -267,9 +278,12 @@ public class RoomService extends ServiceImpl<RoomMapper, Room> {
             return existing.getStatus() == 1;
         }
 
-        // 检查人数
-        int count = roomMemberMapper.countActiveMembers(roomId);
-        if (count >= room.getMaxPlayers()) {
+        // 检查人数（COUNT 与上限均做空值防护，避免 Integer 拆箱 NPE 导致接口 HTTP 500）
+        Integer countBoxed = roomMemberMapper.countActiveMembers(roomId);
+        int count = countBoxed != null ? countBoxed : 0;
+        Integer maxBoxed = room.getMaxPlayers();
+        int maxPlayers = maxBoxed != null && maxBoxed > 0 ? maxBoxed : 4;
+        if (count >= maxPlayers) {
             return false;
         }
 

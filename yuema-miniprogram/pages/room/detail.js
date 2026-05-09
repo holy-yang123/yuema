@@ -1,34 +1,13 @@
 const app = getApp();
 const roomService = require('../../services/roomService');
 const scoreService = require('../../services/scoreService');
-const { GAME_RULE_OPTIONS } = require('../../utils/gameRuleSets');
-
-/** 按房间当前 gameType 解析 game_rules，得到预设标签与自定义条 */
-function parseRuleDisplay(room) {
-  let parsed = {};
-  if (room.gameRules) {
-    try {
-      parsed = typeof room.gameRules === 'string' ? JSON.parse(room.gameRules) : room.gameRules;
-    } catch (e) {
-      parsed = {};
-    }
-  }
-  const gt = room.gameType || 'sichuan';
-  const bucket = parsed[gt] || {};
-  const opts = GAME_RULE_OPTIONS[gt] || [];
-  const presetTags = [];
-  opts.forEach((o) => {
-    if (bucket[o.key] === true) {
-      presetTags.push({ key: o.key, label: o.label });
-    }
-  });
-  const customLines = Array.isArray(bucket.customLines)
-    ? bucket.customLines.map((s) => String(s)).filter((t) => t.trim() !== '')
-    : [];
-  return { presetTags, customLines };
-}
+const { GAME_TYPE_LABELS } = require('../../utils/gameTypeLabels');
+const { parseGameRulesDisplay } = require('../../utils/gameRulesDisplay');
 const chatService = require('../../services/chatService');
 const { createRoomSocket } = require('../../utils/socket');
+
+/** 聊天列表内存/setData 上限，超出则丢弃最早消息 */
+const CHAT_MESSAGES_MAX = 100;
 
 Page({
   behaviors: [require('../../behaviors/themeBehavior')],
@@ -42,11 +21,7 @@ Page({
     currentRound: 0,
     scoreSummary: { memberScores: [] },
     settlement: { settlements: [] },
-    gameTypeMap: {
-      sichuan: '四川麻将',
-      guobiao: '国标麻将',
-      guangdong: '广东麻将'
-    },
+    gameTypeMap: { ...GAME_TYPE_LABELS },
     chatOpen: false,
     chatMessages: [],
     chatInput: '',
@@ -73,8 +48,11 @@ Page({
   _socket: null,
   _wsHandlers: null,
   _sceneRoomNo: null,
+  /** 房间详情请求代数：仅最后一次发起的结果可写回，避免 onShow/WS 并发旧响应覆盖 */
+  _roomDetailSeq: 0,
 
   onLoad(options) {
+    this._roomDetailSeq = 0;
     if (options.id) {
       this.setData({ roomId: parseInt(options.id, 10) });
     } else if (options.scene) {
@@ -225,8 +203,11 @@ Page({
   },
 
   appendChatLine(row) {
-    const list = this.data.chatMessages.concat([row]);
-    this.setData({ chatMessages: list, chatScrollIntoView: `msg-${row.id}` });
+    const merged = this.data.chatMessages.concat([row]);
+    // 控制列表长度，避免长会话下 setData 与内存线性增长
+    const chatMessages =
+      merged.length > CHAT_MESSAGES_MAX ? merged.slice(-CHAT_MESSAGES_MAX) : merged;
+    this.setData({ chatMessages, chatScrollIntoView: `msg-${row.id}` });
   },
 
   toggleChat() {
@@ -267,8 +248,13 @@ Page({
   },
 
   async loadRoomDetail() {
+    const detailSeq = ++this._roomDetailSeq;
+    const roomId = this.data.roomId;
     try {
-      const res = await roomService.getRoomInfo(this.data.roomId);
+      const res = await roomService.getRoomInfo(roomId);
+      if (detailSeq !== this._roomDetailSeq || roomId !== this.data.roomId) {
+        return;
+      }
       const data = res.data;
 
       const u = app.globalData.userInfo;
@@ -281,7 +267,7 @@ Page({
         emptySeats.push(i);
       }
 
-      const ruleDisp = parseRuleDisplay(data.room);
+      const ruleDisp = parseGameRulesDisplay(data.room);
 
       this.setData({
         room: data.room,
@@ -294,31 +280,49 @@ Page({
       });
 
       if (data.room.status === 1 || data.room.status === 2) {
-        this.loadScoreData();
+        this.loadScoreData(detailSeq, roomId);
       }
 
       if (data.room.status === 2) {
         this.teardownSocket();
       }
     } catch (err) {
-      console.error('加载房间详情失败:', err);
-      wx.showToast({
-        title: '加载失败',
-        icon: 'none'
-      });
+      if (detailSeq === this._roomDetailSeq) {
+        console.error('加载房间详情失败:', err);
+        wx.showToast({
+          title: '加载失败',
+          icon: 'none'
+        });
+      }
     }
   },
 
-  async loadScoreData() {
+  /**
+   * @param detailSeqAtStart loadRoomDetail 发起时的代数，与当前 roomId 共同防止旧请求回写
+   */
+  async loadScoreData(detailSeqAtStart, roomIdAtStart) {
+    const rid = roomIdAtStart != null ? roomIdAtStart : this.data.roomId;
     try {
-      const summaryRes = await scoreService.getScoreSummary(this.data.roomId);
+      const summaryRes = await scoreService.getScoreSummary(rid);
+      if (detailSeqAtStart != null && detailSeqAtStart !== this._roomDetailSeq) {
+        return;
+      }
+      if (rid !== this.data.roomId) {
+        return;
+      }
       this.setData({
         scoreSummary: summaryRes.data,
         currentRound: summaryRes.data.totalRounds
       });
 
       if (this.data.room.status === 2) {
-        const settlementRes = await scoreService.getSettlement(this.data.roomId);
+        const settlementRes = await scoreService.getSettlement(rid);
+        if (detailSeqAtStart != null && detailSeqAtStart !== this._roomDetailSeq) {
+          return;
+        }
+        if (rid !== this.data.roomId) {
+          return;
+        }
         this.setData({
           settlement: settlementRes.data
         });

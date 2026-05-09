@@ -12,6 +12,7 @@ F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\service\Scor
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\entity\ScoreRecord.java
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\entity\User.java
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\mapper\UserGameRecordMapper.java
+F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\config\GlobalExceptionHandler.java
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\entity\ChatMessage.java
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\mapper\RoomMemberMapper.java
 F:\workspace\约麻\ymapp\yuema-server\src\main\java\com\yuema\server\entity\Order.java

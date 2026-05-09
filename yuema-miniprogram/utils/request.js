@@ -1,6 +1,25 @@
 // 禁止在模块顶层 getApp()：app.js 会在 App() 执行前 require 本文件，此时 getApp() 为 undefined
 const { clearAuthAndGoLogin, shouldForceRelogin } = require('./authRedirect');
 
+/** 将 wx.request 的 data 规范为业务 JSON 对象，避免网关 HTML / 非 JSON 导致读 .code 抛异常 */
+function normalizeResponseData(raw) {
+  if (raw == null) {
+    return null;
+  }
+  if (typeof raw === 'object') {
+    return raw;
+  }
+  if (typeof raw === 'string') {
+    try {
+      const parsed = JSON.parse(raw);
+      return typeof parsed === 'object' && parsed !== null ? parsed : null;
+    } catch (e) {
+      return null;
+    }
+  }
+  return null;
+}
+
 function safeGetApp() {
   try {
     return typeof getApp === 'function' ? getApp() : null;
@@ -34,25 +53,36 @@ const request = (options) => {
       },
       success: (res) => {
         if (res.statusCode === 200) {
-          if (res.data.code === 200 || silentCodes.indexOf(res.data.code) !== -1) {
-            resolve(res.data);
-          } else if (shouldForceRelogin(res.data)) {
-            // HTTP 200 但业务表示需重新登录（如用户记录已删仍带旧 JWT，接口返回「用户不存在」）
-            clearAuthAndGoLogin({
-              toastTitle: res.data.message || '请重新登录'
-            });
-            reject(res.data);
-          } else {
+          const data = normalizeResponseData(res.data);
+          // 非 JSON 或缺少业务 code 时拒绝，避免访问 undefined.code 崩溃
+          if (data == null || typeof data.code !== 'number') {
             wx.showToast({
-              title: res.data.message || '请求失败',
+              title: '服务响应异常',
               icon: 'none'
             });
-            reject(res.data);
+            reject(new Error('INVALID_RESPONSE'));
+            return;
+          }
+          if (data.code === 200 || silentCodes.indexOf(data.code) !== -1) {
+            resolve(data);
+          } else if (shouldForceRelogin(data)) {
+            // HTTP 200 但业务表示需重新登录（如用户记录已删仍带旧 JWT，接口返回「用户不存在」）
+            clearAuthAndGoLogin({
+              toastTitle: data.message || '请重新登录'
+            });
+            reject(data);
+          } else {
+            wx.showToast({
+              title: data.message || '请求失败',
+              icon: 'none'
+            });
+            reject(data);
           }
         } else if (res.statusCode === 401) {
           // 未携带 token / JWT 失效：服务端统一 401
+          const body = normalizeResponseData(res.data);
           clearAuthAndGoLogin({
-            toastTitle: (res.data && res.data.message) || '登录已过期'
+            toastTitle: (body && body.message) || '登录已过期'
           });
           reject(res);
         } else {

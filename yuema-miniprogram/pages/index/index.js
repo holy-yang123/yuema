@@ -2,6 +2,8 @@ const app = getApp();
 const roomService = require('../../services/roomService');
 const venueService = require('../../services/venueService');
 const { LOGIN_PAGE } = require('../../utils/pageRoutes');
+const { GAME_TYPE_LABELS } = require('../../utils/gameTypeLabels');
+const { parseGameRulesDisplay } = require('../../utils/gameRulesDisplay');
 
 Page({
   behaviors: [require('../../behaviors/themeBehavior')],
@@ -12,11 +14,7 @@ Page({
     address: '', // 当前地址
     /** 当前用户 id，用于判断是否本人发布的牌局（展示编辑/删除） */
     currentUserId: null,
-    gameTypeMap: {
-      'sichuan': '四川麻将',
-      'guobiao': '国标麻将',
-      'guangdong': '广东麻将'
-    }
+    gameTypeMap: { ...GAME_TYPE_LABELS }
   },
 
   onLoad() {
@@ -50,48 +48,47 @@ Page({
     }
   },
 
-  // 加载数据
+  // 加载数据（合并 setData，减少列表区多次布局）
   async loadData() {
     this.setData({ loading: true });
-    
     try {
       let { location } = app.globalData;
       if (!location) {
         location = await app.updateLocation();
       }
 
-      // 如果有经纬度但没有地址，尝试获取地址 (Mock 逻辑，实际需调用逆地址解析 API)
-      if (location && !this.data.address) {
-        this.setData({ address: '获取位置成功' });
-      }
-
-      // 加载牌局列表
       const roomRes = await roomService.getRoomList(
         location ? location.longitude : null,
         location ? location.latitude : null
       );
       const u = app.globalData.userInfo;
       const currentUserId = u ? (u.userId != null ? u.userId : u.id) : null;
-      this.setData({
-        roomList: (roomRes.data || []).slice(0, 5),
-        currentUserId
-      });
+      const roomList = (roomRes.data || []).slice(0, 5).map((r) => ({
+        ...r,
+        ruleCardTags: parseGameRulesDisplay(r).presetTags
+      }));
 
-      // 加载附近场地
+      let venueList = [];
       if (location) {
         const venueRes = await venueService.getNearbyVenues(location.longitude, location.latitude, 5);
-        this.setData({
-          venueList: venueRes.data || []
-        });
+        venueList = venueRes.data || [];
       } else {
         const venueRes = await venueService.getVenueList();
-        this.setData({
-          venueList: (venueRes.data || []).slice(0, 5)
-        });
+        venueList = (venueRes.data || []).slice(0, 5);
       }
+
+      const patch = {
+        loading: false,
+        roomList,
+        venueList,
+        currentUserId
+      };
+      if (location && !this.data.address) {
+        patch.address = '获取位置成功';
+      }
+      this.setData(patch);
     } catch (err) {
       console.error('加载数据失败:', err);
-    } finally {
       this.setData({ loading: false });
     }
   },

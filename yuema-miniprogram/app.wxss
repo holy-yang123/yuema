@@ -61,6 +61,13 @@ page {
 }
 
 /* ---- 深色主题：暖灰炭底 + 同色相配强调（略提亮橙）---- */
+/* 深色卡片上的「删除」：避免浅粉底与炭底反差刺眼，略压饱和度 */
+.theme-scope--dark .room-danger-btn,
+.theme-scope--dark .owner-btn-danger {
+  background: rgba(248, 113, 113, 0.16) !important;
+  border-color: rgba(248, 113, 113, 0.42) !important;
+}
+
 .theme-scope--dark {
   --bg: #1c1c1a;
   --bg-soft: #242422;
