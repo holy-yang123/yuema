@@ -86,7 +86,7 @@
         <image class="menu-icon-img" src="{{themeIsDark ? '/images/icons/ic-phone-dark.svg' : '/images/icons/ic-phone.svg'}}" mode="aspectFit" />
       </view>
       <text class="menu-item-text">绑定手机</text>
-      <text class="menu-item-status">{{userInfo.phone ? '已绑定' : '未绑定'}}</text>
+      <text class="menu-item-status">{{phoneMenuStatus}}</text>
       <text class="menu-arrow">›</text>
     </view>
     <view class="menu-item" bindtap="showAbout">
@@ -125,6 +125,28 @@
       </view>
 
       <button class="confirm-login-btn" bindtap="confirmLogin">进入约麻</button>
+    </view>
+  </view>
+
+  <!-- 编辑资料：与登录完善资料一致，支持昵称 + 微信头像选择 + 上传 -->
+  <view class="login-modal {{showEditProfileModal ? 'show' : ''}}">
+    <view class="login-modal-mask" bindtap="closeEditProfileModal"></view>
+    <view class="login-modal-content">
+      <view class="modal-header">
+        <text class="modal-title">编辑资料</text>
+        <text class="modal-subtitle">可修改昵称与头像</text>
+      </view>
+      <view class="login-form">
+        <button class="avatar-wrapper" open-type="chooseAvatar" bindchooseavatar="onEditChooseAvatar" disabled="{{editAvatarPickDelay}}">
+          <image class="modal-avatar" src="{{tempEditAvatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"></image>
+          <view class="avatar-edit-tag">更换</view>
+        </button>
+        <view class="nickname-input-wrap">
+          <text class="input-label">昵称</text>
+          <input type="nickname" class="nickname-input" placeholder="请输入昵称" value="{{tempEditNickname}}" bindinput="onEditNicknameInput" />
+        </view>
+      </view>
+      <button class="confirm-login-btn" bindtap="confirmEditProfile">保存</button>
     </view>
   </view>
 </view>

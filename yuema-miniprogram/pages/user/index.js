@@ -2,6 +2,15 @@ const app = getApp();
 const userService = require('../../services/userService');
 const themeUtil = require('../../utils/theme');
 
+/** 个人中心菜单展示用手机号脱敏 */
+function maskPhone(phone) {
+  const s = String(phone || '').replace(/\s/g, '');
+  if (s.length < 7) {
+    return '已绑定';
+  }
+  return `${s.slice(0, 3)}****${s.slice(-4)}`;
+}
+
 Page({
   behaviors: [require('../../behaviors/themeBehavior')],
   data: {
@@ -10,6 +19,13 @@ Page({
     levelName: '雀士',
     /** 弹窗打开后短延迟再允许点头像，降低连点触发「another chooseAvatar is in progress」 */
     avatarPickDelay: false,
+    /** 编辑资料弹窗内 chooseAvatar 同样需要短延迟，与登录弹窗独立避免互相干扰 */
+    editAvatarPickDelay: false,
+    showEditProfileModal: false,
+    tempEditNickname: '',
+    tempEditAvatarUrl: '',
+    /** 绑定手机行右侧文案：未绑定 / 脱敏号码 */
+    phoneMenuStatus: '未绑定',
     showLoginModal: false,
     /** 来自登录门禁页完善资料，成功后回首页 Tab */
     fromLoginGate: false
@@ -64,10 +80,14 @@ Page({
       const levelNames = ['雀士', '雀杰', '雀豪', '雀圣', '雀神'];
       const levelName = levelNames[Math.min(userInfo.level - 1, 4)] || '雀士';
 
+      // 绑定手机菜单状态：已绑定时展示脱敏号码，便于辨认当前账号
+      const phoneMenuStatus = userInfo.phone ? maskPhone(userInfo.phone) : '未绑定';
+
       this.setData({
         userInfo: userInfo,
         winRate: winRate,
-        levelName: levelName
+        levelName: levelName,
+        phoneMenuStatus
       });
 
       // 更新全局数据
@@ -111,52 +131,120 @@ Page({
     });
   },
 
-  // 编辑资料
+  // 编辑资料：弹窗内同时改昵称与头像（头像为新选的本地临时文件时再上传）
   editProfile() {
-    wx.showModal({
-      title: '编辑昵称',
-      editable: true,
-      placeholderText: '请输入新昵称',
-      success: async (res) => {
-        if (res.confirm && res.content) {
-          try {
-            await userService.updateUserInfo({ nickname: res.content });
-            wx.showToast({ title: '修改成功', icon: 'success' });
-            this.loadUserInfo();
-          } catch (err) {
-            wx.showToast({ title: '修改失败', icon: 'none' });
-          }
-        }
-      }
+    if (!app.globalData.token) {
+      wx.showToast({ title: '请先登录', icon: 'none' });
+      return;
+    }
+    const u = this.data.userInfo || {};
+    this.setData({
+      showEditProfileModal: true,
+      tempEditNickname: u.nickname || '',
+      tempEditAvatarUrl: u.avatarUrl || '',
+      editAvatarPickDelay: true
     });
+    setTimeout(() => {
+      if (this.data.showEditProfileModal) {
+        this.setData({ editAvatarPickDelay: false });
+      }
+    }, 400);
   },
 
-  // 绑定手机
+  closeEditProfileModal() {
+    this.setData({ showEditProfileModal: false });
+  },
+
+  onEditChooseAvatar(e) {
+    const { avatarUrl } = e.detail;
+    if (!avatarUrl) {
+      return;
+    }
+    this.setData({ tempEditAvatarUrl: avatarUrl });
+  },
+
+  // bindinput：避免用户改昵称后直接点保存但未触发 blur 导致仍提交旧昵称
+  onEditNicknameInput(e) {
+    this.setData({ tempEditNickname: e.detail.value });
+  },
+
+  async confirmEditProfile() {
+    const nick = (this.data.tempEditNickname || '').trim();
+    if (!nick) {
+      wx.showToast({ title: '请输入昵称', icon: 'none' });
+      return;
+    }
+    if (this._editProfileBusy) {
+      return;
+    }
+    this._editProfileBusy = true;
+    wx.showLoading({ title: '保存中...', mask: true });
+    try {
+      const { tempEditAvatarUrl } = this.data;
+      if (tempEditAvatarUrl && app.isTempAvatarPath(tempEditAvatarUrl)) {
+        await app.uploadAvatar(tempEditAvatarUrl);
+      }
+      await userService.updateUserInfo({ nickname: nick });
+      await this.loadUserInfo();
+      this.closeEditProfileModal();
+      wx.showToast({ title: '保存成功', icon: 'success' });
+    } catch (err) {
+      wx.showToast({ title: '保存失败', icon: 'none' });
+      console.error(err);
+    } finally {
+      wx.hideLoading();
+      this._editProfileBusy = false;
+    }
+  },
+
+  // 绑定手机；已绑定则二次确认后再走换绑输入
   bindPhone() {
+    if (!app.globalData.token) {
+      wx.showToast({ title: '请先登录', icon: 'none' });
+      return;
+    }
+
+    const openPhoneInput = () => {
+      const bound = !!this.data.userInfo.phone;
+      wx.showModal({
+        title: bound ? '换绑手机' : '绑定手机',
+        editable: true,
+        placeholderText: '请输入11位手机号',
+        success: async (res) => {
+          if (!res.confirm || !res.content) {
+            return;
+          }
+          const raw = String(res.content).replace(/\s/g, '');
+          if (!/^1\d{10}$/.test(raw)) {
+            wx.showToast({ title: '手机号格式不正确', icon: 'none' });
+            return;
+          }
+          try {
+            await userService.updateUserInfo({ phone: raw });
+            wx.showToast({ title: bound ? '换绑成功' : '绑定成功', icon: 'success' });
+            this.loadUserInfo();
+          } catch (err) {
+            wx.showToast({ title: bound ? '换绑失败' : '绑定失败', icon: 'none' });
+          }
+        }
+      });
+    };
+
     if (this.data.userInfo.phone) {
-      wx.showToast({
-        title: '已绑定手机',
-        icon: 'none'
+      wx.showModal({
+        title: '确认换绑',
+        content: '换绑后将改为使用新手机号，请确认是本人操作。',
+        confirmText: '继续换绑',
+        success: (res) => {
+          if (res.confirm) {
+            openPhoneInput();
+          }
+        }
       });
       return;
     }
-    
-    wx.showModal({
-      title: '绑定手机',
-      editable: true,
-      placeholderText: '请输入手机号',
-      success: async (res) => {
-        if (res.confirm && res.content) {
-          try {
-            await userService.updateUserInfo({ phone: res.content });
-            wx.showToast({ title: '绑定成功', icon: 'success' });
-            this.loadUserInfo();
-          } catch (err) {
-            wx.showToast({ title: '绑定失败', icon: 'none' });
-          }
-        }
-      }
-    });
+
+    openPhoneInput();
   },
 
   // 关于
@@ -180,7 +268,8 @@ Page({
           app.globalData.userInfo = null;
           this.setData({
             userInfo: {},
-            winRate: 0
+            winRate: 0,
+            phoneMenuStatus: '未绑定'
           });
           // 不再强制跳转，让用户留在个人中心看到登录按钮
           wx.showToast({ title: '已退出登录', icon: 'none' });

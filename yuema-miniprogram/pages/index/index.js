@@ -11,6 +11,8 @@ Page({
     roomList: [],
     venueList: [],
     loading: false,
+    /** 右上角头像：与 globalData 同步，避免首帧 undefined */
+    userInfo: {},
     address: '', // 当前地址
     /** 当前用户 id，用于判断是否本人发布的牌局（展示编辑/删除） */
     currentUserId: null,
@@ -29,7 +31,8 @@ Page({
       return;
     }
     this.setData({
-      address: app.globalData.address || this.data.address
+      address: app.globalData.address || this.data.address,
+      userInfo: app.globalData.userInfo || {}
     });
     this.loadData();
   },
@@ -81,7 +84,9 @@ Page({
         loading: false,
         roomList,
         venueList,
-        currentUserId
+        currentUserId,
+        // 供首页右上角头像绑定：原先仅用全局变量未 setData，导致占位图路径失效时出现空白方块
+        userInfo: app.globalData.userInfo || {}
       };
       if (location && !this.data.address) {
         patch.address = '获取位置成功';

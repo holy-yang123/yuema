@@ -16,8 +16,14 @@
         <text class="greeting-sub">找到你的牌搭子</text>
       </view>
     </view>
+    <!-- 无头像时用占位底+人物图标，避免缺省 PNG 时出现整块空灰 -->
     <view class="greeting-avatar" bindtap="goToUser">
-      <image src="{{userInfo.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill" class="avatar"/>
+      <block wx:if="{{userInfo.avatarUrl}}">
+        <image src="{{userInfo.avatarUrl}}" mode="aspectFill" class="avatar greeting-avatar-img"/>
+      </block>
+      <view wx:else class="greeting-avatar-fallback">
+        <image class="greeting-avatar-icon" src="{{themeIsDark ? '/images/icons/ic-user-dark.svg' : '/images/icons/ic-user.svg'}}" mode="aspectFit"/>
+      </view>
     </view>
   </view>
 
