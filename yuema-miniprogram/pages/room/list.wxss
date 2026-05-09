@@ -117,6 +117,11 @@
   color: #8A9096;
 }
 
+.status-tag.ended {
+  background: rgba(255, 77, 79, 0.08);
+  color: #ff7875;
+}
+
 .card-body {
   margin-bottom: 32rpx;
 }

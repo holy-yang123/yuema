@@ -8,6 +8,8 @@ Page({
     refreshing: false,
     searchQuery: '',
     scrollViewHeightPx: 400,
+    /** 个人中心「我的牌局」进入时为 true */
+    isMyRooms: false,
     gameTypeMap: {
       'sichuan': '四川麻将',
       'guobiao': '国标麻将',
@@ -15,7 +17,12 @@ Page({
     }
   },
 
-  onLoad() {
+  onLoad(options) {
+    const isMyRooms = options && options.type === 'my';
+    this.setData({ isMyRooms });
+    if (isMyRooms) {
+      wx.setNavigationBarTitle({ title: '我的牌局' });
+    }
     try {
       const h = wx.getWindowInfo().windowHeight;
       this.setData({ scrollViewHeightPx: Math.max(200, Math.floor(h * 0.62)) });
@@ -50,11 +57,22 @@ Page({
 
   async loadRooms() {
     try {
-      const { location } = getApp().globalData;
-      const res = await roomService.getRoomList(
-        location ? location.longitude : null,
-        location ? location.latitude : null
-      );
+      let res;
+      if (this.data.isMyRooms) {
+        res = await roomService.getMyRooms();
+      } else {
+        let location = null;
+        try {
+          const app = getApp();
+          location = app && app.globalData ? app.globalData.location : null;
+        } catch (e) {
+          // ignore
+        }
+        res = await roomService.getRoomList(
+          location ? location.longitude : null,
+          location ? location.latitude : null
+        );
+      }
       this.setData({
         rooms: res.data || []
       }, () => {
@@ -102,10 +120,11 @@ Page({
     // 搜索过滤
     if (this.data.searchQuery) {
       const query = this.data.searchQuery.toLowerCase();
-      filtered = filtered.filter(r => 
-        r.roomNo.toLowerCase().includes(query) || 
-        this.data.gameTypeMap[r.gameType].includes(query)
-      );
+      filtered = filtered.filter((r) => {
+        const no = (r.roomNo && String(r.roomNo).toLowerCase()) || '';
+        const typeLabel = this.data.gameTypeMap[r.gameType] || r.gameType || '';
+        return no.includes(query) || String(typeLabel).toLowerCase().includes(query);
+      });
     }
 
     this.setData({ filteredRooms: filtered });
@@ -124,11 +143,17 @@ Page({
     if (!room) return;
 
     try {
-      await roomService.joinRoom(room.roomNo);
+      const res = await roomService.joinRoom(room.roomNo);
       wx.showToast({
         title: '加入成功',
         icon: 'success'
       });
+      const roomId = res.data && res.data.roomId;
+      if (roomId) {
+        wx.navigateTo({
+          url: `/pages/room/detail?id=${roomId}`
+        });
+      }
       this.loadRooms();
     } catch (err) {
       wx.showToast({

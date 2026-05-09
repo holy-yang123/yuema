@@ -38,7 +38,16 @@
       <text class="record-score {{item.finalScore >= 0 ? 'win' : 'lose'}}">
         {{item.finalScore > 0 ? '+' : ''}}{{item.finalScore}} 分
       </text>
-      <text class="record-badge" wx:if="{{item.isWinner === 1}}">胜</text>
+      <view class="record-actions">
+        <text class="record-badge" wx:if="{{item.isWinner === 1}}">胜</text>
+        <button
+          class="share-record-btn"
+          open-type="share"
+          data-index="{{index}}"
+          bindtap="prepareShareRecord"
+          size="mini"
+        >分享</button>
+      </view>
     </view>
   </view>
 

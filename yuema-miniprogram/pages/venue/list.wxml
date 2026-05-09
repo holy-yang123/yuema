@@ -8,9 +8,9 @@
   </view>
 
   <scroll-view scroll-y class="venue-list" style="height: {{scrollViewHeightPx}}px" refresher-enabled refresher-background="#08090A" refresher-triggered="{{refreshing}}" bindrefresherrefresh="onRefresh">
-    <view class="venue-card" wx:for="{{venues}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}">
+    <view class="venue-card" wx:for="{{filteredVenues}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}">
       <view class="venue-image">
-        <image src="{{item.imageUrls || '/images/default-venue.png'}}" mode="aspectFill"></image>
+        <image src="{{item.coverUrl}}" mode="aspectFill"></image>
       </view>
       <view class="venue-info">
         <view class="venue-name">{{item.name}}</view>
@@ -26,8 +26,8 @@
       </view>
     </view>
 
-    <view class="empty-state" wx:if="{{venues.length === 0}}">
-      <text>暂无场地信息</text>
+    <view class="empty-state" wx:if="{{filteredVenues.length === 0}}">
+      <text>{{searchQuery ? '无匹配场地' : '暂无场地信息'}}</text>
     </view>
   </scroll-view>
 </view>

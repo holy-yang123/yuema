@@ -170,6 +170,22 @@ Page({
       this.refreshModifyPending();
       this.loadRoomDetail();
     };
+    h.score_update = (msg) => {
+      const d = msg.data;
+      if (!d || Number(d.roomId) !== Number(this.data.roomId)) {
+        return;
+      }
+      const memberScores = d.memberScores || [];
+      const totalRounds = d.totalRounds != null ? d.totalRounds : this.data.currentRound;
+      this.setData({
+        scoreSummary: {
+          roomId: d.roomId,
+          totalRounds,
+          memberScores
+        },
+        currentRound: totalRounds
+      });
+    };
 
     Object.keys(h).forEach((k) => socket.on(k, h[k]));
     this._wsHandlers = h;
@@ -542,6 +558,17 @@ Page({
   viewScoreHistory() {
     wx.navigateTo({
       url: `/pages/score/history?roomId=${this.data.roomId}`
+    });
+  },
+
+  copyRoomNo() {
+    const no = this.data.room && this.data.room.roomNo;
+    if (!no) {
+      return;
+    }
+    wx.setClipboardData({
+      data: String(no),
+      success: () => wx.showToast({ title: '房间号已复制', icon: 'none' })
     });
   },
 

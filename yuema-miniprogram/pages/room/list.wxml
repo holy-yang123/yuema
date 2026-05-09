@@ -16,8 +16,8 @@
     <view class="room-card" wx:for="{{filteredRooms}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}">
       <view class="card-header">
         <view class="room-no">#{{item.roomNo}}</view>
-        <view class="status-tag {{item.status === 0 ? 'waiting' : 'playing'}}">
-          {{item.status === 0 ? '等待中' : '进行中'}}
+        <view class="status-tag {{item.status === 0 ? 'waiting' : item.status === 1 ? 'playing' : 'ended'}}">
+          {{item.status === 0 ? '等待中' : item.status === 1 ? '进行中' : '已结束'}}
         </view>
       </view>
       <view class="card-body">
@@ -34,7 +34,7 @@
           <text class="value">{{item.venueName}}</text>
         </view>
       </view>
-      <view class="card-footer">
+      <view class="card-footer" wx:if="{{!isMyRooms && item.status === 0}}">
         <button class="join-btn" type="primary" size="mini" catchtap="onJoin" data-id="{{item.id}}">立即加入</button>
       </view>
     </view>

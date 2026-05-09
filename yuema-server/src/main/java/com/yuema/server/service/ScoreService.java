@@ -8,6 +8,7 @@ import com.yuema.server.entity.ScoreRecord;
 import com.yuema.server.mapper.RoomMapper;
 import com.yuema.server.mapper.RoomMemberMapper;
 import com.yuema.server.mapper.ScoreRecordMapper;
+import com.yuema.server.websocket.RoomWebSocketHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,6 +23,9 @@ public class ScoreService extends ServiceImpl<ScoreRecordMapper, ScoreRecord> {
 
     @Autowired
     private RoomMemberMapper roomMemberMapper;
+
+    @Autowired
+    private RoomWebSocketHandler roomWebSocketHandler;
 
     /**
      * @return null 成功；ROUND_EXISTS 该局已有记分；ROOM_INVALID 房间不存在或未进行中
@@ -50,6 +54,9 @@ public class ScoreService extends ServiceImpl<ScoreRecordMapper, ScoreRecord> {
             record.setRemark(dto.getRemark());
             save(record);
         }
+
+        Map<String, Object> summary = getScoreSummary(dto.getRoomId());
+        roomWebSocketHandler.broadcast(dto.getRoomId(), "score_update", summary);
 
         return null;
     }

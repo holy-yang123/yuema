@@ -47,7 +47,18 @@
   justify-content: space-between;
   color: #8A9096;
   font-size: 26rpx;
-  margin-bottom: 40rpx;
+  margin-bottom: 16rpx;
+}
+
+.venue-quick-actions {
+  display: flex;
+  gap: 24rpx;
+  margin-bottom: 32rpx;
+}
+
+.quick-link {
+  font-size: 26rpx;
+  color: #28e088;
 }
 
 .distance {
@@ -87,22 +98,40 @@
   line-height: 1.8;
 }
 
-.footer-btn {
+.footer-bar {
   position: fixed;
   bottom: 0;
   left: 0;
   right: 0;
-  padding: 24rpx 32rpx env(safe-area-inset-bottom);
+  display: flex;
+  gap: 20rpx;
+  padding: 24rpx 32rpx calc(24rpx + env(safe-area-inset-bottom));
   background: #000000;
   border-top: 1rpx solid #1F1F1F;
   z-index: 100;
 }
 
-.book-btn {
-  background: #28E088 !important;
-  color: #000000 !important;
-  border-radius: 8rpx !important;
+.btn-foot {
+  flex: 1;
   height: 88rpx !important;
   line-height: 88rpx !important;
+  border-radius: 8rpx !important;
+  font-size: 28rpx !important;
   font-weight: 600 !important;
+  border: none !important;
+}
+
+.btn-foot::after {
+  border: none;
+}
+
+.btn-foot.primary {
+  background: #28e088 !important;
+  color: #000000 !important;
+}
+
+.btn-foot.secondary {
+  background: rgba(19, 22, 28, 0.9) !important;
+  color: #f4f5f7 !important;
+  border: 1rpx solid rgba(255, 255, 255, 0.08) !important;
 }

@@ -1,12 +1,12 @@
 <page-meta root-background-color="#08090A" background-color="#08090A" background-color-bottom="#08090A" background-text-style="light" />
 <view class="container">
-  <swiper class="banner" indicator-dots autoplay circular>
-    <swiper-item wx:for="{{venue.imageUrls}}" wx:key="*this">
+  <swiper class="banner" indicator-dots autoplay circular wx:if="{{bannerImages.length}}">
+    <swiper-item wx:for="{{bannerImages}}" wx:key="*this">
       <image src="{{item}}" mode="aspectFill"></image>
     </swiper-item>
   </swiper>
 
-  <view class="info-section">
+  <view class="info-section" wx:if="{{venue}}">
     <view class="venue-header">
       <view class="venue-name">{{venue.name}}</view>
       <view class="venue-rating">{{venue.rating}} ⭐</view>
@@ -15,14 +15,19 @@
       <text class="address-text">{{venue.address}}</text>
       <text class="distance">导航 ></text>
     </view>
+    <view class="venue-quick-actions">
+      <text class="quick-link" bindtap="copyAddress">复制地址</text>
+      <text class="quick-link" wx:if="{{venue.phone}}" bindtap="callPhone">拨打电话</text>
+    </view>
   </view>
 
-  <view class="detail-section">
+  <view class="detail-section" wx:if="{{venue}}">
     <view class="section-title">场地介绍</view>
     <view class="section-content">{{venue.description || '暂无详细介绍'}}</view>
   </view>
 
-  <view class="footer-btn">
-    <button class="book-btn" bindtap="goToBook">立即预订</button>
+  <view class="footer-bar safe-bottom" wx:if="{{venue}}">
+    <button class="btn-foot secondary" bindtap="goToBook">预订说明</button>
+    <button class="btn-foot primary" bindtap="openMap">打开地图</button>
   </view>
 </view>

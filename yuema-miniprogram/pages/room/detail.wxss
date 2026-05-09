@@ -20,11 +20,27 @@
   margin-bottom: 32rpx;
 }
 
+.room-id-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  flex: 1;
+  min-width: 0;
+}
+
 .room-id {
   font-size: 36rpx;
   font-weight: 700;
   color: #ffffff;
   letter-spacing: -1rpx;
+}
+
+.copy-room-no {
+  font-size: 24rpx;
+  color: #28e088;
+  padding: 6rpx 16rpx;
+  border: 1rpx solid rgba(40, 224, 136, 0.35);
+  border-radius: 8rpx;
 }
 
 .status-pill {

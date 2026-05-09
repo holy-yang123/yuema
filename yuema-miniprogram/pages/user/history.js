@@ -17,7 +17,8 @@ Page({
       sichuan: '四川麻将',
       guobiao: '国标麻将',
       guangdong: '广东麻将'
-    }
+    },
+    shareRecord: null
   },
 
   onLoad() {
@@ -26,8 +27,36 @@ Page({
       setTimeout(() => wx.navigateBack(), 800);
       return;
     }
+    try {
+      wx.showShareMenu({ menus: ['shareAppMessage'] });
+    } catch (e) {
+      // ignore
+    }
     this.loadStats();
     this.loadRecords(true);
+  },
+
+  prepareShareRecord(e) {
+    const idx = e.currentTarget.dataset.index;
+    const r = this.data.records[idx];
+    this.setData({ shareRecord: r || null });
+  },
+
+  onShareAppMessage() {
+    const r = this.data.shareRecord;
+    if (r && r.roomId) {
+      const gt = this.data.gameTypeMap[r.gameType] || r.gameType || '麻将';
+      const sc = r.finalScore != null ? r.finalScore : 0;
+      const sign = sc > 0 ? '+' : '';
+      return {
+        title: `约麻战绩：${gt} ${sign}${sc}分`,
+        path: `/pages/room/detail?id=${r.roomId}`
+      };
+    }
+    return {
+      title: '约麻 — 历史战绩',
+      path: '/pages/index/index'
+    };
   },
 
   onReachBottom() {
