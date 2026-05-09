@@ -53,6 +53,10 @@ public class Room {
     private BigDecimal latitude;
     
     private String remark;
+
+    /** 玩法细则 JSON（按 game_type 分桶），见 CreateRoomDTO.gameRules */
+    @TableField("game_rules")
+    private String gameRules;
     
     @TableField(value = "created_at", fill = FieldFill.INSERT)
     private LocalDateTime createdAt;

@@ -1,6 +1,7 @@
 const app = getApp();
 const roomService = require('../../services/roomService');
 const venueService = require('../../services/venueService');
+const { LOGIN_PAGE } = require('../../utils/pageRoutes');
 
 Page({
   data: {
@@ -8,6 +9,8 @@ Page({
     venueList: [],
     loading: false,
     address: '', // 当前地址
+    /** 当前用户 id，用于判断是否本人发布的牌局（展示编辑/删除） */
+    currentUserId: null,
     gameTypeMap: {
       'sichuan': '四川麻将',
       'guobiao': '国标麻将',
@@ -22,7 +25,7 @@ Page({
   onShow() {
     if (!app.globalData.token) {
       wx.reLaunch({
-        url: '/pages/user/login'
+        url: LOGIN_PAGE
       });
       return;
     }
@@ -41,7 +44,7 @@ Page({
   ensureLoggedIn() {
     if (!app.globalData.token) {
       wx.reLaunch({
-        url: '/pages/user/login'
+        url: LOGIN_PAGE
       });
     }
   },
@@ -66,8 +69,11 @@ Page({
         location ? location.longitude : null,
         location ? location.latitude : null
       );
+      const u = app.globalData.userInfo;
+      const currentUserId = u ? (u.userId != null ? u.userId : u.id) : null;
       this.setData({
-        roomList: (roomRes.data || []).slice(0, 5)
+        roomList: (roomRes.data || []).slice(0, 5),
+        currentUserId
       });
 
       // 加载附近场地
@@ -212,6 +218,41 @@ Page({
     const roomId = e.currentTarget.dataset.id;
     wx.navigateTo({
       url: `/pages/room/detail?id=${roomId}`
+    });
+  },
+
+  // 编辑本人发布的等待中牌局
+  goEditRoom(e) {
+    const roomId = e.currentTarget.dataset.id;
+    wx.navigateTo({
+      url: `/pages/room/create?id=${roomId}`
+    });
+  },
+
+  // 删除本人发布的等待中牌局
+  confirmDeleteRoom(e) {
+    const roomId = e.currentTarget.dataset.id;
+    wx.showModal({
+      title: '删除牌局',
+      content: '确定删除该牌局吗？删除后不可恢复。',
+      success: async (r) => {
+        if (!r.confirm) {
+          return;
+        }
+        try {
+          wx.showLoading({ title: '删除中' });
+          await roomService.deleteRoom(roomId);
+          wx.hideLoading();
+          wx.showToast({ title: '已删除', icon: 'success' });
+          this.loadData();
+        } catch (err) {
+          wx.hideLoading();
+          wx.showToast({
+            title: (err && err.message) || '删除失败',
+            icon: 'none'
+          });
+        }
+      }
     });
   },
 

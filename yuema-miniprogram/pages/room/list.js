@@ -10,6 +10,8 @@ Page({
     scrollViewHeightPx: 400,
     /** 个人中心「我的牌局」进入时为 true */
     isMyRooms: false,
+    /** 用于判断是否本人发布的牌局 */
+    currentUserId: null,
     gameTypeMap: {
       'sichuan': '四川麻将',
       'guobiao': '国标麻将',
@@ -73,8 +75,12 @@ Page({
           location ? location.latitude : null
         );
       }
+      const app = typeof getApp === 'function' ? getApp() : null;
+      const u = app && app.globalData ? app.globalData.userInfo : null;
+      const currentUserId = u ? (u.userId != null ? u.userId : u.id) : null;
       this.setData({
-        rooms: res.data || []
+        rooms: res.data || [],
+        currentUserId
       }, () => {
         this.filterRooms();
       });
@@ -166,6 +172,39 @@ Page({
   goToCreate() {
     wx.navigateTo({
       url: '/pages/room/create'
+    });
+  },
+
+  goEditRoom(e) {
+    const id = e.currentTarget.dataset.id;
+    wx.navigateTo({
+      url: `/pages/room/create?id=${id}`
+    });
+  },
+
+  confirmDeleteRoom(e) {
+    const id = e.currentTarget.dataset.id;
+    wx.showModal({
+      title: '删除牌局',
+      content: '确定删除该牌局吗？删除后不可恢复。',
+      success: async (r) => {
+        if (!r.confirm) {
+          return;
+        }
+        try {
+          wx.showLoading({ title: '删除中' });
+          await roomService.deleteRoom(id);
+          wx.hideLoading();
+          wx.showToast({ title: '已删除', icon: 'success' });
+          this.loadRooms();
+        } catch (err) {
+          wx.hideLoading();
+          wx.showToast({
+            title: (err && err.message) || '删除失败',
+            icon: 'none'
+          });
+        }
+      }
     });
   }
 });

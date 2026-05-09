@@ -1,6 +1,6 @@
 {
   "navigationBarTitleText": "牌局详情",
-  "backgroundColor": "#08090A",
-  "backgroundTextStyle": "light",
+  "backgroundColor": "#faf9f5",
+  "backgroundTextStyle": "dark",
   "usingComponents": {}
 }

@@ -1,6 +1,6 @@
 {
   "navigationBarTitleText": "记分",
-  "backgroundColor": "#08090A",
-  "backgroundTextStyle": "light",
+  "backgroundColor": "#faf9f5",
+  "backgroundTextStyle": "dark",
   "usingComponents": {}
 }

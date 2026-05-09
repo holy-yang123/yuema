@@ -1,6 +1,32 @@
 const app = getApp();
 const roomService = require('../../services/roomService');
 const scoreService = require('../../services/scoreService');
+const { GAME_RULE_OPTIONS } = require('../../utils/gameRuleSets');
+
+/** 按房间当前 gameType 解析 game_rules，得到预设标签与自定义条 */
+function parseRuleDisplay(room) {
+  let parsed = {};
+  if (room.gameRules) {
+    try {
+      parsed = typeof room.gameRules === 'string' ? JSON.parse(room.gameRules) : room.gameRules;
+    } catch (e) {
+      parsed = {};
+    }
+  }
+  const gt = room.gameType || 'sichuan';
+  const bucket = parsed[gt] || {};
+  const opts = GAME_RULE_OPTIONS[gt] || [];
+  const presetTags = [];
+  opts.forEach((o) => {
+    if (bucket[o.key] === true) {
+      presetTags.push({ key: o.key, label: o.label });
+    }
+  });
+  const customLines = Array.isArray(bucket.customLines)
+    ? bucket.customLines.map((s) => String(s)).filter((t) => t.trim() !== '')
+    : [];
+  return { presetTags, customLines };
+}
 const chatService = require('../../services/chatService');
 const { createRoomSocket } = require('../../utils/socket');
 
@@ -36,7 +62,11 @@ Page({
     modifyIsRequester: false,
     modifyCanVote: false,
     modifyHasVoted: false,
-    inviteRoomNo: ''
+    inviteRoomNo: '',
+    /** 当前玩法下勾选的预设规则展示 */
+    rulePresetTags: [],
+    /** 当前玩法桶下自定义规则文案 */
+    ruleCustomLines: []
   },
 
   _socket: null,
@@ -250,12 +280,16 @@ Page({
         emptySeats.push(i);
       }
 
+      const ruleDisp = parseRuleDisplay(data.room);
+
       this.setData({
         room: data.room,
         members: data.members,
         emptySeats,
         isOwner,
-        currentUserId
+        currentUserId,
+        rulePresetTags: ruleDisp.presetTags,
+        ruleCustomLines: ruleDisp.customLines
       });
 
       if (data.room.status === 1 || data.room.status === 2) {
@@ -569,6 +603,37 @@ Page({
     wx.setClipboardData({
       data: String(no),
       success: () => wx.showToast({ title: '房间号已复制', icon: 'none' })
+    });
+  },
+
+  // 跳转编辑页（仅房主、等待中由后端再校验）
+  goEditRoom() {
+    wx.navigateTo({
+      url: `/pages/room/create?id=${this.data.roomId}`
+    });
+  },
+
+  // 删除本人发布的等待中牌局
+  confirmDeleteRoom() {
+    wx.showModal({
+      title: '删除牌局',
+      content: '确定删除该牌局吗？删除后不可恢复。',
+      success: async (r) => {
+        if (!r.confirm) {
+          return;
+        }
+        try {
+          wx.showLoading({ title: '删除中' });
+          await roomService.deleteRoom(this.data.roomId);
+          wx.hideLoading();
+          wx.showToast({ title: '已删除', icon: 'success' });
+          this.teardownSocket();
+          wx.navigateBack({ fail: () => wx.switchTab({ url: '/pages/index/index' }) });
+        } catch (err) {
+          wx.hideLoading();
+          wx.showToast({ title: (err && err.message) || '删除失败', icon: 'none' });
+        }
+      }
     });
   },
 

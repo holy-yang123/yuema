@@ -8,6 +8,8 @@
  * 真机联调可用：HTTPS 隧道/ngrok、部署到有证书域名，或使用开发者工具「真机调试」走调试通道。
  */
 const roomService = require('./services/roomService');
+const { LOGIN_PAGE } = require('./utils/pageRoutes');
+const { clearAuthAndGoLogin, shouldForceRelogin } = require('./utils/authRedirect');
 
 App({
   globalData: {
@@ -22,6 +24,27 @@ App({
   },
 
   onLaunch(options) {
+    // 品牌字体：需在微信公众平台 → 开发 → 开发管理 → 服务器域名 → downloadFile 合法域名 加入 fonts.gstatic.com，否则静默失败，回退为 app.wxss 中系统栈
+    const onFontFail = (name, err) => {
+      console.warn(`[loadFontFace] ${name}`, err);
+    };
+    if (wx.loadFontFace) {
+      wx.loadFontFace({
+        family: 'Poppins',
+        source: 'url("https://fonts.gstatic.com/s/poppins/v24/pxiByp8kv8JHgFVrLEj6Z1xlFQ.woff2")',
+        global: true,
+        success: () => console.log('[loadFontFace] Poppins ok'),
+        fail: (e) => onFontFail('Poppins', e)
+      });
+      wx.loadFontFace({
+        family: 'Lora',
+        source: 'url("https://fonts.gstatic.com/s/lora/v37/0QI6MX1D_JOuGQbT0gvTJPa787weuxJBkq0.woff2")',
+        global: true,
+        success: () => console.log('[loadFontFace] Lora ok'),
+        fail: (e) => onFontFail('Lora', e)
+      });
+    }
+
     const q = (options && options.query) || {};
     const scene = q.scene != null ? String(q.scene) : '';
     const directNo = q.roomNo != null ? String(q.roomNo) : '';
@@ -140,18 +163,29 @@ App({
         },
         success: (res) => {
           const status = res.statusCode;
-          if (status !== undefined && status !== 200) {
-            reject(`头像上传失败 HTTP ${status}`);
-            return;
-          }
           let body = res.data;
           if (typeof body === 'string') {
             try {
               body = JSON.parse(body);
             } catch (e) {
-              reject('头像上传响应解析失败');
-              return;
+              body = null;
             }
+          }
+          // 401 须先于「非 200」分支处理，否则只会 reject 而不会清态跳转
+          if (status === 401 || shouldForceRelogin(body)) {
+            clearAuthAndGoLogin({
+              toastTitle: (body && body.message) || '登录已过期'
+            });
+            reject((body && body.message) || '登录已失效');
+            return;
+          }
+          if (status !== undefined && status !== 200) {
+            reject(`头像上传失败 HTTP ${status}`);
+            return;
+          }
+          if (body == null || typeof body !== 'object') {
+            reject('头像上传响应解析失败');
+            return;
           }
           if (body.code === 200 && body.data && body.data.avatarUrl) {
             if (this.globalData.userInfo) {
@@ -223,6 +257,12 @@ App({
           if (res.data.code === 200) {
             this.globalData.userInfo = res.data.data;
             resolve(res.data.data);
+          } else if (shouldForceRelogin(res.data)) {
+            // 启动拉用户信息失败：与封装 request 一致，清态回登录（避免出现未捕获的 MiniProgramError）
+            clearAuthAndGoLogin({
+              toastTitle: res.data.message || '请重新登录'
+            });
+            reject(res.data);
           } else {
             reject(res.data.message);
           }
@@ -236,7 +276,7 @@ App({
   checkLogin() {
     if (!this.globalData.token) {
       wx.reLaunch({
-        url: '/pages/user/login'
+        url: LOGIN_PAGE
       });
       return false;
     }

@@ -6,6 +6,16 @@ module.exports = {
     return request.post('/room/create', data);
   },
 
+  // 房主编辑等待中的牌局
+  updateRoom(roomId, data) {
+    return request.put(`/room/update?roomId=${encodeURIComponent(roomId)}`, data);
+  },
+
+  // 房主删除等待中的牌局
+  deleteRoom(roomId) {
+    return request.del(`/room/delete?roomId=${encodeURIComponent(roomId)}`);
+  },
+
   // 加入牌局
   joinRoom(roomNo) {
     return request.post('/room/join', { roomNo });

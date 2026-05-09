@@ -1,4 +1,4 @@
-<page-meta root-background-color="#08090A" background-color="#08090A" background-color-bottom="#08090A" background-text-style="light" />
+<page-meta root-background-color="#faf9f5" background-color="#faf9f5" background-color-bottom="#faf9f5" background-text-style="dark" />
 <view class="container detail-page">
   <!-- 房间信息 -->
   <view class="room-header-card">
@@ -30,6 +30,29 @@
         <text class="meta-cell-value">{{room.baseScore}}</text>
       </view>
     </view>
+
+    <view class="room-rules-remark" wx:if="{{rulePresetTags.length > 0 || ruleCustomLines.length > 0 || room.remark}}">
+      <view class="rule-block" wx:if="{{rulePresetTags.length > 0 || ruleCustomLines.length > 0}}">
+        <text class="rule-block-title">本场约定</text>
+        <view class="rule-tag-row" wx:if="{{rulePresetTags.length > 0}}">
+          <text class="rule-tag" wx:for="{{rulePresetTags}}" wx:key="key">{{item.label}}</text>
+        </view>
+        <view class="rule-custom-lines" wx:if="{{ruleCustomLines.length > 0}}">
+          <text class="rule-custom-line" wx:for="{{ruleCustomLines}}" wx:for-item="line" wx:for-index="ri" wx:key="ri">· {{line}}</text>
+        </view>
+      </view>
+      <view class="remark-block" wx:if="{{room.remark}}">
+        <text class="rule-block-title">备注</text>
+        <text class="room-remark-body">{{room.remark}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 房主在等待中时可编辑/删除牌局 -->
+  <view class="owner-room-actions" wx:if="{{room.status === 0 && isOwner}}">
+    <button class="owner-link-btn" bindtap="goEditRoom">编辑牌局</button>
+    <text class="owner-link-sep">|</text>
+    <button class="owner-link-btn danger" bindtap="confirmDeleteRoom">删除牌局</button>
   </view>
 
   <!-- 计分修改待投票 -->

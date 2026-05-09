@@ -1,6 +1,6 @@
 {
   "navigationBarTitleText": "约麻",
   "enablePullDownRefresh": true,
-  "backgroundColor": "#08090A",
-  "backgroundTextStyle": "light"
+  "backgroundColor": "#faf9f5",
+  "backgroundTextStyle": "dark"
 }

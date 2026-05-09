@@ -1,6 +1,11 @@
 package com.yuema.server.service;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.yuema.server.dto.CreateRoomDTO;
 import com.yuema.server.entity.Room;
 import com.yuema.server.entity.RoomMember;
@@ -42,6 +47,9 @@ public class RoomService extends ServiceImpl<RoomMapper, Room> {
     @Autowired
     private RoomWebSocketHandler roomWebSocketHandler;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @Transactional
     public Room createRoom(Long creatorId, CreateRoomDTO dto) {
         Room room = new Room();
@@ -69,6 +77,10 @@ public class RoomService extends ServiceImpl<RoomMapper, Room> {
         room.setBaseScore(dto.getBaseScore() != null ? dto.getBaseScore() : 1);
         room.setTaiFee(dto.getTaiFee() != null ? dto.getTaiFee() : 0);
         room.setRemark(dto.getRemark());
+        // 玩法细则：DTO 为 JsonNode，落库为 JSON 字符串；含 customLines 条数与长度裁剪
+        if (dto.getGameRules() != null) {
+            room.setGameRules(normalizeGameRulesJson(dto.getGameRules()));
+        }
 
         save(room);
 
@@ -83,6 +95,148 @@ public class RoomService extends ServiceImpl<RoomMapper, Room> {
         roomMemberMapper.insert(member);
 
         return room;
+    }
+
+    /**
+     * 房主在等待中状态下修改牌局信息（玩法、人数上限、场地/坐标等）
+     */
+    @Transactional
+    public String updateRoom(Long roomId, Long operatorId, CreateRoomDTO dto) {
+        Room room = getById(roomId);
+        if (room == null) {
+            return "NOT_FOUND";
+        }
+        if (!room.getCreatorId().equals(operatorId)) {
+            return "NOT_OWNER";
+        }
+        if (room.getStatus() == null || room.getStatus() != 0) {
+            return "NOT_EDITABLE";
+        }
+
+        int count = roomMemberMapper.countActiveMembers(roomId);
+        if (dto.getMaxPlayers() != null && dto.getMaxPlayers() < count) {
+            return "MAX_TOO_SMALL";
+        }
+
+        room.setGameType(dto.getGameType());
+        room.setMaxPlayers(dto.getMaxPlayers());
+        room.setVenueId(dto.getVenueId());
+        room.setLongitude(dto.getLongitude());
+        room.setLatitude(dto.getLatitude());
+
+        if (dto.getVenueId() != null) {
+            Venue venue = venueMapper.selectById(dto.getVenueId());
+            if (venue != null) {
+                room.setVenueName(venue.getName());
+                if (room.getLongitude() == null) {
+                    room.setLongitude(venue.getLongitude());
+                }
+                if (room.getLatitude() == null) {
+                    room.setLatitude(venue.getLatitude());
+                }
+            }
+        } else {
+            room.setVenueName(null);
+        }
+
+        // 小程序请求体未传的字段勿覆盖为 null
+        if (dto.getStartTime() != null) {
+            room.setStartTime(dto.getStartTime());
+        }
+        if (dto.getBaseScore() != null) {
+            room.setBaseScore(dto.getBaseScore());
+        }
+        if (dto.getTaiFee() != null) {
+            room.setTaiFee(dto.getTaiFee());
+        }
+        if (dto.getRemark() != null) {
+            room.setRemark(dto.getRemark());
+        }
+        // 与 remark 一致：请求未传 gameRules 时不覆盖已有细则
+        if (dto.getGameRules() != null) {
+            room.setGameRules(normalizeGameRulesJson(dto.getGameRules()));
+        }
+
+        updateById(room);
+        return null;
+    }
+
+    /**
+     * 校验并裁剪玩法细则：每桶最多 5 条自定义、每条最多 40 字；仅保留布尔开关与 customLines。
+     */
+    private String normalizeGameRulesJson(JsonNode node) {
+        if (node == null || node.isNull() || node.isMissingNode()) {
+            return null;
+        }
+        if (!node.isObject()) {
+            throw new IllegalArgumentException("gameRules 须为 JSON 对象");
+        }
+        ObjectNode out = objectMapper.createObjectNode();
+        node.fields().forEachRemaining(e -> {
+            String gameTypeKey = e.getKey();
+            JsonNode bucket = e.getValue();
+            if (!bucket.isObject()) {
+                return;
+            }
+            ObjectNode bucketOut = objectMapper.createObjectNode();
+            ArrayNode customArr = objectMapper.createArrayNode();
+            bucket.fields().forEachRemaining(be -> {
+                String k = be.getKey();
+                JsonNode v = be.getValue();
+                if ("customLines".equals(k)) {
+                    if (v != null && v.isArray()) {
+                        int n = 0;
+                        for (JsonNode line : v) {
+                            if (n >= 5) {
+                                break;
+                            }
+                            String t = line.isTextual() ? line.asText().trim() : "";
+                            if (!t.isEmpty()) {
+                                if (t.length() > 40) {
+                                    t = t.substring(0, 40);
+                                }
+                                customArr.add(t);
+                                n++;
+                            }
+                        }
+                    }
+                } else if (v != null && v.isBoolean()) {
+                    bucketOut.set(k, v);
+                }
+            });
+            if (customArr.size() > 0) {
+                bucketOut.set("customLines", customArr);
+            }
+            if (bucketOut.size() > 0) {
+                out.set(gameTypeKey, bucketOut);
+            }
+        });
+        try {
+            return objectMapper.writeValueAsString(out);
+        } catch (Exception ex) {
+            throw new IllegalArgumentException("玩法细则序列化失败");
+        }
+    }
+
+    /**
+     * 房主删除等待中的牌局：清理成员记录并逻辑删除房间
+     */
+    @Transactional
+    public String deleteRoom(Long roomId, Long operatorId) {
+        Room room = getById(roomId);
+        if (room == null) {
+            return "NOT_FOUND";
+        }
+        if (!room.getCreatorId().equals(operatorId)) {
+            return "NOT_OWNER";
+        }
+        if (room.getStatus() == null || room.getStatus() != 0) {
+            return "NOT_DELETABLE";
+        }
+
+        roomMemberMapper.delete(new LambdaQueryWrapper<RoomMember>().eq(RoomMember::getRoomId, roomId));
+        removeById(roomId);
+        return null;
     }
 
     public Room getByRoomNo(String roomNo) {

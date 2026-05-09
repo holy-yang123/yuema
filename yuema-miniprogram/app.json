@@ -1,6 +1,6 @@
 {
   "pages": [
-    "pages/user/login",
+    "pages/login/index",
     "pages/index/index",
     "pages/room/list",
     "pages/room/detail",
@@ -13,19 +13,19 @@
     "pages/user/history"
   ],
   "window": {
-    "backgroundTextStyle": "light",
-    "navigationBarBackgroundColor": "#08090A",
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#faf9f5",
     "navigationBarTitleText": "约麻",
-    "navigationBarTextStyle": "white",
-    "backgroundColor": "#08090A",
-    "backgroundColorTop": "#08090A",
-    "backgroundColorBottom": "#08090A"
+    "navigationBarTextStyle": "black",
+    "backgroundColor": "#faf9f5",
+    "backgroundColorTop": "#faf9f5",
+    "backgroundColorBottom": "#faf9f5"
   },
   "tabBar": {
-    "color": "#8A9096",
-    "selectedColor": "#4ae8b8",
-    "backgroundColor": "#08090A",
-    "borderStyle": "black",
+    "color": "#b0aea5",
+    "selectedColor": "#d97757",
+    "backgroundColor": "#faf9f5",
+    "borderStyle": "white",
     "list": [
       {
         "pagePath": "pages/index/index",

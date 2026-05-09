@@ -1,5 +1,5 @@
 .container {
-  background-color: #08090A;
+  background-color: #faf9f5;
   min-height: 100%;
   padding-bottom: 140rpx;
   box-sizing: border-box;
@@ -14,12 +14,12 @@
 .banner image {
   width: 100%;
   height: 100%;
-  filter: brightness(0.8);
+  filter: brightness(1);
 }
 
 .info-section {
   padding: 40rpx 32rpx;
-  background-color: #08090A;
+  background-color: #faf9f5;
 }
 
 .venue-header {
@@ -30,14 +30,14 @@
 }
 
 .venue-name {
-  color: #ffffff;
+  color: #141413;
   font-size: 40rpx;
   font-weight: 600;
   letter-spacing: -1rpx;
 }
 
 .venue-rating {
-  color: #FFAB00;
+  color: #e8a820;
   font-size: 28rpx;
   font-weight: 500;
 }
@@ -45,7 +45,7 @@
 .venue-address {
   display: flex;
   justify-content: space-between;
-  color: #8A9096;
+  color: #b0aea5;
   font-size: 26rpx;
   margin-bottom: 16rpx;
 }
@@ -58,22 +58,22 @@
 
 .quick-link {
   font-size: 26rpx;
-  color: #28e088;
+  color: #d97757;
 }
 
 .distance {
-  color: #28E088;
+  color: #788c5d;
   font-weight: 500;
 }
 
 .detail-section {
   padding: 40rpx 32rpx;
-  background-color: #101214;
-  border-top: 1rpx solid #1F1F1F;
+  background-color: #ffffff;
+  border-top: 1rpx solid #e8e6dc;
 }
 
 .section-title {
-  color: #ffffff;
+  color: #141413;
   font-size: 32rpx;
   font-weight: 600;
   margin-bottom: 24rpx;
@@ -89,11 +89,11 @@
   transform: translateY(-50%);
   width: 4rpx;
   height: 24rpx;
-  background: #28E088;
+  background: #d97757;
 }
 
 .section-content {
-  color: #8A9096;
+  color: #b0aea5;
   font-size: 28rpx;
   line-height: 1.8;
 }
@@ -106,16 +106,17 @@
   display: flex;
   gap: 20rpx;
   padding: 24rpx 32rpx calc(24rpx + env(safe-area-inset-bottom));
-  background: #000000;
-  border-top: 1rpx solid #1F1F1F;
+  background: #ffffff;
+  border-top: 1rpx solid #e8e6dc;
   z-index: 100;
+  box-shadow: 0 -8rpx 28rpx rgba(20, 20, 19, 0.06);
 }
 
 .btn-foot {
   flex: 1;
   height: 88rpx !important;
   line-height: 88rpx !important;
-  border-radius: 8rpx !important;
+  border-radius: 12rpx !important;
   font-size: 28rpx !important;
   font-weight: 600 !important;
   border: none !important;
@@ -126,12 +127,12 @@
 }
 
 .btn-foot.primary {
-  background: #28e088 !important;
-  color: #000000 !important;
+  background: linear-gradient(145deg, #e08568 0%, #d97757 100%) !important;
+  color: #ffffff !important;
 }
 
 .btn-foot.secondary {
-  background: rgba(19, 22, 28, 0.9) !important;
-  color: #f4f5f7 !important;
-  border: 1rpx solid rgba(255, 255, 255, 0.08) !important;
+  background: #faf9f5 !important;
+  color: #141413 !important;
+  border: 1rpx solid #e8e6dc !important;
 }

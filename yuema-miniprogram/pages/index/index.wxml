@@ -1,4 +1,4 @@
-<page-meta root-background-color="#08090A" background-color="#08090A" background-color-bottom="#08090A" background-text-style="light" />
+<page-meta root-background-color="#faf9f5" background-color="#faf9f5" background-color-bottom="#faf9f5" background-text-style="dark" />
 <view class="container home-page">
   <!-- 顶部问候 -->
   <view class="greeting">
@@ -24,7 +24,7 @@
   <view class="search-bar">
     <view class="search-input">
       <text class="search-icon">⌕</text>
-      <input placeholder="搜索牌局、场地" disabled placeholder-style="color: rgba(255,255,255,0.28); font-weight: 400"/>
+      <input placeholder="搜索牌局、场地" disabled placeholder-style="color: rgba(20,20,19,0.35); font-weight: 400"/>
     </view>
   </view>
 
@@ -86,7 +86,11 @@
           </view>
         </view>
         <view class="room-card-footer">
-          <button class="room-join-btn" size="mini" catchtap="quickJoin" data-id="{{item.id}}">加入</button>
+          <block wx:if="{{currentUserId && item.creatorId === currentUserId && item.status === 0}}">
+            <button class="room-secondary-btn" size="mini" catchtap="goEditRoom" data-id="{{item.id}}">编辑</button>
+            <button class="room-danger-btn" size="mini" catchtap="confirmDeleteRoom" data-id="{{item.id}}">删除</button>
+          </block>
+          <button wx:else class="room-join-btn" size="mini" catchtap="quickJoin" data-id="{{item.id}}">加入</button>
         </view>
       </view>
     </view>

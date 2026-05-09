@@ -1,4 +1,4 @@
-<page-meta root-background-color="#08090A" background-color="#08090A" background-color-bottom="#08090A" background-text-style="light" />
+<page-meta root-background-color="#faf9f5" background-color="#faf9f5" background-color-bottom="#faf9f5" background-text-style="dark" />
 <view class="container">
   <view class="header">
     <view class="search-box">
@@ -12,7 +12,7 @@
     </view>
   </view>
 
-  <scroll-view scroll-y class="room-list" style="height: {{scrollViewHeightPx}}px" refresher-enabled refresher-background="#08090A" refresher-triggered="{{refreshing}}" bindrefresherrefresh="onRefresh">
+  <scroll-view scroll-y class="room-list" style="height: {{scrollViewHeightPx}}px" refresher-enabled refresher-background="#faf9f5" refresher-triggered="{{refreshing}}" bindrefresherrefresh="onRefresh">
     <view class="room-card" wx:for="{{filteredRooms}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}">
       <view class="card-header">
         <view class="room-no">#{{item.roomNo}}</view>
@@ -34,8 +34,12 @@
           <text class="value">{{item.venueName}}</text>
         </view>
       </view>
-      <view class="card-footer" wx:if="{{!isMyRooms && item.status === 0}}">
-        <button class="join-btn" type="primary" size="mini" catchtap="onJoin" data-id="{{item.id}}">立即加入</button>
+      <view class="card-footer" wx:if="{{item.status === 0}}">
+        <block wx:if="{{currentUserId && item.creatorId === currentUserId}}">
+          <button class="owner-btn owner-btn-outline" size="mini" catchtap="goEditRoom" data-id="{{item.id}}">编辑</button>
+          <button class="owner-btn owner-btn-danger" size="mini" catchtap="confirmDeleteRoom" data-id="{{item.id}}">删除</button>
+        </block>
+        <button wx:elif="{{!isMyRooms}}" class="join-btn" type="primary" size="mini" catchtap="onJoin" data-id="{{item.id}}">立即加入</button>
       </view>
     </view>
 

@@ -1,7 +1,7 @@
 {
   "navigationBarTitleText": "牌局大厅",
   "enablePullDownRefresh": true,
-  "backgroundColor": "#08090A",
-  "backgroundTextStyle": "light",
+  "backgroundColor": "#faf9f5",
+  "backgroundTextStyle": "dark",
   "usingComponents": {}
 }

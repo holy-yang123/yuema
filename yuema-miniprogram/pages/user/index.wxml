@@ -1,4 +1,4 @@
-<page-meta root-background-color="#08090A" background-color="#08090A" background-color-bottom="#08090A" background-text-style="light" />
+<page-meta root-background-color="#faf9f5" background-color="#faf9f5" background-color-bottom="#faf9f5" background-text-style="dark" />
 <view class="container">
   <!-- 用户信息卡片 -->
   <view class="profile-hero">

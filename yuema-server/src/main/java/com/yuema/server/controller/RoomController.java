@@ -108,6 +108,49 @@ public class RoomController {
         return Result.success(rooms);
     }
 
+    /** 房主修改等待中的牌局 */
+    @PutMapping("/update")
+    public Result<Room> updateRoom(@RequestAttribute Long userId,
+                                   @RequestParam Long roomId,
+                                   @RequestBody CreateRoomDTO dto) {
+        String err = roomService.updateRoom(roomId, userId, dto);
+        if (err != null) {
+            if ("NOT_FOUND".equals(err)) {
+                return Result.error("房间不存在");
+            }
+            if ("NOT_OWNER".equals(err)) {
+                return Result.error("无权修改");
+            }
+            if ("NOT_EDITABLE".equals(err)) {
+                return Result.error("仅等待中的牌局可修改");
+            }
+            if ("MAX_TOO_SMALL".equals(err)) {
+                return Result.error("最大人数不能少于当前人数");
+            }
+            return Result.error("修改失败");
+        }
+        return Result.success(roomService.getById(roomId));
+    }
+
+    /** 房主删除等待中的牌局 */
+    @DeleteMapping("/delete")
+    public Result<Void> deleteRoom(@RequestAttribute Long userId, @RequestParam Long roomId) {
+        String err = roomService.deleteRoom(roomId, userId);
+        if (err != null) {
+            if ("NOT_FOUND".equals(err)) {
+                return Result.error("房间不存在");
+            }
+            if ("NOT_OWNER".equals(err)) {
+                return Result.error("无权删除");
+            }
+            if ("NOT_DELETABLE".equals(err)) {
+                return Result.error("仅等待中的牌局可删除");
+            }
+            return Result.error("删除失败");
+        }
+        return Result.success();
+    }
+
     @PostMapping("/start")
     public Result<Void> startRoom(@RequestAttribute Long userId,
                                    @RequestParam Long roomId) {

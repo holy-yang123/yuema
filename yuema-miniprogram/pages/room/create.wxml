@@ -1,4 +1,4 @@
-<page-meta root-background-color="#08090A" background-color="#08090A" background-color-bottom="#08090A" background-text-style="light" />
+<page-meta root-background-color="#faf9f5" background-color="#faf9f5" background-color-bottom="#faf9f5" background-text-style="dark" />
 <view class="container">
   <view class="form-container">
     <view class="form-item">
@@ -9,6 +9,26 @@
         </view>
       </picker>
     </view>
+
+    <!-- 当前玩法下的预设规则开关 -->
+    <block wx:if="{{currentRuleOptions.length > 0}}">
+      <view class="rules-section-title">玩法细则</view>
+      <view class="form-item" wx:for="{{currentRuleOptions}}" wx:key="key">
+        <text class="label">{{item.label}}</text>
+        <switch checked="{{activeBucketCopy[item.key]}}" data-key="{{item.key}}" bindchange="onRuleSwitch" color="#d97757"/>
+      </view>
+      <view class="custom-rules-wrap">
+        <text class="custom-rules-hint">自定义规则（每条≤40字，最多5条）</text>
+        <view class="custom-line-row" wx:for="{{displayCustomLines}}" wx:key="index" wx:for-index="idx">
+          <text class="custom-line-text">{{item}}</text>
+          <text class="custom-line-del" data-index="{{idx}}" bindtap="removeCustomLine">删除</text>
+        </view>
+        <view class="custom-add-row">
+          <input class="custom-add-input" value="{{customLineInput}}" maxlength="40" bindinput="onCustomLineInput" placeholder="补充口头约定，如封顶、坐序"/>
+          <button class="custom-add-btn" bindtap="addCustomLine" size="mini">添加</button>
+        </view>
+      </view>
+    </block>
 
     <view class="form-item">
       <text class="label">最大人数</text>
@@ -34,9 +54,15 @@
         {{selectedLocation ? selectedLocation.address : '点击选择位置'}}
       </view>
     </view>
+
+    <view class="form-item form-item-column">
+      <text class="label">备注</text>
+      <textarea class="remark-area" value="{{remark}}" maxlength="255" bindinput="onRemarkInput" placeholder="特殊需求、迟到说明等"/>
+    </view>
   </view>
 
   <view class="btn-area">
-    <button class="submit-btn" bindtap="submit">创建房间</button>
+    <!-- 编辑模式标题由 onLoad 设置，按钮文案区分创建/保存 -->
+    <button class="submit-btn" bindtap="submit">{{editRoomId ? '保存修改' : '创建房间'}}</button>
   </view>
 </view>

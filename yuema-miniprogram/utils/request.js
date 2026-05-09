@@ -1,4 +1,5 @@
 // 禁止在模块顶层 getApp()：app.js 会在 App() 执行前 require 本文件，此时 getApp() 为 undefined
+const { clearAuthAndGoLogin, shouldForceRelogin } = require('./authRedirect');
 
 function safeGetApp() {
   try {
@@ -35,6 +36,12 @@ const request = (options) => {
         if (res.statusCode === 200) {
           if (res.data.code === 200 || silentCodes.indexOf(res.data.code) !== -1) {
             resolve(res.data);
+          } else if (shouldForceRelogin(res.data)) {
+            // HTTP 200 但业务表示需重新登录（如用户记录已删仍带旧 JWT，接口返回「用户不存在」）
+            clearAuthAndGoLogin({
+              toastTitle: res.data.message || '请重新登录'
+            });
+            reject(res.data);
           } else {
             wx.showToast({
               title: res.data.message || '请求失败',
@@ -43,17 +50,9 @@ const request = (options) => {
             reject(res.data);
           }
         } else if (res.statusCode === 401) {
-          const a = safeGetApp();
-          if (a && a.globalData) {
-            wx.removeStorageSync('token');
-            a.globalData.token = null;
-          }
-          wx.showToast({
-            title: '登录已过期',
-            icon: 'none'
-          });
-          wx.reLaunch({
-            url: '/pages/user/login'
+          // 未携带 token / JWT 失效：服务端统一 401
+          clearAuthAndGoLogin({
+            toastTitle: (res.data && res.data.message) || '登录已过期'
           });
           reject(res);
         } else {

@@ -1,0 +1,29 @@
+<page-meta root-background-color="#fdfcfa" background-color="#fdfcfa" background-color-bottom="#f3efe6" background-text-style="dark" />
+<!-- canvas 氛围层；装饰圆与主内容在上层 z-index 分层 -->
+<view class="login-page">
+  <canvas type="2d" id="login-bg" class="login-canvas"></canvas>
+  <view class="login-deco login-deco--a"></view>
+  <view class="login-deco login-deco--b"></view>
+  <view class="login-deco login-deco--c"></view>
+  <view class="login-layer safe-bottom">
+    <view class="login-main">
+      <view class="login-card">
+        <view class="login-badge font-display">约好友 · 开好局</view>
+        <text class="login-title font-display">约麻</text>
+        <view class="login-title-line"></view>
+        <text class="login-desc font-body">登录后即可组局、记分与同步战绩</text>
+        <view class="login-features">
+          <text class="login-chip">组局</text>
+          <text class="login-dot">·</text>
+          <text class="login-chip">记分</text>
+          <text class="login-dot">·</text>
+          <text class="login-chip">战绩</text>
+        </view>
+      </view>
+    </view>
+    <view class="login-actions">
+      <button class="login-btn {{btnPressed ? 'login-btn--pressed' : ''}}" loading="{{loading}}" disabled="{{loading}}" bindtap="onWxLogin" bindtouchstart="onBtnTouchStart" bindtouchend="onBtnTouchEnd" bindtouchcancel="onBtnTouchEnd">微信登录</button>
+      <text class="login-hint">使用微信账号快速登录，信息安全由微信平台保障</text>
+    </view>
+  </view>
+</view>
