@@ -55,9 +55,12 @@ Page({
 
   // 历史战绩
   goToHistory() {
-    wx.showToast({
-      title: '功能开发中',
-      icon: 'none'
+    if (!app.globalData.token) {
+      wx.showToast({ title: '请先登录', icon: 'none' });
+      return;
+    }
+    wx.navigateTo({
+      url: '/pages/user/history'
     });
   },
 

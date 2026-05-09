@@ -1,0 +1,106 @@
+.history-page {
+  padding-bottom: 48rpx;
+}
+
+.stats-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16rpx;
+}
+
+.stats-cell {
+  flex: 1;
+  text-align: center;
+}
+
+.stats-num {
+  display: block;
+  font-size: 36rpx;
+  font-weight: 700;
+  color: #f4f5f7;
+}
+
+.stats-num.win {
+  color: #28e088;
+}
+
+.stats-num.lose {
+  color: #ff4d4f;
+}
+
+.stats-label {
+  display: block;
+  font-size: 22rpx;
+  color: #6b7280;
+  margin-top: 8rpx;
+}
+
+.section-title {
+  font-size: 32rpx;
+  font-weight: 600;
+  margin: 8rpx 0 24rpx;
+}
+
+.empty-tip {
+  font-size: 26rpx;
+  color: #6b7280;
+  text-align: center;
+  padding: 48rpx 0;
+}
+
+.record-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12rpx;
+}
+
+.record-game {
+  font-size: 30rpx;
+  font-weight: 600;
+}
+
+.record-time {
+  font-size: 22rpx;
+  color: #6b7280;
+}
+
+.record-meta {
+  font-size: 24rpx;
+  color: #8a9096;
+  margin-bottom: 16rpx;
+}
+
+.record-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.record-score {
+  font-size: 32rpx;
+  font-weight: 700;
+}
+
+.record-score.win {
+  color: #28e088;
+}
+
+.record-score.lose {
+  color: #ff4d4f;
+}
+
+.record-badge {
+  font-size: 22rpx;
+  color: #000;
+  background: #28e088;
+  padding: 4rpx 16rpx;
+  border-radius: 8rpx;
+}
+
+.load-more {
+  text-align: center;
+  font-size: 24rpx;
+  color: #6b7280;
+  padding: 24rpx;
+}

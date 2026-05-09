@@ -66,6 +66,9 @@ public class RoomWebSocketHandler extends TextWebSocketHandler {
                 case "score_update":
                     handleScoreUpdate(session, json);
                     break;
+                case "ping":
+                    sendMessage(session, createMessage("pong", "ok"));
+                    break;
                 default:
                     sendMessage(session, createMessage("error", "未知消息类型"));
             }

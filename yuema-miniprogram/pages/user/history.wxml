@@ -1,0 +1,47 @@
+<page-meta root-background-color="#08090A" background-color="#08090A" background-color-bottom="#08090A" background-text-style="light" />
+<view class="container history-page">
+  <view class="stats-card card">
+    <view class="stats-row">
+      <view class="stats-cell">
+        <text class="stats-num">{{stats.totalGames}}</text>
+        <text class="stats-label">总局数</text>
+      </view>
+      <view class="stats-cell">
+        <text class="stats-num">{{stats.winGames}}</text>
+        <text class="stats-label">胜局</text>
+      </view>
+      <view class="stats-cell">
+        <text class="stats-num">{{stats.winRate}}%</text>
+        <text class="stats-label">胜率</text>
+      </view>
+      <view class="stats-cell">
+        <text class="stats-num {{stats.score >= 0 ? 'win' : 'lose'}}">{{stats.score > 0 ? '+' : ''}}{{stats.score}}</text>
+        <text class="stats-label">累计分</text>
+      </view>
+    </view>
+  </view>
+
+  <view class="section-title">对局记录</view>
+
+  <view wx:if="{{records.length === 0 && !loading}}" class="empty-tip">暂无战绩，结束牌局后会记入此处</view>
+
+  <view class="record-card card" wx:for="{{records}}" wx:key="id">
+    <view class="record-top">
+      <text class="record-game">{{gameTypeMap[item.gameType] || item.gameType || '麻将'}}</text>
+      <text class="record-time">{{item.endedAtShort}}</text>
+    </view>
+    <view class="record-meta">
+      <text wx:if="{{item.venueName}}">{{item.venueName}} · </text>
+      <text>{{item.rounds || 0}} 局</text>
+    </view>
+    <view class="record-bottom">
+      <text class="record-score {{item.finalScore >= 0 ? 'win' : 'lose'}}">
+        {{item.finalScore > 0 ? '+' : ''}}{{item.finalScore}} 分
+      </text>
+      <text class="record-badge" wx:if="{{item.isWinner === 1}}">胜</text>
+    </view>
+  </view>
+
+  <view class="load-more" wx:if="{{loading}}">加载中…</view>
+  <view class="load-more" wx:if="{{!loading && current >= pages && records.length > 0}}">没有更多了</view>
+</view>

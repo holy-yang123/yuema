@@ -51,8 +51,8 @@ public class RoomController {
     }
 
     @PostMapping("/join")
-    public Result<Void> joinRoom(@RequestAttribute Long userId,
-                                  @RequestBody @Validated JoinRoomDTO dto) {
+    public Result<Map<String, Object>> joinRoom(@RequestAttribute Long userId,
+                                                 @RequestBody @Validated JoinRoomDTO dto) {
         String roomNo = dto.getRoomNo();
         Room room = roomService.getByRoomNo(roomNo);
         if (room == null) {
@@ -64,7 +64,9 @@ public class RoomController {
             return Result.error("加入房间失败，可能房间已满或已结束");
         }
 
-        return Result.success();
+        Map<String, Object> data = new HashMap<>();
+        data.put("roomId", room.getId());
+        return Result.success(data);
     }
 
     @GetMapping("/info")

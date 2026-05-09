@@ -122,17 +122,40 @@ Page({
     });
   },
 
+  parseRoomNoFromScan(raw) {
+    if (!raw || typeof raw !== 'string') {
+      return '';
+    }
+    const s = raw.trim();
+    const m = s.match(/(?:\?|&)scene=([^&]+)/i);
+    if (m) {
+      try {
+        return decodeURIComponent(m[1]);
+      } catch (e) {
+        return m[1];
+      }
+    }
+    if (/^\d{6}$/.test(s)) {
+      return s;
+    }
+    return '';
+  },
+
   // 加入牌局（扫码或输入房间号）
   joinRoom() {
     wx.showActionSheet({
       itemList: ['扫码加入', '输入房间号'],
       success: (res) => {
         if (res.tapIndex === 0) {
-          // 扫码
           wx.scanCode({
             success: (result) => {
-              // 解析二维码中的房间号
-              console.log('扫码结果:', result);
+              const raw = result.result || result.path || '';
+              const roomNo = this.parseRoomNoFromScan(raw);
+              if (roomNo) {
+                this.doJoinRoom(roomNo);
+              } else {
+                wx.showToast({ title: '未识别到房间号', icon: 'none' });
+              }
             }
           });
         } else {
@@ -155,12 +178,18 @@ Page({
   // 执行加入牌局
   async doJoinRoom(roomNo) {
     try {
-      await roomService.joinRoom(roomNo);
+      const res = await roomService.joinRoom(roomNo);
       wx.showToast({
         title: '加入成功',
         icon: 'success'
       });
       this.loadData();
+      const roomId = res.data && res.data.roomId;
+      if (roomId) {
+        wx.navigateTo({
+          url: `/pages/room/detail?id=${roomId}`
+        });
+      }
     } catch (err) {
       wx.showToast({
         title: err.message || '加入失败',

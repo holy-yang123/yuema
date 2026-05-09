@@ -79,12 +79,56 @@
     </view>
   </view>
 
+  <view class="locked-tip" wx:if="{{roundLocked}}">
+    <text wx:if="{{isOwner}}">本局已有分数。修改需其他玩家全部同意。</text>
+    <text wx:else>本局已有分数，仅房主可申请修改。</text>
+  </view>
+
+  <view class="modify-entry" wx:if="{{roundLocked && isOwner}}">
+    <button class="btn btn-secondary" bindtap="openModifyModal">发起修改本局分数</button>
+  </view>
+
   <!-- 提交按钮 -->
   <view class="submit-area safe-bottom">
-    <button class="btn btn-primary submit-btn {{totalScore !== 0 ? 'disabled' : ''}}" 
+    <button class="btn btn-primary submit-btn {{totalScore !== 0 || roundLocked ? 'disabled' : ''}}" 
             bindtap="submitScore"
-            disabled="{{totalScore !== 0 || submitting}}">
+            disabled="{{totalScore !== 0 || submitting || roundLocked}}">
       {{submitting ? '提交中...' : '确认记录'}}
     </button>
+  </view>
+
+  <view class="modify-modal-mask" wx:if="{{showModifyModal}}" catchtap="closeModifyModal"></view>
+  <view class="modify-modal" wx:if="{{showModifyModal}}">
+    <text class="modify-modal-title">修改第 {{roundNo}} 局（提交后他人投票）</text>
+    <view class="player-score-list">
+      <view class="player-score-item" wx:for="{{modifyPlayers}}" wx:key="userId">
+        <view class="player-score-left">
+          <view class="player-score-avatar">
+            <image src="{{item.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"/>
+          </view>
+          <text class="player-score-name">{{item.nickname}}</text>
+        </view>
+        <view class="player-score-right">
+          <view class="score-toggle {{item.score >= 0 ? 'toggle-positive' : 'toggle-negative'}}" 
+                data-index="{{index}}" bindtap="toggleModifySign">
+            {{item.score >= 0 ? '+' : '-'}}
+          </view>
+          <input class="score-value-input" 
+                 type="number" 
+                 value="{{item.score === 0 ? '' : Math.abs(item.score)}}"
+                 placeholder="0"
+                 placeholder-style="color: rgba(255,255,255,0.2)"
+                 data-index="{{index}}"
+                 bindinput="onModifyScoreInput"/>
+        </view>
+      </view>
+    </view>
+    <view class="validation-bar {{modifyTotal === 0 ? 'valid' : 'invalid'}}">
+      <text class="validation-text">总和须为 0，当前 {{modifyTotal > 0 ? '+' : ''}}{{modifyTotal}}</text>
+    </view>
+    <view class="modify-modal-actions">
+      <button class="btn btn-secondary" bindtap="closeModifyModal">取消</button>
+      <button class="btn btn-primary" bindtap="submitModify" disabled="{{modifyTotal !== 0 || submitting}}">提交申请</button>
+    </view>
   </view>
 </view>

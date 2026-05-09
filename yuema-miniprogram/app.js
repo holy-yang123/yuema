@@ -7,26 +7,75 @@
  * 真机扫码预览仍会校验 → 会出现请求失败、Network 里 Provisional headers、库里 avatar_url 仍为 NULL。
  * 真机联调可用：HTTPS 隧道/ngrok、部署到有证书域名，或使用开发者工具「真机调试」走调试通道。
  */
+const roomService = require('./services/roomService');
+
 App({
   globalData: {
     userInfo: null,
     token: null,
     location: null, // {longitude, latitude}
     address: '', // 地址描述
+    /** 小程序码 scene / 扫码待加入的房间号 */
+    pendingJoinRoomNo: null,
     // 本机调试改为当前电脑的局域网 IP；真机请改为可 HTTPS 访问的后端域名并在公众平台配置服务器域名
     apiBaseUrl: 'http://192.168.1.140:8080/api'
   },
 
-  onLaunch() {
+  onLaunch(options) {
+    const q = (options && options.query) || {};
+    const scene = q.scene != null ? String(q.scene) : '';
+    const directNo = q.roomNo != null ? String(q.roomNo) : '';
+    let roomNo = directNo;
+    if (!roomNo && scene) {
+      try {
+        roomNo = decodeURIComponent(scene);
+      } catch (e) {
+        roomNo = scene;
+      }
+    }
+    if (roomNo) {
+      this.globalData.pendingJoinRoomNo = roomNo.trim();
+    }
+
     // 检查登录状态
     const token = wx.getStorageSync('token');
     if (token) {
       this.globalData.token = token;
-      this.getUserInfo();
+      this.getUserInfo().finally(() => {
+        this.tryConsumePendingJoin();
+      });
+    } else {
+      this.tryConsumePendingJoin();
     }
 
     // 获取位置信息
     this.updateLocation();
+  },
+
+  /** 登录成功后或启动时已有 token：消费待加入房间 */
+  tryConsumePendingJoin() {
+    const no = this.globalData.pendingJoinRoomNo;
+    if (!no || !this.globalData.token) {
+      return Promise.resolve();
+    }
+    this.globalData.pendingJoinRoomNo = null;
+    return roomService
+      .joinRoom(no)
+      .then((res) => {
+        const roomId = res.data && res.data.roomId;
+        if (roomId) {
+          wx.navigateTo({
+            url: `/pages/room/detail?id=${roomId}`
+          });
+        }
+      })
+      .catch((err) => {
+        console.error('pending join', err);
+        wx.showToast({
+          title: (err && err.message) || '加入牌局失败',
+          icon: 'none'
+        });
+      });
   },
 
   // 更新位置信息
@@ -146,6 +195,7 @@ App({
                 this.globalData.token = data.token;
                 this.globalData.userInfo = data;
                 wx.setStorageSync('token', data.token);
+                this.tryConsumePendingJoin();
                 resolve(data);
               } else if (result.data.code === 404) {
                 resolve({ needProfile: true });

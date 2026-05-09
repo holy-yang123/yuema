@@ -14,5 +14,13 @@ module.exports = {
   // 更新用户信息
   updateUserInfo(data) {
     return request.put('/user/info', data);
+  },
+
+  getStats() {
+    return request.get('/user/stats');
+  },
+
+  getGameRecords(current = 1, size = 20) {
+    return request.get('/user/game-records', { current, size });
   }
 };

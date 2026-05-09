@@ -8,7 +8,8 @@
     "pages/score/history",
     "pages/venue/list",
     "pages/venue/detail",
-    "pages/user/index"
+    "pages/user/index",
+    "pages/user/history"
   ],
   "window": {
     "backgroundTextStyle": "light",

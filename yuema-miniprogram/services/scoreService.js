@@ -52,5 +52,21 @@ module.exports = {
   // 获取结算信息
   getSettlement(roomId) {
     return request.get('/score/settlement', { roomId });
+  },
+
+  modifyRequest(data) {
+    return request.post('/score/modify-request', data);
+  },
+
+  modifyVote(requestId, vote) {
+    return request.post('/score/modify-vote', { requestId, vote });
+  },
+
+  modifyCancel(requestId) {
+    return request.post('/score/modify-cancel', { requestId });
+  },
+
+  modifyPending(roomId) {
+    return request.get('/score/modify-pending', { roomId });
   }
 };

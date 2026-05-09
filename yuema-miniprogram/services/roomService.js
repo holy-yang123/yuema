@@ -26,13 +26,31 @@ module.exports = {
     return request.get('/room/my');
   },
 
-  // 开始牌局
+  // 开始牌局（query 便于后端 @RequestParam 绑定）
   startRoom(roomId) {
-    return request.post('/room/start', { roomId });
+    return request.post(`/room/start?roomId=${encodeURIComponent(roomId)}`, {});
   },
 
   // 结束牌局
   endRoom(roomId) {
-    return request.post('/room/end', { roomId });
+    return request.post(`/room/end?roomId=${encodeURIComponent(roomId)}`, {});
+  },
+
+  leaveRoom(roomId) {
+    return request.post(`/room/leave?roomId=${encodeURIComponent(roomId)}`, {});
+  },
+
+  kickMember(roomId, targetUserId) {
+    const q = `roomId=${encodeURIComponent(roomId)}&targetUserId=${encodeURIComponent(targetUserId)}`;
+    return request.post(`/room/kick?${q}`, {});
+  },
+
+  transferRoom(roomId, newOwnerId) {
+    const q = `roomId=${encodeURIComponent(roomId)}&newOwnerId=${encodeURIComponent(newOwnerId)}`;
+    return request.post(`/room/transfer?${q}`, {});
+  },
+
+  getRoomQrCode(roomId) {
+    return request.get('/room/qrcode', { roomId });
   }
 };

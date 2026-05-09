@@ -1,5 +1,5 @@
 <page-meta root-background-color="#08090A" background-color="#08090A" background-color-bottom="#08090A" background-text-style="light" />
-<view class="container">
+<view class="container detail-page">
   <!-- 房间信息 -->
   <view class="room-header-card">
     <view class="room-header-top">
@@ -29,6 +29,30 @@
     </view>
   </view>
 
+  <!-- 计分修改待投票 -->
+  <view class="card modify-banner" wx:if="{{showModifySheet && modifyPending}}">
+    <view class="card-title flex-between">
+      <text>分数修改确认</text>
+      <text class="modify-round-tag">第 {{modifyPending.roundNo}} 局</text>
+    </view>
+    <text class="modify-hint">新房主发起修改，需其他玩家全部同意</text>
+    <view class="modify-score-rows">
+      <view class="modify-score-row" wx:for="{{modifyPlayerScores}}" wx:key="userId">
+        <text>{{item.displayName}}</text>
+        <text class="modify-sc {{item.scoreChange >= 0 ? 'pos' : 'neg'}}">{{item.scoreChange > 0 ? '+' : ''}}{{item.scoreChange}}</text>
+      </view>
+    </view>
+    <text class="modify-vote-meta" wx:if="{{modifyRequiredVotes > 0}}">同意 {{modifyVotes.length}} / {{modifyRequiredVotes}}</text>
+    <view class="modify-actions" wx:if="{{modifyIsRequester}}">
+      <button class="btn btn-secondary btn-sm" bindtap="cancelModify">撤销申请</button>
+    </view>
+    <view class="modify-actions" wx:if="{{modifyCanVote && !modifyHasVoted}}">
+      <button class="btn btn-primary btn-sm" data-vote="1" bindtap="voteModify">同意</button>
+      <button class="btn btn-secondary btn-sm danger-outline" data-vote="2" bindtap="voteModify">拒绝</button>
+    </view>
+    <text class="modify-voted" wx:if="{{modifyCanVote && modifyHasVoted}}">你已投票</text>
+  </view>
+
   <!-- 成员列表 -->
   <view class="card">
     <view class="card-title">
@@ -36,7 +60,7 @@
       <text class="card-title-badge">{{members.length}}/{{room.maxPlayers}}</text>
     </view>
     <view class="member-list">
-      <view class="member-item" wx:for="{{members}}" wx:key="userId">
+      <view class="member-item" wx:for="{{members}}" wx:key="userId" bindlongpress="onMemberLongPress" data-user-id="{{item.userId}}" data-nickname="{{item.nickname}}" data-role="{{item.role}}">
         <view class="member-avatar-wrap">
           <image class="member-avatar" src="{{item.avatarUrl || '/images/default-avatar.png'}}" mode="aspectFill"/>
           <text class="seat-badge">{{item.seatNo}}</text>
@@ -53,6 +77,7 @@
         <text class="member-info empty-info">等待加入</text>
       </view>
     </view>
+    <text class="member-hint">长按成员可进行离开 / 踢人 / 转让</text>
   </view>
 
   <!-- 计分区域 -->
@@ -93,10 +118,47 @@
   <!-- 操作按钮 -->
   <view class="action-bar safe-bottom" wx:if="{{room.status === 0}}">
     <button class="btn btn-secondary action-btn" open-type="share">邀请好友</button>
+    <button class="btn btn-secondary action-btn" bindtap="openInvite">小程序码</button>
     <button class="btn btn-primary action-btn" wx:if="{{isOwner}}" bindtap="startGame">开始牌局</button>
   </view>
 
   <view class="action-bar safe-bottom" wx:if="{{room.status === 1 && isOwner}}">
     <button class="btn btn-danger action-btn-full" bindtap="endGame">结束牌局</button>
+  </view>
+
+  <!-- 侧栏入口：聊天 -->
+  <view class="fab-chat" wx:if="{{room.status !== 2}}" bindtap="toggleChat">
+    <text>聊</text>
+  </view>
+  <view class="fab-invite" wx:if="{{room.status !== 2}}" bindtap="openInvite">
+    <text>邀</text>
+  </view>
+
+  <!-- 聊天抽屉 -->
+  <view class="chat-mask" wx:if="{{chatOpen}}" catchtap="toggleChat"></view>
+  <view class="chat-drawer {{chatOpen ? 'open' : ''}}">
+    <view class="chat-drawer-head">
+      <text class="chat-title">房间聊天</text>
+      <text class="chat-close" bindtap="toggleChat">关闭</text>
+    </view>
+    <scroll-view class="chat-scroll" scroll-y scroll-into-view="{{chatScrollIntoView}}" scroll-with-animation>
+      <view class="chat-msg" id="msg-{{item.id}}" wx:for="{{chatMessages}}" wx:key="id">
+        <text class="chat-msg-meta">{{item.nickname || '系统'}} · {{item.msgType === 'system' ? '提示' : ''}}</text>
+        <text class="chat-msg-body">{{item.content}}</text>
+      </view>
+    </scroll-view>
+    <view class="chat-input-row safe-bottom">
+      <input class="chat-input" value="{{chatInput}}" bindinput="onChatInput" placeholder="说点什么…" confirm-type="send" bindconfirm="sendChat"/>
+      <button class="btn btn-primary chat-send" bindtap="sendChat">发送</button>
+    </view>
+  </view>
+
+  <!-- 邀请二维码 -->
+  <view class="modal-mask" wx:if="{{showInvite}}" catchtap="closeInvite"></view>
+  <view class="invite-panel" wx:if="{{showInvite}}">
+    <text class="invite-title">邀请加入 #{{inviteRoomNo || room.roomNo}}</text>
+    <image class="invite-qr" wx:if="{{qrUrl}}" src="{{qrUrl}}" mode="aspectFit"/>
+    <text class="invite-tip">扫码进入牌局（房间进行中时若已满或未在等待中可能无法加入）</text>
+    <button class="btn btn-secondary" bindtap="closeInvite">关闭</button>
   </view>
 </view>
