@@ -16,9 +16,11 @@ module.exports = Behavior({
     attached() {
       // 订阅 Store 变化
       this._unsubscribeStore = store.subscribe((state) => {
+        const userInfo = state.userInfo || {};
         const patch = {
-          userInfo: state.userInfo || {},
-          isLoggedIn: !!state.token
+          userInfo,
+          isLoggedIn: !!state.token,
+          currentUserId: userInfo.userId ?? userInfo.id ?? null
         };
         
         this.setData(patch);

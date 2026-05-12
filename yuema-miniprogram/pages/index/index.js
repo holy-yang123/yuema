@@ -7,33 +7,27 @@ const { buildRuleCardTags } = require('../../utils/gameRulesDisplay');
 const { attachScheduleDisplay } = require('../../utils/roomScheduleDisplay');
 
 Page({
-  behaviors: [require('../../behaviors/themeBehavior')],
+  behaviors: [
+    require('../../behaviors/themeBehavior'),
+    require('../../behaviors/authBehavior')
+  ],
   data: {
     roomList: [],
     venueList: [],
     loading: false,
-    /** 右上角头像：与 globalData 同步，避免首帧 undefined */
-    userInfo: {},
     address: '', // 当前地址
-    /** 当前用户 id，用于判断是否本人发布的牌局（展示编辑/删除） */
-    currentUserId: null,
+    /** 启用 authBehavior 的强制登录拦截 */
+    requireAuth: true,
     gameTypeMap: { ...GAME_TYPE_LABELS }
   },
 
   onLoad() {
-    this.ensureLoggedIn();
+    // 逻辑已由 behaviors 处理
   },
 
   onShow() {
-    if (!app.globalData.token) {
-      wx.reLaunch({
-        url: LOGIN_PAGE
-      });
-      return;
-    }
     this.setData({
-      address: app.globalData.address || this.data.address,
-      userInfo: app.globalData.userInfo || {}
+      address: app.globalData.address || this.data.address
     });
     this.loadData();
   },
@@ -44,60 +38,63 @@ Page({
     });
   },
 
-  ensureLoggedIn() {
-    if (!app.globalData.token) {
-      wx.reLaunch({
-        url: LOGIN_PAGE
-      });
+  // 加载数据（优化为并发请求并支持预加载）
+  async loadData() {
+    if (this.data.loading) return;
+    this.setData({ loading: true });
+
+    try {
+      // 1. 尝试消费 App.js 的预加载数据 (30秒内有效)
+      const { preloadedData, preloadTimestamp } = app.globalData;
+      const isPreloadValid = preloadedData && (Date.now() - preloadTimestamp < 30000);
+      
+      if (isPreloadValid) {
+        console.log('[Index] Consuming preloaded data');
+        this.applyData(preloadedData.rooms, preloadedData.venues);
+        // 消费后清除，防止重复使用过时数据
+        app.globalData.preloadedData = null;
+        return;
+      }
+
+      // 2. 无缓存时发起并发请求
+      console.log('[Index] No valid preload, fetching fresh data');
+      let loc = app.globalData.location;
+      if (!loc) {
+        loc = await app.updateLocation();
+      }
+
+      const [roomRes, venueRes] = await Promise.all([
+        roomService.getRoomList(loc?.longitude, loc?.latitude),
+        loc 
+          ? venueService.getNearbyVenues(loc.longitude, loc.latitude, 5)
+          : venueService.getVenueList()
+      ]);
+
+      this.applyData(roomRes, venueRes);
+      
+      if (loc && !this.data.address) {
+        this.setData({ address: '获取位置成功' });
+      }
+    } catch (err) {
+      console.error('[Index] Load failed:', err);
+      this.setData({ loading: false });
     }
   },
 
-  // 加载数据（合并 setData，减少列表区多次布局）
-  async loadData() {
-    this.setData({ loading: true });
-    try {
-      let { location } = app.globalData;
-      if (!location) {
-        location = await app.updateLocation();
-      }
+  /** 渲染数据到页面 */
+  applyData(roomRes, venueRes) {
+    const roomList = (roomRes?.data || []).slice(0, 5).map((r) => ({
+      ...attachScheduleDisplay(r),
+      ruleCardTags: buildRuleCardTags(r)
+    }));
+    
+    const venueList = (venueRes?.data || []).slice(0, 5);
 
-      const roomRes = await roomService.getRoomList(
-        location ? location.longitude : null,
-        location ? location.latitude : null
-      );
-      const u = app.globalData.userInfo;
-      const currentUserId = u ? (u.userId != null ? u.userId : u.id) : null;
-      // 预设细则 + customLines，与牌局列表卡片一致
-      const roomList = (roomRes.data || []).slice(0, 5).map((r) => ({
-        ...attachScheduleDisplay(r),
-        ruleCardTags: buildRuleCardTags(r)
-      }));
-
-      let venueList = [];
-      if (location) {
-        const venueRes = await venueService.getNearbyVenues(location.longitude, location.latitude, 5);
-        venueList = venueRes.data || [];
-      } else {
-        const venueRes = await venueService.getVenueList();
-        venueList = (venueRes.data || []).slice(0, 5);
-      }
-
-      const patch = {
-        loading: false,
-        roomList,
-        venueList,
-        currentUserId,
-        // 供首页右上角头像绑定：原先仅用全局变量未 setData，导致占位图路径失效时出现空白方块
-        userInfo: app.globalData.userInfo || {}
-      };
-      if (location && !this.data.address) {
-        patch.address = '获取位置成功';
-      }
-      this.setData(patch);
-    } catch (err) {
-      console.error('加载数据失败:', err);
-      this.setData({ loading: false });
-    }
+    this.setData({
+      roomList,
+      venueList,
+      loading: false
+    });
   },
 
   // 加载附近场地（此方法已合并到 loadData 中，保留为空或删除）
