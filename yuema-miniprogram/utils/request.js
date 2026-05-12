@@ -1,5 +1,6 @@
-// 禁止在模块顶层 getApp()：app.js 会在 App() 执行前 require 本文件，此时 getApp() 为 undefined
 const { clearAuthAndGoLogin, shouldForceRelogin } = require('./authRedirect');
+const store = require('./store');
+const { HTTP_CODE, BUSINESS_CODE } = require('./constants');
 
 /** 将 wx.request 的 data 规范为业务 JSON 对象，避免网关 HTML / 非 JSON 导致读 .code 抛异常 */
 function normalizeResponseData(raw) {
@@ -48,14 +49,14 @@ const request = (options) => {
       data: options.data || {},
       header: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${app.globalData.token || ''}`,
+        'Authorization': `Bearer ${store.state.token || ''}`,
         ...options.header
       },
       success: (res) => {
-        if (res.statusCode === 200) {
+        if (res.statusCode === HTTP_CODE.SUCCESS) {
           const data = normalizeResponseData(res.data);
           // 非 JSON 或缺少业务 code 时拒绝，避免访问 undefined.code 崩溃
-          if (data == null || typeof data.code !== 'number') {
+          if (data?.code == null) {
             wx.showToast({
               title: '服务响应异常',
               icon: 'none'
@@ -63,10 +64,10 @@ const request = (options) => {
             reject(new Error('INVALID_RESPONSE'));
             return;
           }
-          if (data.code === 200 || silentCodes.indexOf(data.code) !== -1) {
+          if (data.code === BUSINESS_CODE.SUCCESS || silentCodes.indexOf(data.code) !== -1) {
             resolve(data);
           } else if (shouldForceRelogin(data)) {
-            // HTTP 200 但业务表示需重新登录（如用户记录已删仍带旧 JWT，接口返回「用户不存在」）
+            // 业务表示需重新登录
             clearAuthAndGoLogin({
               toastTitle: data.message || '请重新登录'
             });
@@ -78,11 +79,11 @@ const request = (options) => {
             });
             reject(data);
           }
-        } else if (res.statusCode === 401) {
-          // 未携带 token / JWT 失效：服务端统一 401
+        } else if (res.statusCode === HTTP_CODE.UNAUTHORIZED) {
+          // 未携带 token / JWT 失效
           const body = normalizeResponseData(res.data);
           clearAuthAndGoLogin({
-            toastTitle: (body && body.message) || '登录已过期'
+            toastTitle: body?.message || '登录已过期'
           });
           reject(res);
         } else {
