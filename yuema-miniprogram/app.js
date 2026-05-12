@@ -206,13 +206,13 @@ App({
         reject('未登录');
         return;
       }
-      wx.uploadFile({
-        url: `${this.globalData.apiBaseUrl}/user/avatar`,
-        filePath: filePath,
-        name: 'file',
-        header: {
-          Authorization: `Bearer ${this.globalData.token}`
-        },
+    wx.uploadFile({
+      url: `${this.globalData.apiBaseUrl}/user/avatar`,
+      filePath: filePath,
+      name: 'file',
+      header: {
+        Authorization: `Bearer ${store.state.token}`
+      },
         success: (res) => {
           const status = res.statusCode;
           let body = res.data;

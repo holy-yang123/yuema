@@ -71,51 +71,63 @@
     </view>
     
     <view class="room-list">
-      <view class="room-card" wx:for="{{roomList}}" wx:key="id" bindtap="goToRoomDetail" data-id="{{item.id}}">
-        <view class="room-card-header">
-          <view class="room-card-left">
-            <text class="room-no-text">#{{item.roomNo}}</text>
-            <text class="room-game-type">{{gameTypeMap[item.gameType]}}</text>
+      <!-- 骨架屏：仅在第一次加载且无数据时展示 -->
+      <block wx:if="{{loading && roomList.length === 0}}">
+        <view class="skeleton-card skeleton-room" wx:for="{{2}}" wx:key="index">
+          <view class="skeleton-shimmer"></view>
+          <view class="skeleton-item" style="width: 40%; height: 40rpx;"></view>
+          <view class="skeleton-item" style="width: 100%; height: 30rpx;"></view>
+          <view class="skeleton-item" style="width: 80%; height: 30rpx;"></view>
+        </view>
+      </block>
+      
+      <block wx:else>
+        <view class="room-card" wx:for="{{roomList}}" wx:key="id" bindtap="goToRoomDetail" data-id="{{item.id}}">
+          <view class="room-card-header">
+            <view class="room-card-left">
+              <text class="room-no-text">#{{item.roomNo}}</text>
+              <text class="room-game-type">{{gameTypeMap[item.gameType]}}</text>
+            </view>
+            <view class="status-pill {{item.status === 0 ? 'status-waiting' : 'status-playing'}}">
+              <view class="status-dot"></view>
+              <text>{{item.status === 0 ? '等待中' : '进行中'}}</text>
+            </view>
           </view>
-          <view class="status-pill {{item.status === 0 ? 'status-waiting' : 'status-playing'}}">
-            <view class="status-dot"></view>
-            <text>{{item.status === 0 ? '等待中' : '进行中'}}</text>
+          <view class="room-card-body">
+            <view class="room-meta-row">
+              <text class="meta-label">人数</text>
+              <text class="meta-value">{{item.currentPlayers}}/{{item.maxPlayers}}</text>
+            </view>
+            <view class="room-meta-row" wx:if="{{item.scheduleDisplayStart}}">
+              <text class="meta-label">开始范围</text>
+              <text class="meta-value">{{item.scheduleDisplayStart}}</text>
+            </view>
+            <view class="room-meta-row" wx:if="{{item.scheduleDisplayDuration}}">
+              <text class="meta-label">预计时长</text>
+              <text class="meta-value">{{item.scheduleDisplayDuration}}</text>
+            </view>
+            <view class="room-meta-row" wx:if="{{item.venueName}}">
+              <text class="meta-label">场地</text>
+              <text class="meta-value venue-name-text">{{item.venueName}}</text>
+            </view>
+            <view class="room-meta-row" wx:if="{{item.remark}}">
+              <text class="meta-label">备注</text>
+              <text class="meta-value room-card-remark">{{item.remark}}</text>
+            </view>
+            <!-- 与详情页「本场约定」一致：含四川加底/加番单选结果 -->
+            <view class="room-rule-tags" wx:if="{{item.ruleCardTags && item.ruleCardTags.length}}">
+              <text class="room-rule-tag" wx:for="{{item.ruleCardTags}}" wx:for-item="tag" wx:key="key">{{tag.label}}</text>
+            </view>
+          </view>
+          <view class="room-card-footer">
+            <block wx:if="{{currentUserId && item.creatorId === currentUserId && item.status === 0}}">
+              <button class="room-secondary-btn" size="mini" catchtap="goEditRoom" data-id="{{item.id}}">编辑</button>
+              <button class="room-danger-btn" size="mini" catchtap="confirmDeleteRoom" data-id="{{item.id}}">删除</button>
+            </block>
+            <button wx:else class="room-join-btn" size="mini" catchtap="quickJoin" data-id="{{item.id}}">加入</button>
           </view>
         </view>
-        <view class="room-card-body">
-          <view class="room-meta-row">
-            <text class="meta-label">人数</text>
-            <text class="meta-value">{{item.currentPlayers}}/{{item.maxPlayers}}</text>
-          </view>
-          <view class="room-meta-row" wx:if="{{item.scheduleDisplayStart}}">
-            <text class="meta-label">开始范围</text>
-            <text class="meta-value">{{item.scheduleDisplayStart}}</text>
-          </view>
-          <view class="room-meta-row" wx:if="{{item.scheduleDisplayDuration}}">
-            <text class="meta-label">预计时长</text>
-            <text class="meta-value">{{item.scheduleDisplayDuration}}</text>
-          </view>
-          <view class="room-meta-row" wx:if="{{item.venueName}}">
-            <text class="meta-label">场地</text>
-            <text class="meta-value venue-name-text">{{item.venueName}}</text>
-          </view>
-          <view class="room-meta-row" wx:if="{{item.remark}}">
-            <text class="meta-label">备注</text>
-            <text class="meta-value room-card-remark">{{item.remark}}</text>
-          </view>
-          <!-- 与详情页「本场约定」一致：含四川加底/加番单选结果 -->
-          <view class="room-rule-tags" wx:if="{{item.ruleCardTags && item.ruleCardTags.length}}">
-            <text class="room-rule-tag" wx:for="{{item.ruleCardTags}}" wx:for-item="tag" wx:key="key">{{tag.label}}</text>
-          </view>
-        </view>
-        <view class="room-card-footer">
-          <block wx:if="{{currentUserId && item.creatorId === currentUserId && item.status === 0}}">
-            <button class="room-secondary-btn" size="mini" catchtap="goEditRoom" data-id="{{item.id}}">编辑</button>
-            <button class="room-danger-btn" size="mini" catchtap="confirmDeleteRoom" data-id="{{item.id}}">删除</button>
-          </block>
-          <button wx:else class="room-join-btn" size="mini" catchtap="quickJoin" data-id="{{item.id}}">加入</button>
-        </view>
-      </view>
+      </block>
     </view>
 
     <view class="empty-state" wx:if="{{roomList.length === 0 && !loading}}">
@@ -133,19 +145,34 @@
     </view>
     
     <view class="venue-list">
-      <view class="venue-card" wx:for="{{venueList}}" wx:key="id" bindtap="goToVenueDetail" data-id="{{item.id}}">
-        <view class="venue-card-image">
-          <image src="{{item.imageUrls || '/images/default-venue.png'}}" mode="aspectFill"/>
-        </view>
-        <view class="venue-card-info">
-          <text class="venue-card-name">{{item.name}}</text>
-          <view class="venue-card-meta">
-            <text class="venue-rating">{{item.rating}} ⭐</text>
-            <text class="venue-price">¥{{item.minPrice/100}}/h</text>
+      <!-- 骨架屏 -->
+      <block wx:if="{{loading && venueList.length === 0}}">
+        <view class="skeleton-card skeleton-venue" wx:for="{{2}}" wx:key="index">
+          <view class="skeleton-shimmer"></view>
+          <view class="skeleton-item" style="width: 180rpx; height: 180rpx;"></view>
+          <view style="flex: 1; padding: 28rpx; display: flex; flex-direction: column; gap: 16rpx;">
+            <view class="skeleton-item" style="width: 60%; height: 32rpx;"></view>
+            <view class="skeleton-item" style="width: 40%; height: 24rpx;"></view>
+            <view class="skeleton-item" style="width: 100%; height: 24rpx;"></view>
           </view>
-          <text class="venue-card-address">{{item.address}}</text>
         </view>
-      </view>
+      </block>
+
+      <block wx:else>
+        <view class="venue-card" wx:for="{{venueList}}" wx:key="id" bindtap="goToVenueDetail" data-id="{{item.id}}">
+          <view class="venue-card-image">
+            <image src="{{item.imageUrls || '/images/default-venue.png'}}" mode="aspectFill"/>
+          </view>
+          <view class="venue-card-info">
+            <text class="venue-card-name">{{item.name}}</text>
+            <view class="venue-card-meta">
+              <text class="venue-rating">{{item.rating}} ⭐</text>
+              <text class="venue-price">¥{{item.minPrice/100}}/h</text>
+            </view>
+            <text class="venue-card-address">{{item.address}}</text>
+          </view>
+        </view>
+      </block>
     </view>
   </view>
 </view>
