@@ -12,11 +12,26 @@ class Store {
   }
 
   /**
-   * 更新状态并通知所有订阅者
+   * 更新状态并通知所有订阅者，同时同步到 app.globalData 以兼容旧代码
    * @param {Object} patch 状态补丁
    */
   setState(patch) {
     this.state = { ...this.state, ...patch };
+    
+    // 同步回 globalData 以兼容尚未重构的旧页面
+    try {
+      const app = typeof getApp === 'function' ? getApp() : null;
+      if (app && app.globalData) {
+        Object.keys(patch).forEach(key => {
+          if (key in app.globalData) {
+            app.globalData[key] = patch[key];
+          }
+        });
+      }
+    } catch (e) {
+      // 忽略 App 未就绪时的错误
+    }
+
     this.notify();
   }
 

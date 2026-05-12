@@ -11,8 +11,14 @@ function maskPhone(phone) {
   return `${s.slice(0, 3)}****${s.slice(-4)}`;
 }
 
+const store = require('../../utils/store');
+const authBehavior = require('../../behaviors/authBehavior');
+
 Page({
-  behaviors: [require('../../behaviors/themeBehavior')],
+  behaviors: [
+    require('../../behaviors/themeBehavior'),
+    authBehavior
+  ],
   data: {
     userInfo: {},
     winRate: 0,
@@ -37,6 +43,13 @@ Page({
     tempAvatarUrl: ''
   },
 
+  observers: {
+    'userInfo': function(userInfo) {
+      if (!userInfo || !userInfo.id) return;
+      this.applyUserInfoDerivedData(userInfo);
+    }
+  },
+
   onLoad(options) {
     const q = options || {};
     if (q.needProfile === '1') {
@@ -53,11 +66,12 @@ Page({
         }
       }, 400);
     }
-    this.loadUserInfo();
   },
 
   onShow() {
-    this.loadUserInfo();
+    if (this.data.isLoggedIn) {
+      app.getUserInfo(); // 自动更新 store，进而触发 observer
+    }
   },
 
   /** 个人中心开关：持久化并刷新壳层与本页主题容器（见 utils/theme.js） */
@@ -68,36 +82,41 @@ Page({
     this.setData(themeUtil.getThemeUIData(mode));
   },
 
-  // 加载用户信息
+  /** 计算用户信息相关的衍生展示数据 */
+  applyUserInfoDerivedData(userInfo) {
+    // 计算胜率
+    const winRate = userInfo.totalGames > 0 
+      ? Math.round((userInfo.winGames / userInfo.totalGames) * 100) 
+      : 0;
+    
+    // 等级名称
+    const levelNames = ['雀士', '雀杰', '雀豪', '雀圣', '雀神'];
+    const lv = Number(userInfo.level);
+    const safeLevel = Number.isFinite(lv) ? lv : 1;
+    const levelIdx = Math.min(Math.max(safeLevel - 1, 0), 4);
+    const levelName = levelNames[levelIdx] || '雀士';
+
+    // 绑定手机菜单状态
+    const phoneMenuStatus = userInfo.phone ? maskPhone(userInfo.phone) : '未绑定';
+
+    const rep = userInfo.reputationScore != null ? userInfo.reputationScore : 100;
+    const verified = userInfo.realnameVerified === 1;
+    const trustSummary = {
+      reputation: rep,
+      verified,
+      realnameText: verified ? '已微信核验' : '未实名核验'
+    };
+
+    this.setData({
+      winRate,
+      levelName,
+      phoneMenuStatus,
+      trustSummary
+    });
+  },
+
+  // 加载用户信息 (改为调用 App 封装的同步方法)
   async loadUserInfo() {
-    if (!app.globalData.token) {
-      return;
-    }
-    try {
-      const res = await userService.getUserInfo();
-      const userInfo = res.data;
-      
-      // 计算胜率
-      const winRate = userInfo.totalGames > 0 
-        ? Math.round((userInfo.winGames / userInfo.totalGames) * 100) 
-        : 0;
-      
-      // 等级名称：后端 level 缺失或非数字时避免 NaN 下标
-      const levelNames = ['雀士', '雀杰', '雀豪', '雀圣', '雀神'];
-      const lv = Number(userInfo.level);
-      const safeLevel = Number.isFinite(lv) ? lv : 1;
-      const levelIdx = Math.min(Math.max(safeLevel - 1, 0), 4);
-      const levelName = levelNames[levelIdx] || '雀士';
-
-      // 绑定手机菜单状态：已绑定时展示脱敏号码，便于辨认当前账号
-      const phoneMenuStatus = userInfo.phone ? maskPhone(userInfo.phone) : '未绑定';
-
-      const rep = userInfo.reputationScore != null ? userInfo.reputationScore : 100;
-      const verified = userInfo.realnameVerified === 1;
-      const trustSummary = {
-        reputation: rep,
-        verified,
-        realnameText: verified ? '已微信核验' : '未实名核验'
       };
 
       this.setData({
@@ -117,7 +136,7 @@ Page({
 
   // 我的牌局：须登录后再请求 /room/my，否则 401 会整页踢回登录栈
   goToMyRooms() {
-    if (!app.globalData.token) {
+    if (!this.data.isLoggedIn) {
       wx.showToast({ title: '请先登录', icon: 'none' });
       return;
     }
@@ -128,7 +147,7 @@ Page({
 
   // 历史战绩
   goToHistory() {
-    if (!app.globalData.token) {
+    if (!this.data.isLoggedIn) {
       wx.showToast({ title: '请先登录', icon: 'none' });
       return;
     }
@@ -157,7 +176,7 @@ Page({
 
   // 编辑资料：弹窗内同时改昵称与头像（头像为新选的本地临时文件时再上传）
   editProfile() {
-    if (!app.globalData.token) {
+    if (!this.data.isLoggedIn) {
       wx.showToast({ title: '请先登录', icon: 'none' });
       return;
     }
@@ -222,7 +241,7 @@ Page({
   },
 
   openWxRealnameModal() {
-    if (!app.globalData.token) {
+    if (!this.data.isLoggedIn) {
       wx.showToast({ title: '请先登录', icon: 'none' });
       return;
     }
@@ -288,7 +307,7 @@ Page({
 
   // 绑定手机；已绑定则二次确认后再走换绑输入
   bindPhone() {
-    if (!app.globalData.token) {
+    if (!this.data.isLoggedIn) {
       wx.showToast({ title: '请先登录', icon: 'none' });
       return;
     }
@@ -353,16 +372,17 @@ Page({
       success: (res) => {
         if (res.confirm) {
           wx.removeStorageSync('token');
-          app.globalData.token = null;
-          app.globalData.userInfo = null;
+          store.setState({ 
+            token: null,
+            userInfo: null
+          });
+          // 重置本地页面数据（衍生数据由 observer 自动处理或手动清空）
           this.setData({
-            userInfo: {},
             winRate: 0,
             levelName: '雀士',
             phoneMenuStatus: '未绑定',
             trustSummary: { reputation: 100, verified: false, realnameText: '未实名核验' }
           });
-          // 不再强制跳转，让用户留在个人中心看到登录按钮
           wx.showToast({ title: '已退出登录', icon: 'none' });
         }
       }

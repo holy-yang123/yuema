@@ -99,7 +99,7 @@ App({
   /** 登录成功后或启动时已有 token：消费待加入房间 */
   tryConsumePendingJoin() {
     const no = this.globalData.pendingJoinRoomNo;
-    if (!no || !this.globalData.token) {
+    if (!no || !store.state.token) {
       return Promise.resolve();
     }
     this.globalData.pendingJoinRoomNo = null;
@@ -202,7 +202,7 @@ App({
    */
   uploadAvatar(filePath) {
     return new Promise((resolve, reject) => {
-      if (!this.globalData.token) {
+      if (!store.state.token) {
         reject('未登录');
         return;
       }
@@ -240,8 +240,10 @@ App({
             return;
           }
           if (body.code === 200 && body.data && body.data.avatarUrl) {
-            if (this.globalData.userInfo) {
-              this.globalData.userInfo.avatarUrl = body.data.avatarUrl;
+            if (store.state.userInfo) {
+              store.setState({
+                userInfo: { ...store.state.userInfo, avatarUrl: body.data.avatarUrl }
+              });
             }
             resolve(body.data);
           } else {
@@ -311,7 +313,7 @@ App({
 
   // 检查登录
   checkLogin() {
-    if (!this.globalData.token) {
+    if (!store.state.token) {
       wx.reLaunch({
         url: LOGIN_PAGE
       });

@@ -27,11 +27,11 @@ function clearAuthAndGoLogin(options) {
     // 存储异常不影响跳转
   }
 
-  const app = typeof getApp === 'function' ? getApp() : null;
-  if (app && app.globalData) {
-    app.globalData.token = null;
-    app.globalData.userInfo = null;
-  }
+  const store = require('./store');
+  store.setState({
+    token: null,
+    userInfo: null
+  });
 
   if (showToast && toastTitle) {
     wx.showToast({ title: toastTitle, icon: 'none' });
