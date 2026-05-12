@@ -8,10 +8,12 @@
  * 真机联调可用：HTTPS 隧道/ngrok、部署到有证书域名，或使用开发者工具「真机调试」走调试通道。
  */
 const roomService = require('./services/roomService');
+const venueService = require('./services/venueService');
+const store = require('./utils/store');
 const { LOGIN_PAGE } = require('./utils/pageRoutes');
 const { clearAuthAndGoLogin, shouldForceRelogin } = require('./utils/authRedirect');
+const { BUSINESS_CODE } = require('./utils/constants');
 const theme = require('./utils/theme');
-// 与 utils/request 统一：401、非 JSON、业务需重登等路径一致，避免双轨维护
 const http = require('./utils/request');
 
 App({
@@ -25,7 +27,11 @@ App({
     // 本机调试改为当前电脑的局域网 IP；真机请改为可 HTTPS 访问的后端域名并在公众平台配置服务器域名
     apiBaseUrl: 'http://192.168.1.140:8080/api',
     /** 与 wx.getStorageSync(yuema_theme_mode) 同步，供界面读取 */
-    themeMode: 'light'
+    themeMode: 'light',
+    /** 首页预加载数据缓存 */
+    preloadedData: null,
+    /** 预加载时间戳，用于判断时效性 */
+    preloadTimestamp: 0
   },
 
   onLaunch(options) {
@@ -71,9 +77,11 @@ App({
     // 检查登录状态
     const token = wx.getStorageSync('token');
     if (token) {
-      this.globalData.token = token;
+      store.setState({ token });
       this.getUserInfo().finally(() => {
         this.tryConsumePendingJoin();
+        // 登录完成后，且已有地理位置或尝试更新后，预加载首页数据
+        this.preloadIndexData();
       });
     } else {
       this.tryConsumePendingJoin();
@@ -121,19 +129,50 @@ App({
       wx.getLocation({
         type: 'gcj02',
         success: (res) => {
-          this.globalData.location = {
+          const loc = {
             longitude: res.longitude,
             latitude: res.latitude
           };
-          resolve(this.globalData.location);
+          this.globalData.location = loc;
+          resolve(loc);
         },
         fail: (err) => {
-          // 如果获取失败且没有历史位置，尝试让用户手动选
           console.error('获取位置失败:', err);
           resolve(null);
         }
       });
     });
+  },
+
+  /**
+   * 预加载首页数据
+   * 包含牌局列表和附近的场地
+   */
+  async preloadIndexData() {
+    try {
+      console.log('[App] Preloading index data...');
+      let loc = this.globalData.location;
+      if (!loc) {
+        loc = await this.updateLocation();
+      }
+
+      // 并发请求
+      const [roomRes, venueRes] = await Promise.all([
+        roomService.getRoomList(loc?.longitude, loc?.latitude),
+        loc 
+          ? venueService.getNearbyVenues(loc.longitude, loc.latitude, 5)
+          : venueService.getVenueList()
+      ]);
+
+      this.globalData.preloadedData = {
+        rooms: roomRes,
+        venues: venueRes
+      };
+      this.globalData.preloadTimestamp = Date.now();
+      console.log('[App] Index data preloaded ok');
+    } catch (e) {
+      console.error('[App] Preload failed:', e);
+    }
   },
 
   /**
@@ -237,14 +276,17 @@ App({
               { silentBusinessCodes: [404] }
             )
             .then((body) => {
-              if (body.code === 200) {
+              if (body.code === BUSINESS_CODE.SUCCESS) {
                 const data = body.data;
-                this.globalData.token = data.token;
-                this.globalData.userInfo = data;
+                store.setState({ 
+                  token: data.token,
+                  userInfo: data
+                });
                 wx.setStorageSync('token', data.token);
                 this.tryConsumePendingJoin();
+                this.preloadIndexData(); // 登录后预加载
                 resolve(data);
-              } else if (body.code === 404) {
+              } else if (body.code === BUSINESS_CODE.NEED_PROFILE) {
                 resolve({ needProfile: true });
               } else {
                 reject(body.message || '登录失败');
@@ -262,7 +304,7 @@ App({
   // 获取用户信息（走封装请求；401 / 需重登 已由 request 内 clearAuthAndGoLogin）
   getUserInfo() {
     return http.get('/user/info').then((body) => {
-      this.globalData.userInfo = body.data;
+      store.setState({ userInfo: body.data });
       return body.data;
     });
   },
