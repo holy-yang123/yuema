@@ -95,6 +95,12 @@ public class UserController {
         data.put("nickname", user.getNickname());
         data.put("avatarUrl", user.getAvatarUrl());
         data.put("level", user.getLevel());
+        // 与 GET /user/info 对齐：登录后首屏「我的」即展示手机号/战绩/信誉等，避免仅依赖后续拉取且前端 observer 未触发时长期显示「未绑定」
+        data.put("phone", user.getPhone());
+        data.put("totalGames", user.getTotalGames());
+        data.put("winGames", user.getWinGames());
+        data.put("reputationScore", user.getReputationScore());
+        data.put("realnameVerified", user.getRealnameVerified());
 
         return Result.success(data);
     }

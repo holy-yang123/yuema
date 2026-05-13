@@ -180,7 +180,8 @@
       <text class="chat-title">房间聊天</text>
       <text class="chat-close" bindtap="toggleChat">关闭</text>
     </view>
-    <scroll-view class="chat-scroll" scroll-y scroll-into-view="{{chatScrollIntoView}}" scroll-with-animation>
+    <!-- enhanced：WebView 下隐藏滚动条须与 show-scrollbar 同开 enhanced -->
+    <scroll-view class="chat-scroll" scroll-y enhanced="{{true}}" show-scrollbar="{{false}}" scroll-into-view="{{chatScrollIntoView}}" scroll-with-animation>
       <view class="chat-msg" id="msg-{{item.id}}" wx:for="{{chatMessages}}" wx:key="id">
         <text class="chat-msg-meta">{{item.nickname || '系统'}} · {{item.msgType === 'system' ? '提示' : ''}}</text>
         <text class="chat-msg-body">{{item.content}}</text>

@@ -1,4 +1,7 @@
 <page-meta root-background-color="{{themeMeta.rootBg}}" background-color="{{themeMeta.bg}}" background-color-bottom="{{themeMeta.bgBottom}}" background-text-style="{{themeMeta.textStyle}}" />
+<!-- 内层 view 作滚动容器，便于 WebKit 隐藏条；弹窗为 position:fixed 不受影响 -->
+<view class="page-native-scroll-host">
+  <view class="page-native-scroll-body">
 <view class="{{themeScopeClass}}">
 <view class="container">
   <!-- 用户信息卡片 -->
@@ -178,4 +181,6 @@
     </view>
   </view>
 </view>
+</view>
+  </view>
 </view>

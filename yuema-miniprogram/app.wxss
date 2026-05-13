@@ -18,6 +18,43 @@ page {
   line-height: 1.55;
   letter-spacing: 0.2rpx;
   background-color: transparent;
+  /* 全局：隐藏页面级纵向滚动条（保留滚动）；与下方 scroll-view 规则覆盖各 tab 页 */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* 全局：WebKit 内核下隐藏页面滚动条轨道（真机/开发者工具因系统绘制可能略有差异） */
+page::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+  background: transparent;
+}
+
+/* 全局：scroll-view 滚动条；WXML 须 show-scrollbar="{{false}}" 且 WebView 下须 enhanced="{{true}}" 才生效（见官方 scroll-view 说明） */
+scroll-view {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+scroll-view::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+  background: transparent;
+}
+
+/* 补全 WebKit 轨道/滑块/角落：部分内核仅隐藏 ::-webkit-scrollbar 仍会露出细灰条；scroll-view 须在 WXML 写 enhanced + show-scrollbar="{{false}}"（WebView 官方要求） */
+page::-webkit-scrollbar-track,
+page::-webkit-scrollbar-thumb,
+page::-webkit-scrollbar-corner,
+scroll-view::-webkit-scrollbar-track,
+scroll-view::-webkit-scrollbar-thumb,
+scroll-view::-webkit-scrollbar-corner {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+  background: transparent;
 }
 
 .font-display {
@@ -58,6 +95,46 @@ page {
   color: var(--text);
   background-color: var(--bg);
   background-image: linear-gradient(180deg, #fdfcfa 0%, var(--bg) 35%, var(--bg-soft) 100%);
+  /* 整页滚动若落在根 view 而非 page 时，与 page 一致隐藏滚动条（非滚动容器时不生效） */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+/* 与 page/scroll-view 同策略：根层成为滚动容器时隐藏 WebKit 滚动条 */
+.theme-scope::-webkit-scrollbar,
+.theme-scope::-webkit-scrollbar-track,
+.theme-scope::-webkit-scrollbar-thumb,
+.theme-scope::-webkit-scrollbar-corner {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+  background: transparent;
+}
+
+/* Tab 整页：page 上滚动条在部分 WebView 无法去掉，改为内层滚动容器；首页用 scroll-view 见 pages/index */
+.page-native-scroll-host {
+  height: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.page-native-scroll-body {
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.page-native-scroll-body::-webkit-scrollbar,
+.page-native-scroll-body::-webkit-scrollbar-track,
+.page-native-scroll-body::-webkit-scrollbar-thumb,
+.page-native-scroll-body::-webkit-scrollbar-corner {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+  background: transparent;
 }
 
 /* ---- 深色主题：暖灰炭底 + 同色相配强调（略提亮橙）---- */

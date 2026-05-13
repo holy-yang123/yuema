@@ -1,3 +1,13 @@
+/* 禁止 page 级滚动条；内层布局与 scroll-view 高度计算不变 */
+page {
+  height: 100%;
+  overflow: hidden;
+}
+
+.page-native-scroll-host {
+  height: 100%;
+}
+
 .container {
   display: flex;
   flex-direction: column;

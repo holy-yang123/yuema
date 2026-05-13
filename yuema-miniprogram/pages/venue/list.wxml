@@ -1,4 +1,7 @@
 <page-meta root-background-color="{{themeMeta.rootBg}}" background-color="{{themeMeta.bg}}" background-color-bottom="{{themeMeta.bgBottom}}" background-text-style="{{themeMeta.textStyle}}" />
+<!-- 锁 page 级滚动，避免与 scroll-view 并列时再出现整页滚动条（样式见 app.wxss） -->
+<view class="page-native-scroll-host">
+  <view class="page-native-scroll-body">
 <view class="{{themeScopeClass}}">
 <view class="container">
   <view class="header">
@@ -8,7 +11,8 @@
     </view>
   </view>
 
-  <scroll-view scroll-y class="venue-list" style="height: {{scrollViewHeightPx}}px" refresher-enabled refresher-background="{{themeMeta.bg}}" refresher-triggered="{{refreshing}}" bindrefresherrefresh="onRefresh">
+  <!-- enhanced：WebView 下 show-scrollbar 须配合 enhanced 才生效 -->
+  <scroll-view scroll-y enhanced="{{true}}" show-scrollbar="{{false}}" class="venue-list" style="height: {{scrollViewHeightPx}}px" refresher-enabled refresher-background="{{themeMeta.bg}}" refresher-triggered="{{refreshing}}" bindrefresherrefresh="onRefresh">
     <view class="venue-card" wx:for="{{filteredVenues}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}">
       <view class="venue-image">
         <image src="{{item.coverUrl}}" mode="aspectFill"></image>
@@ -32,4 +36,6 @@
     </view>
   </scroll-view>
 </view>
+</view>
+  </view>
 </view>

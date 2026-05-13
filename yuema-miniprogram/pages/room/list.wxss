@@ -1,3 +1,13 @@
+/* 禁止 page 自身滚动条；外层滚动由 .page-native-scroll-body（app.wxss），列表区由 hall-room-scroll */
+page {
+  height: 100%;
+  overflow: hidden;
+}
+
+.page-native-scroll-host {
+  height: 100%;
+}
+
 .container {
   display: flex;
   flex-direction: column;

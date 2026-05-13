@@ -1,4 +1,7 @@
 <page-meta root-background-color="{{themeMeta.rootBg}}" background-color="{{themeMeta.bg}}" background-color-bottom="{{themeMeta.bgBottom}}" background-text-style="{{themeMeta.textStyle}}" />
+<!-- 与「我的」一致：锁 page 滚动，避免整页原生滚动条；列表仍由内层 scroll-view 滚动 -->
+<view class="page-native-scroll-host">
+  <view class="page-native-scroll-body">
 <view class="{{themeScopeClass}}">
 <view class="container">
   <view class="header">
@@ -14,7 +17,8 @@
   </view>
 
   <!-- hall-room-scroll：与首页推荐区外层区分类名，避免样式语义混淆 -->
-  <scroll-view scroll-y class="hall-room-scroll" style="height: {{scrollViewHeightPx}}px" refresher-enabled refresher-background="{{themeMeta.bg}}" refresher-triggered="{{refreshing}}" bindrefresherrefresh="onRefresh">
+  <!-- enhanced：WebView 下 show-scrollbar 仅在与 enhanced 同开时生效（官方文档），用于真正隐藏纵向滚动条 -->
+  <scroll-view scroll-y enhanced="{{true}}" show-scrollbar="{{false}}" class="hall-room-scroll" style="height: {{scrollViewHeightPx}}px" refresher-enabled refresher-background="{{themeMeta.bg}}" refresher-triggered="{{refreshing}}" bindrefresherrefresh="onRefresh">
     <view class="room-card" wx:for="{{filteredRooms}}" wx:key="id" bindtap="goToDetail" data-id="{{item.id}}">
       <view class="room-card-header">
         <view class="room-card-left">
@@ -71,4 +75,6 @@
     <text class="plus">+</text>
   </view>
 </view>
+</view>
+  </view>
 </view>

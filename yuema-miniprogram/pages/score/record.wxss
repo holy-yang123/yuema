@@ -31,12 +31,22 @@
   top: 12vh;
   max-height: 75vh;
   overflow-y: auto;
+  /* 与 app.wxss 页面级一致：弹层内滚动不显示滚动条 */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
   background: var(--surface-solid);
   border: 1rpx solid rgba(20, 20, 19, 0.08);
   border-radius: 16rpx;
   padding: 28rpx;
   z-index: 210;
   box-shadow: 0 16rpx 48rpx rgba(20, 20, 19, 0.12);
+}
+
+.modify-modal::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+  background: transparent;
 }
 
 .modify-modal-title {

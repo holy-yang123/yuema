@@ -64,5 +64,6 @@
     "chooseLocation"
   ],
   "requiredBackgroundModes": ["audio"],
+  "lazyCodeLoading": "requiredComponents",
   "sitemapLocation": "sitemap.json"
 }

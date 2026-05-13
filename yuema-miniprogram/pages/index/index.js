@@ -12,6 +12,8 @@ Page({
     require('../../behaviors/authBehavior')
   ],
   data: {
+    /** scroll-view 自定义下拉刷新状态（替代页面 enablePullDownRefresh，避免 page 级滚动条） */
+    refreshing: false,
     roomList: [],
     venueList: [],
     loading: false,
@@ -32,9 +34,11 @@ Page({
     this.loadData();
   },
 
-  onPullDownRefresh() {
-    this.loadData().then(() => {
-      wx.stopPullDownRefresh();
+  onIndexRefresherRefresh() {
+    this.setData({ refreshing: true });
+    // loadData 在 loading 时可能同步 return undefined，须包一层 Promise 以便 finally 关闭 refresher
+    Promise.resolve(this.loadData()).finally(() => {
+      this.setData({ refreshing: false });
     });
   },
 

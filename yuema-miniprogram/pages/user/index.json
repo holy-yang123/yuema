@@ -1,4 +1,5 @@
 {
+  "component": true,
   "navigationBarTitleText": "我的",
   "backgroundColor": "#faf9f5",
   "backgroundTextStyle": "dark",

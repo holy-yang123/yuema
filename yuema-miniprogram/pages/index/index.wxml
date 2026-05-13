@@ -1,4 +1,7 @@
 <page-meta root-background-color="{{themeMeta.rootBg}}" background-color="{{themeMeta.bg}}" background-color-bottom="{{themeMeta.bgBottom}}" background-text-style="{{themeMeta.textStyle}}" />
+<!-- page 级滚动条难隐藏：用全高 scroll-view 承担纵向滚动 + 自定义下拉刷新（替代页面 enablePullDownRefresh） -->
+<view class="page-native-scroll-host">
+  <scroll-view class="index-tab-page-scroll" scroll-y enhanced="{{true}}" show-scrollbar="{{false}}" refresher-enabled="{{true}}" refresher-background="{{themeMeta.bg}}" refresher-triggered="{{refreshing}}" bindrefresherrefresh="onIndexRefresherRefresh">
 <view class="{{themeScopeClass}}">
 <view class="container home-page">
   <!-- 顶部问候 -->
@@ -176,4 +179,6 @@
     </view>
   </view>
 </view>
+</view>
+  </scroll-view>
 </view>

@@ -65,9 +65,23 @@ Component({
   },
 
   /** 页面生命周期 - 展示 */
-  onShow() {
-    if (this.data.isLoggedIn) {
-      app.getUserInfo(); // 刷新数据，通过 store 触发 observer
+  async onShow() {
+    if (!this.data.isLoggedIn) {
+      return;
+    }
+    // 显式 await 后同步衍生字段：避免仅依赖 observers 时，/user/info 返回后 phoneMenuStatus/胜率等仍不刷新
+    try {
+      await app.getUserInfo();
+    } catch (e) {
+      console.error('onShow 刷新用户信息失败:', e);
+    }
+    const raw = store.state.userInfo || {};
+    const u =
+      raw && (raw.id != null || raw.userId != null)
+        ? { ...raw, id: raw.id != null ? raw.id : raw.userId }
+        : null;
+    if (u && u.id != null) {
+      this.applyUserInfoDerivedData(u);
     }
   },
 
