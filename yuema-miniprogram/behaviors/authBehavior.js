@@ -16,7 +16,12 @@ module.exports = Behavior({
     attached() {
       // 订阅 Store 变化
       this._unsubscribeStore = store.subscribe((state) => {
-        const userInfo = state.userInfo || {};
+        const raw = state.userInfo || {};
+        // 登录接口 data 用 userId，/user/info 返回实体字段 id；只认 id 会导致「头像/昵称已有仍显示访客与登录按钮」
+        const userInfo =
+          raw && (raw.id != null || raw.userId != null)
+            ? { ...raw, id: raw.id != null ? raw.id : raw.userId }
+            : raw;
         const patch = {
           userInfo,
           isLoggedIn: !!state.token,
